@@ -1,0 +1,24 @@
+{
+  "originHash" : "4d1136f771a13ce9e974c4f47302adb1c296c536fd3912b18c64c9fa720f474c",
+  "pins" : [
+    {
+      "identity" : "keychainaccess",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
+      "state" : {
+        "branch" : "master",
+        "revision" : "e0c7eebc5a4465a3c4680764f26b7a61f567cdaf"
+      }
+    },
+    {
+      "identity" : "linkheaderparser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Frizlab/LinkHeaderParser.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "1c58f73654b70ed1582cdbaca4e39e7256cc6254"
+      }
+    }
+  ],
+  "version" : 3
+}
