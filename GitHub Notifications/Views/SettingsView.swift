@@ -21,23 +21,24 @@ struct SettingsView: View {
                 }
                 .buttonStyle(BorderlessButtonStyle())
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top)
             
             ScrollView {
                 content
                     .padding(.horizontal)
-                    .frame(maxHeight: .infinity, alignment: .top)
             }
+            .padding(.trailing, 10)
             
             HStack {
-                Button(action: { NSApplication.shared.terminate(nil) }) {
-                    Text("Quit App")
-                }
+                Button("Quit App", action: { NSApplication.shared.terminate(nil) })
                 Spacer()
                 Button("Save Settings", action: configViewModel.saveSettings)
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.bottom)
         }
+        .background(.windowBackground)
     }
     
     func addExcludedUserEntry() {
@@ -62,6 +63,7 @@ struct SettingsView: View {
                     .disabled(!configViewModel.useSeparateGraphUrl)
                 SecureField("GitHub PAT", text: $configViewModel.token)
             }
+            Divider()
             Section("Ignore PRs with only the following contributors:") {
                 VStack {
                     ForEach($configViewModel.excludedUsers.enumerated().map({$0}), id: \.element.id) { index, $item in
@@ -74,6 +76,12 @@ struct SettingsView: View {
                 }
                 
                 Button("Add Entry", action: addExcludedUserEntry)
+            }
+            Divider()
+            Section("Additional Settings") {
+                Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
+                    Text("Close window when opening a link, press CMD on click to get opposite behaviour")
+                }
             }
         }
     }

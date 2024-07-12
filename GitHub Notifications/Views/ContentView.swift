@@ -8,13 +8,23 @@
 import SwiftUI
 
 struct ContentView: View {
+    var closeWindow: () -> Void
+    
     @ObservedObject var pullRequestsViewModel = PullRequestsViewModel()
     @ObservedObject var configViewModel = ConfigViewModel()
     @State var settingsOpen = false
     
-    init() {
+    init(closeWindow: @escaping () -> Void) {
+        self.closeWindow = closeWindow
         pullRequestsViewModel.triggerFetchPullRequests()
         pullRequestsViewModel.startFetchTimer()
+    }
+    
+    func modifierLinkAction(modifierPressed: Bool) {
+        print(modifierPressed)
+        if ConfigService.closeWindowOnLinkClick != modifierPressed {
+            closeWindow()
+        }
     }
 
     var body: some View {
@@ -28,7 +38,7 @@ struct ContentView: View {
     @ViewBuilder
     var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
-            PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests)
+            PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests, modifierLinkAction: modifierLinkAction)
         } else if pullRequestsViewModel.hasError {
             Image(systemName: "icloud.slash")
                 .font(.largeTitle)
@@ -57,5 +67,5 @@ struct ContentView: View {
 }
 
 #Preview(traits: .fixedLayout(width: 600, height: 400)) {
-    ContentView()
+    ContentView(closeWindow: {})
 }

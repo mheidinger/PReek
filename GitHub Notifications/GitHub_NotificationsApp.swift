@@ -6,14 +6,19 @@
 //
 
 import SwiftUI
+import MenuBarExtraAccess
 
 @main
 struct GitHub_NotificationsApp: App {
+    @State var isMenuPresented: Bool = false
+    
     var body: some Scene {
         MenuBarExtra("GitHub Notifications", image: "MenuBarIcon") {
-            ContentView()
+            ContentView(closeWindow: { isMenuPresented = false })
+                .frame(width: 600, height: 400)
         }
         .menuBarExtraStyle(.window)
         .defaultSize(width: 600, height: 400)
+        .menuBarExtraAccess(isPresented: $isMenuPresented)
     }
 }

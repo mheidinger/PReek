@@ -20,6 +20,8 @@ class PullRequestsViewModel: ObservableObject {
             return pullRequest.events.allSatisfy { event in
                 return !ConfigService.excludedUsers.contains(event.user.login)
             }
+        }.sorted {
+            $0.lastUpdated > $1.lastUpdated
         }
     }
     

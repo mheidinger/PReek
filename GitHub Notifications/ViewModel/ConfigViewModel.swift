@@ -22,6 +22,8 @@ class ConfigViewModel: ObservableObject {
     
     @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { username in return ExcludedUser(username: username)}
     
+    @Published var closeWindowOnLinkClick: Bool = ConfigService.closeWindowOnLinkClick
+    
     func saveSettings() {
         ConfigService.apiBaseUrl = apiBaseUrl
         if useSeparateGraphUrl {
@@ -31,5 +33,6 @@ class ConfigViewModel: ObservableObject {
         }
         ConfigService.token = token
         ConfigService.excludedUsers = excludedUsers.map { excludedUser in return excludedUser.username }
+        ConfigService.closeWindowOnLinkClick = closeWindowOnLinkClick
     }
 }

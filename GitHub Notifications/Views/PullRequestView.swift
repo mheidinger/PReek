@@ -21,6 +21,8 @@ struct PullRequestHeaderView: View {
     
     @Binding var sectionExpanded: Bool
     
+    var modifierLinkAction: ModifierLink.AdditionalActionProcessor?
+    
     var body: some View {
         HStack(spacing: 10) {
             HStack {
@@ -37,32 +39,32 @@ struct PullRequestHeaderView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 5) {
                     HStack {
-                        Link(destination: pullRequest.repository.url) {
+                        ModifierLink(destination: pullRequest.repository.url, additionalAction: modifierLinkAction) {
                             Text(pullRequest.repository.name)
+                                .foregroundStyle(.primary)
                                 .multilineTextAlignment(.leading)
                         }
-                            .pointingHandCursor()
-                            .foregroundStyle(.primary)
-                        Link(pullRequest.numberFormatted, destination: pullRequest.url)
-                            .pointingHandCursor()
-                            .monospaced()
-                            .foregroundStyle(.secondary)
+                        ModifierLink(destination: pullRequest.url, additionalAction: modifierLinkAction) {
+                            Text(pullRequest.numberFormatted)
+                                .foregroundStyle(.secondary)
+                                .monospaced()
+                        }
                     }
-                    Link(destination: pullRequest.url) {
+                    ModifierLink(destination: pullRequest.url, additionalAction: modifierLinkAction) {
                         Text(pullRequest.title)
+                            .foregroundStyle(.primary)
                             .multilineTextAlignment(.leading)
+                            .frame(width: 250, alignment: .leading)
+                            .lineLimit(2)
                     }
-                        .pointingHandCursor()
-                        .foregroundStyle(.primary)
-                        .frame(width: 250, alignment: .leading)
-                        .lineLimit(2)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 5) {
                     if let authorUrl = pullRequest.author.url {
-                        Link("by \(pullRequest.author.login)", destination: authorUrl)
-                            .pointingHandCursor()
-                            .foregroundStyle(.secondary)
+                        ModifierLink(destination: authorUrl, additionalAction: modifierLinkAction) {
+                            Text("by \(pullRequest.author.login)")
+                                .foregroundStyle(.secondary)
+                        }
                     } else {
                         Text("by \(pullRequest.author.login)")
                             .foregroundStyle(.secondary)
@@ -135,10 +137,11 @@ struct PullRequestContentView: View {
 }
 
 struct PullRequestView: View {
+    var pullRequest: PullRequest
+    var modifierLinkAction: ModifierLink.AdditionalActionProcessor?
+    
     @AppStorage("pullRequestReadMap") var pullRequestReadMap: [String: Date] = [:]
     @State var sectionExpanded: Bool = false
-    
-    var pullRequest: PullRequest
 
     var isRead: Bool {
         guard let markedRead = pullRequestReadMap[pullRequest.id] else {
@@ -168,7 +171,9 @@ struct PullRequestView: View {
                         pullRequest: pullRequest,
                         isRead: isRead,
                         toggleRead: toggleRead,
-                        sectionExpanded: $sectionExpanded)
+                        sectionExpanded: $sectionExpanded,
+                        modifierLinkAction: modifierLinkAction
+                    )
                     .frame(maxWidth: .infinity)
                 }
             )
@@ -179,8 +184,8 @@ struct PullRequestView: View {
 
 #Preview {
     PullRequestView(
-        sectionExpanded: true,
-        pullRequest: PullRequest.preview()
+        pullRequest: PullRequest.preview(),
+        sectionExpanded: true
     )
     .padding()
 }

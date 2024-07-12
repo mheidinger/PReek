@@ -17,4 +17,10 @@ class ConfigService {
         set { excludedUsersStr = newValue.joined(separator: "|") }
         get { return excludedUsersStr.split(separator: "|").map { subString in return String(subString)} }
     }
+    
+    @KeychainStorage("closeWindowOnLinkClick") private static var closeWindowOnLinkClickStr: String = "true"
+    static var closeWindowOnLinkClick: Bool {
+        set { closeWindowOnLinkClickStr = newValue ? "true" : "false" }
+        get { return closeWindowOnLinkClickStr == "true" }
+    }
 }

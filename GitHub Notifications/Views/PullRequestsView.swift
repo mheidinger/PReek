@@ -9,23 +9,18 @@ import SwiftUI
 
 struct PullRequestsView: View {
     var pullRequests: [PullRequest]
+    var modifierLinkAction: ModifierLink.AdditionalActionProcessor?
     
     var body: some View {
         ScrollView {
             VStack(spacing: 10) {
                 DividedView {
-                    ForEach(sortedPullRequests) { pullRequest in
-                        PullRequestView(pullRequest: pullRequest)
+                    ForEach(pullRequests) { pullRequest in
+                        PullRequestView(pullRequest: pullRequest, modifierLinkAction: modifierLinkAction)
                     }
                 }
             }
             .padding([.horizontal, .top])
-        }
-    }
-    
-    var sortedPullRequests: [PullRequest] {
-        pullRequests.map { $0 }.sorted {
-            $0.lastUpdated > $1.lastUpdated
         }
     }
 }
