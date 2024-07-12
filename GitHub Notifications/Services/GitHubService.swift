@@ -45,7 +45,7 @@ class GitHubService {
     }
     
     // When since is set to nil, will default to notifications from the last week
-    static func fetchUserNotifications(since: Date? = nil) async throws -> [Notification] {
+    static func fetchUserNotifications(since: Date? = nil, onNotificationsReceived: ([Notification]) async throws -> Void) async throws {
         let fallbackSince = Date().addingTimeInterval(-604800) // substract 1 week in seconds
         var url: URL? = try baseUrl().appending(path: "notifications")
             .appending(queryItems: [
@@ -53,8 +53,6 @@ class GitHubService {
                 URLQueryItem(name: "since", value: (since ?? fallbackSince).formatted(.iso8601))
             ])
         
-        
-        var notifications: [Notification] = []
         repeat {
             var request = URLRequest(url: url!)
             request.httpMethod = "GET"
@@ -62,7 +60,7 @@ class GitHubService {
             let (data, response) = try await sendRequest(request: request)
             
             let parsedData = try decoder.decode([NotificationDto].self, from: data)
-            notifications += toNotifications(dtos: parsedData)
+            try await onNotificationsReceived(toNotifications(dtos: parsedData)) // TODO: Let this run async?
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 break
@@ -81,8 +79,6 @@ class GitHubService {
                 url = nil
             }
         } while url != nil
-        
-        return notifications
     }
     
     static func fetchPullRequests(repoMap: [String: [Int]]) async throws -> [PullRequest] {
