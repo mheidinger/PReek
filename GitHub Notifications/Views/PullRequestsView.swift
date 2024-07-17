@@ -10,10 +10,10 @@ import SwiftUI
 struct PullRequestsView: View {
     var pullRequests: [PullRequest]
     var modifierLinkAction: ModifierLink.AdditionalActionProcessor?
-    
+
     var body: some View {
         ScrollView {
-            VStack(spacing: 10) {
+            LazyVStack(spacing: 4) {
                 DividedView {
                     ForEach(pullRequests) { pullRequest in
                         PullRequestView(pullRequest: pullRequest, modifierLinkAction: modifierLinkAction)
