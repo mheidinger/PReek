@@ -1,6 +1,6 @@
 # GitHub Notifications MacOS Menu Bar Widget
 
-~Project is very much in progress, use with caution!~
+*Project is very much in progress, use with caution!*
 
 ## TODOs
 
