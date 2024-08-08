@@ -18,6 +18,7 @@ struct PullRequestDto: Decodable {
     struct User: Decodable {
         var login: String
         var url: String
+        var name: String?
     }
     
     struct Repository: Decodable {

@@ -141,7 +141,7 @@ struct PullRequestEventView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(pullRequestEvent.user.login).frame(width: 200, alignment: .leading)
+                Text(pullRequestEvent.user.displayName).frame(width: 200, alignment: .leading)
                 Spacer()
                 Text(eventDataToActionLabel(data: pullRequestEvent.data)).frame(width: 150, alignment: .trailing)
                 Spacer()

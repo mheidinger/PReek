@@ -22,6 +22,7 @@ struct PullRequest: Identifiable {
     let number: Int
     let status: Status
     let lastUpdated: Date
+    let lastNonViewerUpdated: Date
     let events: [PullRequestEvent]
     let url: URL
     
@@ -38,6 +39,7 @@ struct PullRequest: Identifiable {
             number: 5312,
             status: status ?? .open,
             lastUpdated: Date(),
+            lastNonViewerUpdated: Date(),
             events: events ?? [
                 PullRequestEvent.previewMerged,
                 PullRequestEvent.previewReview(),

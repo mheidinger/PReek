@@ -7,8 +7,42 @@
 
 import Foundation
 
+private struct DynamicCodingKeys: CodingKey {
+    var stringValue: String
+    init?(stringValue: String) {
+        self.stringValue = stringValue
+    }
+    var intValue: Int?
+    init?(intValue: Int) {
+        return nil
+    }
+}
+
 struct FetchPullRequestsResponse: Decodable {
-    var data: [String: [String: PullRequestDto]]
+    typealias PullRequestDtoMap = [String: PullRequestDto]
+    typealias RepositoryDtoMap = [String: PullRequestDtoMap]
+    
+    struct Data: Decodable {
+        let viewer: PullRequestDto.User
+        let repoMap: RepositoryDtoMap
+        
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
+            
+            viewer = try container.decode(PullRequestDto.User.self, forKey: DynamicCodingKeys(stringValue: "viewer")!)
+            
+            var repos = RepositoryDtoMap()
+            for key in container.allKeys {
+                if key.stringValue.starts(with: "repo") {
+                    let repo = try container.decode(PullRequestDtoMap.self, forKey: key)
+                    repos[key.stringValue] = repo
+                }
+            }
+            repoMap = repos
+        }
+    }
+    
+    let data: Data
 }
 
 struct FetchPullRequestsQueryBuilder {
@@ -38,16 +72,27 @@ struct FetchPullRequestsQueryBuilder {
             \(pullRequestFragment)
             
             query pullRequests {
-                \(queryContent)
+              viewer {
+                ...ActorFragment
+              }
+            
+              \(queryContent)
             }
             """
     }
     
     private static let pullRequestFragment = """
+        fragment ActorFragment on Actor {
+          login
+          url
+          ... on User {
+            name
+          }
+        }
+        
         fragment PullRequestReviewFragment on PullRequestReview {
           author {
-            login
-            url
+            ...ActorFragment
           }
           bodyText
           state
@@ -56,8 +101,7 @@ struct FetchPullRequestsQueryBuilder {
             nodes {
               id
               author {
-                login
-                url
+                ...ActorFragment
               }
               bodyText
               createdAt
@@ -70,7 +114,7 @@ struct FetchPullRequestsQueryBuilder {
             }
           }
         }
-
+        
         fragment PullRequestFragment on PullRequest {
           id
           state
@@ -78,8 +122,7 @@ struct FetchPullRequestsQueryBuilder {
           number
           updatedAt
           author {
-            login
-            url
+            ...ActorFragment
           }
           repository {
             nameWithOwner
@@ -95,30 +138,26 @@ struct FetchPullRequestsQueryBuilder {
               }
               ... on ClosedEvent {
                 actor {
-                  login
-                  url
+                  ...ActorFragment
                 }
                 createdAt
               }
               ... on HeadRefForcePushedEvent {
                 actor {
-                  login
-                  url
+                  ...ActorFragment
                 }
                 createdAt
               }
               ... on IssueComment {
                 author {
-                  login
-                  url
+                  ...ActorFragment
                 }
                 bodyText
                 createdAt
               }
               ... on MergedEvent {
                 actor {
-                  login
-                  url
+                  ...ActorFragment
                 }
                 createdAt
               }
@@ -126,8 +165,7 @@ struct FetchPullRequestsQueryBuilder {
                 commit {
                   author {
                     user {
-                      login
-                      url
+                      ...ActorFragment
                     }
                   }
                   committedDate
@@ -138,15 +176,13 @@ struct FetchPullRequestsQueryBuilder {
               }
               ... on ReadyForReviewEvent {
                 actor {
-                  login
-                  url
+                  ...ActorFragment
                 }
                 createdAt
               }
               ... on RenamedTitleEvent {
                 actor {
-                  login
-                  url
+                  ...ActorFragment
                 }
                 createdAt
                 currentTitle
@@ -154,21 +190,18 @@ struct FetchPullRequestsQueryBuilder {
               }
               ... on ReopenedEvent {
                 actor {
-                  login
-                  url
+                  ...ActorFragment
                 }
                 createdAt
               }
               ... on ReviewRequestedEvent {
                 actor {
-                  login
-                  url
+                  ...ActorFragment
                 }
                 createdAt
                 requestedReviewer {
                   ... on Actor {
-                    login
-                    url
+                    ...ActorFragment
                   }
                 }
               }
@@ -176,5 +209,4 @@ struct FetchPullRequestsQueryBuilder {
           }
         }
         """
-
 }

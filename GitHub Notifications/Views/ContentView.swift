@@ -21,12 +21,11 @@ struct ContentView: View {
     }
     
     func modifierLinkAction(modifierPressed: Bool) {
-        print(modifierPressed)
         if ConfigService.closeWindowOnLinkClick != modifierPressed {
             closeWindow()
         }
     }
-
+    
     var body: some View {
         if settingsOpen {
             SettingsView(settingsOpen: $settingsOpen, configViewModel: configViewModel)

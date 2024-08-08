@@ -67,7 +67,7 @@ class PullRequestsViewModel: ObservableObject {
                 self.isRefreshing = true
                 self.hasError = false
             }
-                      
+            
             try await GitHubService.fetchUserNotifications(since: lastUpdated, onNotificationsReceived: handleReceivedNotifications)
             
             DispatchQueue.main.async {

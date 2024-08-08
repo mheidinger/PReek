@@ -27,6 +27,7 @@ private func toUser(user: PullRequestDto.User?) -> User {
     
     return User(
         login: user.login,
+        displayName: user.name,
         url: URL(string: user.url)
     )
 }
@@ -81,7 +82,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
     case .ReopenedEvent:
         return (PullRequestEventReopenedData(), false)
     case .ReviewRequestedEvent:
-        return (PullRequestEventReviewRequestedData(requestedReviewer: timelineItem.requestedReviewer?.login), false)
+        return (PullRequestEventReviewRequestedData(requestedReviewer: timelineItem.requestedReviewer?.name ?? timelineItem.requestedReviewer?.login), false)
     default:
         return (nil, false)
     }
@@ -119,9 +120,13 @@ private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem])
     }
 }
 
-private func toPullRequest(dto: PullRequestDto) -> PullRequest {
+private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> PullRequest {
     let events = timelineItemsToEvents(timelineItems: dto.timelineItems.nodes ?? []).sorted {
         $0.time > $1.time
+    }
+    
+    let lastNonViewerUpdated = events.first { event in
+        event.user.login != viewer.login
     }
     
     return PullRequest(
@@ -132,11 +137,12 @@ private func toPullRequest(dto: PullRequestDto) -> PullRequest {
         number: dto.number,
         status: dto.isDraft ? PullRequest.Status.draft : (pullRequestStatus[dto.state] ?? PullRequest.Status.open),
         lastUpdated: dto.updatedAt,
+        lastNonViewerUpdated: lastNonViewerUpdated?.time ?? dto.updatedAt,
         events: events,
         url: URL(string: dto.url) ?? URL(string: "https://invalid.data")!
     )
 }
 
-func toPullRequests(dtos: [PullRequestDto]) -> [PullRequest] {
-    return dtos.map(toPullRequest)
+func toPullRequests(dtos: [PullRequestDto], viewer: PullRequestDto.User) -> [PullRequest] {
+    return dtos.map({ toPullRequest(dto: $0, viewer: viewer) })
 }

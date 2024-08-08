@@ -48,12 +48,12 @@ struct PullRequestHeaderView: View {
                         .foregroundStyle(.primary)
                         if let authorUrl = pullRequest.author.url {
                             ModifierLink(destination: authorUrl, additionalAction: modifierLinkAction) {
-                                Text("by \(pullRequest.author.login)")
+                                Text("by \(pullRequest.author.displayName)")
                             }
                             .foregroundStyle(.secondary)
                             .textScale(.secondary)
                         } else {
-                            Text("by \(pullRequest.author.login)")
+                            Text("by \(pullRequest.author.displayName)")
                                 .foregroundStyle(.secondary)
                                 .textScale(.secondary)
                         }
@@ -134,7 +134,7 @@ struct PullRequestView: View {
         guard let markedRead = pullRequestReadMap[pullRequest.id] else {
             return false
         }
-        return markedRead > pullRequest.lastUpdated
+        return markedRead > pullRequest.lastNonViewerUpdated
     }
     
     func toggleRead() {
@@ -157,9 +157,11 @@ struct PullRequestView: View {
 }
 
 #Preview {
-    PullRequestView(
-        pullRequest: PullRequest.preview(),
-        sectionExpanded: true
-    )
+    ScrollView {
+        PullRequestView(
+            pullRequest: PullRequest.preview(),
+            sectionExpanded: true
+        )
+    }
     .padding()
 }

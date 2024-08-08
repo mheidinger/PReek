@@ -43,4 +43,4 @@
   - [ ] Closed / Merged PRs older than X days
 - [ ] Filters on `PullRequestsView`
 - [ ] Mark all as read (all, selection, all closed, ?)
-- [ ] Don't mark as unread if last modification is from user
+- [x] Don't mark as unread if last modification is from user

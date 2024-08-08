@@ -89,8 +89,8 @@ class GitHubService {
         
         let (data, _) = try await sendRequest(request: request)
         let parsedData = try decoder.decode(FetchPullRequestsResponse.self, from: data)
-        let dtos = parsedData.data.flatMap { $0.value.compactMap { $0.value } }
-        return toPullRequests(dtos: dtos)
+        let dtos = parsedData.data.repoMap.flatMap { $0.value.compactMap { $0.value } }
+        return toPullRequests(dtos: dtos, viewer: parsedData.data.viewer)
     }
     
     static private func sendRequest(request: URLRequest) async throws -> (Data, URLResponse) {

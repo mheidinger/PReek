@@ -22,13 +22,13 @@ extension CaseIterableDefaultsLast {
 extension Dictionary: RawRepresentable where Key == String, Value == Date {
     public init?(rawValue: String) {
         guard let data = rawValue.data(using: .utf8), // convert from String to Data
-            let result = try? JSONDecoder().decode([String:Date].self, from: data)
+              let result = try? JSONDecoder().decode([String:Date].self, from: data)
         else {
             return nil
         }
         self = result
     }
-
+    
     public var rawValue: String {
         guard let data = try? JSONEncoder().encode(self), // data is Data type
               let result = String(data: data, encoding: .utf8)

@@ -41,14 +41,14 @@ struct ModifierLink<Label: View>: View {
             openURL(destination)
             additionalAction?(NSEvent.modifierFlags.contains(convertToNSEventModifierFlags(modifiers)))
         }, label: label)
-            .buttonStyle(PlainButtonStyle())
-            .onHover { inside in
-                if inside {
-                    NSCursor.pointingHand.set()
-                } else {
-                    NSCursor.arrow.set()
-                }
+        .buttonStyle(PlainButtonStyle())
+        .onHover { inside in
+            if inside {
+                NSCursor.pointingHand.set()
+            } else {
+                NSCursor.arrow.set()
             }
+        }
     }
 }
 
@@ -58,5 +58,5 @@ struct ModifierLink<Label: View>: View {
     }) {
         Text("Click Me!")
     }
-        .padding()
+    .padding()
 }

@@ -10,7 +10,7 @@ import SwiftUI
 struct PullRequestsView: View {
     var pullRequests: [PullRequest]
     var modifierLinkAction: ModifierLink.AdditionalActionProcessor?
-
+    
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 4) {
@@ -20,7 +20,8 @@ struct PullRequestsView: View {
                     }
                 }
             }
-            .padding([.horizontal, .top])
+            .padding(.horizontal)
+            .padding(.top, 5)
         }
     }
 }
