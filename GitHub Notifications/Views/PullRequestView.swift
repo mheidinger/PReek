@@ -28,42 +28,49 @@ struct PullRequestHeaderView: View {
                 .imageScale(.large)
             
             HStack(alignment: .top) {
-                VStack(alignment:.leading, spacing: 5) {
-                    ModifierLink(destination: pullRequest.url, additionalAction: modifierLinkAction) {
-                        Text(pullRequest.title)
-                            .multilineTextAlignment(.leading)
-                            .lineLimit(2)
-                    }
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                    HStack(spacing: 5) {
-                        ModifierLink(destination: pullRequest.url, additionalAction: modifierLinkAction){
-                            Text(pullRequest.numberFormatted)
-                        }
-                        .foregroundStyle(.primary)
-                        Text("in")
+                VStack(alignment:.leading, spacing: 3) {
+                    HStack {
                         ModifierLink(destination: pullRequest.repository.url, additionalAction: modifierLinkAction) {
                             Text(pullRequest.repository.name)
                         }
-                        .foregroundStyle(.primary)
+                        ModifierLink(destination: pullRequest.url, additionalAction: modifierLinkAction){
+                            Text(pullRequest.numberFormatted)
+                        }
+                        .foregroundColor(.secondary)
+                    }
+                    HStack {
+                        ModifierLink(destination: pullRequest.url, additionalAction: modifierLinkAction) {
+                            Text(pullRequest.title)
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(2)
+                        }
+                        .font(.headline)
+                    }
+                    HStack(spacing: 5) {
                         if let authorUrl = pullRequest.author.url {
                             ModifierLink(destination: authorUrl, additionalAction: modifierLinkAction) {
                                 Text("by \(pullRequest.author.displayName)")
                             }
-                            .foregroundStyle(.secondary)
-                            .textScale(.secondary)
                         } else {
                             Text("by \(pullRequest.author.displayName)")
-                                .foregroundStyle(.secondary)
-                                .textScale(.secondary)
                         }
                         Text("·")
-                            .foregroundStyle(.secondary)
-                            .textScale(.secondary)
                         Text("updated at \(pullRequest.lastUpdated.formatted(date: .omitted, time: .shortened))")
-                            .foregroundStyle(.secondary)
-                            .textScale(.secondary)
+                        Text("·")
+                        
+                        ModifierLink(destination: pullRequest.filesUrl, additionalAction: modifierLinkAction) {
+                            HStack(spacing: 2) {
+                                Text(pullRequest.additionsFormatted)
+                                    .foregroundStyle(.green)
+                                Text(pullRequest.deletionsFormatted)
+                                    .foregroundStyle(.red)
+                            }
+                        }
+                        
                     }
+                    .foregroundStyle(.secondary)
+                    .textScale(.secondary)
+                    .padding(.top, -3)
                 }
                 Spacer()
             }
@@ -73,9 +80,9 @@ struct PullRequestHeaderView: View {
                 .imageScale(.medium)
                 .foregroundStyle(.blue)
                 .onTapGesture(perform: toggleRead)
-                .padding(.leading, 10)
         }
         .padding(.horizontal)
+        .padding(.bottom, 5)
         .frame(maxWidth: .infinity)
     }
 }

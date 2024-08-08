@@ -29,7 +29,7 @@ struct PullRequestsView: View {
 #Preview {
     PullRequestsView(pullRequests: [
         PullRequest.preview(title: "short"),
-        PullRequest.preview(title: "asdsadasdasdaaaaaaasssssssssssssssssssssssssssaaaaaaa"),
+        PullRequest.preview(title: "long long long long long long long long long long long long long long long long long long"),
         PullRequest.preview(),
         PullRequest.preview(),
         PullRequest.preview(),

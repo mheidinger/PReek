@@ -139,7 +139,9 @@ private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> 
         lastUpdated: dto.updatedAt,
         lastNonViewerUpdated: lastNonViewerUpdated?.time ?? dto.updatedAt,
         events: events,
-        url: URL(string: dto.url) ?? URL(string: "https://invalid.data")!
+        url: URL(string: dto.url) ?? URL(string: "https://invalid.data")!,
+        additions: dto.additions,
+        deletions: dto.deletions
     )
 }
 

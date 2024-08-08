@@ -118,4 +118,6 @@ struct PullRequestDto: Decodable {
     var repository: Repository
     var timelineItems: TimelineItems
     var url: String
+    var additions: Int
+    var deletions: Int
 }

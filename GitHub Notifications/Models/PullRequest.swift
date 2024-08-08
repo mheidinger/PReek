@@ -25,9 +25,23 @@ struct PullRequest: Identifiable {
     let lastNonViewerUpdated: Date
     let events: [PullRequestEvent]
     let url: URL
+    let additions: Int
+    let deletions: Int
     
     var numberFormatted: String {
         "#\(number.formatted(.number .grouping(.never)))"
+    }
+    
+    var additionsFormatted: String {
+        "+\(additions.formatted(.number))"
+    }
+    
+    var deletionsFormatted: String {
+        "-\(deletions.formatted(.number))"
+    }
+    
+    var filesUrl: URL {
+        return url.appendingPathComponent("files")
     }
     
     static func preview(title: String? = nil, status: Status? = nil, events: [PullRequestEvent]? = nil) -> PullRequest {
@@ -45,7 +59,9 @@ struct PullRequest: Identifiable {
                 PullRequestEvent.previewReview(),
                 PullRequestEvent.previewComment
             ],
-            url: URL(string: "https://example.com")!
+            url: URL(string: "https://example.com")!,
+            additions: 123456,
+            deletions: 654321
         )
     }
 }

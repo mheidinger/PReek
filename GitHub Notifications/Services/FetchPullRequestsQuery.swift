@@ -130,6 +130,8 @@ struct FetchPullRequestsQueryBuilder {
           }
           isDraft
           url
+          additions
+          deletions
           timelineItems(last: 30) {
             nodes {
               type: __typename
