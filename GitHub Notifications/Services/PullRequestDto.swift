@@ -65,6 +65,8 @@ struct PullRequestDto: Decodable {
         var createdAt: Date?
         /// all except PullRequestReview (author.user), PullRequestCommit (commit.author.user)
         var actor: User?
+        /// all except HeadRefForcePushedEvent (`/files`), PullRequestCommit (commit.url), RenamedTitleEvent, ReopenedEvent, ReviewRequestedEvent
+        var url: String?
         /// PullRequestCommit
         var commit: Commit?
         /// PullRequestReview and IssueCommit
@@ -83,6 +85,7 @@ struct PullRequestDto: Decodable {
     struct Commit: Decodable {
         var author: CommitAuthor?
         var committedDate: Date
+        var url: String
     }
     
     struct CommitAuthor: Decodable {

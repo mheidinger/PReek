@@ -32,11 +32,11 @@
   - [ ] Filters
     - [ ] Only `participating` notifications
     - [x] Exclude author list
-- [ ] Links / Buttons to open in Browser
+- [x] Links / Buttons to open in Browser
   - [x] Repository
   - [x] PR itself
-  - [ ] Events?
-  - [ ] Changes?
+  - [x] Events
+  - [x] Changes
 - [x] Data loading optimization
 - [ ] Get rid of old data?
   - [ ] Marked as read information older than X days + no longer in PR list
@@ -44,3 +44,5 @@
 - [ ] Filters on `PullRequestsView`
 - [ ] Mark all as read (all, selection, all closed, ?)
 - [x] Don't mark as unread if last modification is from user
+- [ ] Better link placement for events?
+- [ ] Link commits (and maybe force pushed?) not to commit directly but filtered files page

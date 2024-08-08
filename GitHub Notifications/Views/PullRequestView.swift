@@ -82,7 +82,6 @@ struct PullRequestHeaderView: View {
                 .onTapGesture(perform: toggleRead)
         }
         .padding(.horizontal)
-        .padding(.bottom, 5)
         .frame(maxWidth: .infinity)
     }
 }
@@ -110,7 +109,11 @@ struct PullRequestContentView: View {
         VStack {
             DividedView {
                 ForEach(pullRequest.events[0..<eventLimit]) { event in
-                    PullRequestEventView(pullRequestEvent: event)
+                    PullRequestEventView(
+                        pullRequestEvent: event,
+                        pullRequestUrl: pullRequest.url,
+                        pullRequestFilesUrl: pullRequest.filesUrl
+                    )
                 }
                 if (self.eventLimit < pullRequest.events.count) {
                     Button(action: loadMore) {
@@ -120,6 +123,7 @@ struct PullRequestContentView: View {
             }
         }
         .padding(.leading, 30)
+        .padding(.vertical, 5)
     }
     
     var body: some View {

@@ -97,6 +97,7 @@ struct FetchPullRequestsQueryBuilder {
           bodyText
           state
           createdAt
+          url
           comments(last: 30) {
             nodes {
               id
@@ -143,6 +144,7 @@ struct FetchPullRequestsQueryBuilder {
                   ...ActorFragment
                 }
                 createdAt
+                url
               }
               ... on HeadRefForcePushedEvent {
                 actor {
@@ -156,12 +158,14 @@ struct FetchPullRequestsQueryBuilder {
                 }
                 bodyText
                 createdAt
+                url
               }
               ... on MergedEvent {
                 actor {
                   ...ActorFragment
                 }
                 createdAt
+                url
               }
               ... on PullRequestCommit {
                 commit {
@@ -171,6 +175,7 @@ struct FetchPullRequestsQueryBuilder {
                     }
                   }
                   committedDate
+                  url
                 }
               }
               ... on PullRequestReview {
@@ -181,6 +186,7 @@ struct FetchPullRequestsQueryBuilder {
                   ...ActorFragment
                 }
                 createdAt
+                url
               }
               ... on RenamedTitleEvent {
                 actor {

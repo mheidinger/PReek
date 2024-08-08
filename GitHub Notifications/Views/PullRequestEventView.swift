@@ -23,16 +23,20 @@ func reviewCommentToCommentPrefix(comment: PullRequestReviewComment) -> String? 
 struct PullRequestEventDataView: View {
     var data: any PullRequestEventData
     
+    private func formatCommitCount(commitCount: Int) -> String {
+        return "\(commitCount) Commit\(commitCount > 1 ? "s" : "")"
+    }
+    
     var body: some View {
         switch (data) {
         case let forcePushData as PullRequestEventForcePushedData:
-            if forcePushData.commitCount != nil {
-                Text("\(forcePushData.commitCount!) Commits")
+            if let commitCount = forcePushData.commitCount {
+                Text(formatCommitCount(commitCount: commitCount))
             } else {
                 EmptyView()
             }
         case let commitData as PullRequestEventCommitData:
-            Text("\(commitData.commitCount) Commits")
+            Text(formatCommitCount(commitCount: commitData.commitCount))
         case let reviewData as PullRequestEventReviewData:
             if !reviewData.comments.isEmpty {
                 VStack(alignment: .leading, spacing: 5) {
@@ -137,6 +141,20 @@ func eventDataToActionLabel(data: any PullRequestEventData) -> String {
 
 struct PullRequestEventView: View {
     var pullRequestEvent: PullRequestEvent
+    var pullRequestUrl: URL
+    var pullRequestFilesUrl: URL
+    
+    func getEventUrl() -> URL {
+        if let url = pullRequestEvent.url {
+            return url
+        }
+        switch pullRequestEvent.data.fallbackUrlType {
+        case .pullRequestFiles:
+            return pullRequestFilesUrl
+        default:
+            return pullRequestUrl
+        }
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -147,6 +165,9 @@ struct PullRequestEventView: View {
                 Spacer()
                 Text(pullRequestEvent.time.formatted(date: .numeric, time: .shortened))
                     .foregroundStyle(.secondary)
+                ModifierLink(destination: getEventUrl(), additionalAction: { modifierPressed in }) {
+                    Image(systemName: "square.and.arrow.up")
+                }
             }
             PullRequestEventDataView(data: pullRequestEvent.data)
                 .padding(.leading, 30)
@@ -159,7 +180,8 @@ struct PullRequestEventView: View {
 #Preview {
     let pullRequestEvents: [PullRequestEvent] = [
         PullRequestEvent.previewClosed,
-        PullRequestEvent.previewCommit,
+        PullRequestEvent.previewCommit(),
+        PullRequestEvent.previewCommit(commitCount: 3),
         PullRequestEvent.previewMerged,
         PullRequestEvent.previewReview(comments: []),
         PullRequestEvent.previewComment,
@@ -174,7 +196,7 @@ struct PullRequestEventView: View {
         VStack {
             DividedView {
                 ForEach(pullRequestEvents) { pullRequestEvent in
-                    PullRequestEventView(pullRequestEvent: pullRequestEvent)
+                    PullRequestEventView(pullRequestEvent: pullRequestEvent, pullRequestUrl: URL(string: "https://example.com")!, pullRequestFilesUrl: URL(string: "https://example.com")!)
                 }
             }
         }.padding()

@@ -89,35 +89,83 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
 }
 
 private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]) -> [PullRequestEvent] {
+    // Step 1: Convert timeline items to data and merge information
     var prevEventData: PullRequestEventData? = nil
-    return timelineItems.reduce([(PullRequestEventData, PullRequestDto.TimelineItem)]()) {dataArray, timelineItem in
-        let data = timelineItemToData(timelineItem: timelineItem, prevEventData: prevEventData)
-        if data.0 == nil {
-            return dataArray
+    let dataArray: [(PullRequestEventData, PullRequestDto.TimelineItem, Bool)] = timelineItems.compactMap { timelineItem in
+        let (data, merge) = timelineItemToData(timelineItem: timelineItem, prevEventData: prevEventData)
+        guard let data, let _ = timelineItem.id else {
+            return nil
         }
-        prevEventData = data.0
+        prevEventData = data
+        return (data, timelineItem, merge)
+    }
+    
+    // Step 2: Merge items if necessary
+    let mergedDataArray = dataArray.reduce([(PullRequestEventData, PullRequestDto.TimelineItem)]()) { dataArray, element in
+        let (data, timelineItem, merge) = element
         
         var newDataArray = dataArray
-        let newItem = (data.0!, timelineItem)
-        
-        if timelineItem.id == nil {
-            return dataArray
-        }
-        
-        if data.1 {
+        let newItem = (data, timelineItem)
+        if !dataArray.isEmpty && merge {
             newDataArray[newDataArray.endIndex-1] = newItem
         } else {
             newDataArray.append(newItem)
         }
         return newDataArray
-    }.map { result in
-        PullRequestEvent(
-            id: result.1.id!,
-            user: toUser(user: result.1.actor ?? result.1.author ?? result.1.commit?.author?.user),
-            time: result.1.createdAt ?? result.1.commit?.committedDate ?? Date(),
-            data: result.0
+    }
+    
+    // Step 3: Convert to PullRequestEvent objects
+    return mergedDataArray.map { result in
+        let (data, timelineItem) = result
+        
+        let finalUrl: URL? = {
+            if let url = timelineItem.url, let parsedUrl = URL(string: url) {
+                return parsedUrl
+            }
+            if let commitUrl = timelineItem.commit?.url, let parsedCommitUrl = URL(string: commitUrl) {
+                return parsedCommitUrl
+            }
+            return nil
+        }()
+        
+        return PullRequestEvent(
+            id: timelineItem.id!,
+            user: toUser(user: timelineItem.actor ?? timelineItem.author ?? timelineItem.commit?.author?.user),
+            time: timelineItem.createdAt ?? timelineItem.commit?.committedDate ?? Date(),
+            url: finalUrl,
+            data: data
         )
     }
+    
+    //    return timelineItems.reduce([(PullRequestEventData, PullRequestDto.TimelineItem)]()) {dataArray, timelineItem in
+    //        let dataAndMerge = timelineItemToData(timelineItem: timelineItem, prevEventData: prevEventData)
+    //        if dataAndMerge.0 == nil {
+    //            return dataArray
+    //        }
+    //        prevEventData = dataAndMerge.0
+    //
+    //        var newDataArray = dataArray
+    //        let newItem = (dataAndMerge.0!, timelineItem)
+    //
+    //        if timelineItem.id == nil {
+    //            return dataArray
+    //        }
+    //
+    //        if dataAndMerge.1 {
+    //            newDataArray[newDataArray.endIndex-1] = newItem
+    //        } else {
+    //            newDataArray.append(newItem)
+    //        }
+    //        return newDataArray
+    //    }.map { result in
+    //        PullRequestEvent(
+    //            id: result.1.id!,
+    //            user: toUser(user: result.1.actor ?? result.1.author ?? result.1.commit?.author?.user),
+    //            time: result.1.createdAt ?? result.1.commit?.committedDate ?? Date(),
+    //            url: result.1.url ?? result.1.commit?.url,
+    //            data: result.0
+    //        )
+    //    }
 }
 
 private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> PullRequest {
