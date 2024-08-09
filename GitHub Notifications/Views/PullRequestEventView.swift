@@ -140,6 +140,8 @@ func eventDataToActionLabel(data: any PullRequestEventData) -> String {
 }
 
 struct PullRequestEventView: View {
+    @Environment(\.closeMenuBarWindowModifierLinkAction) var modifierLinkAction
+    
     var pullRequestEvent: PullRequestEvent
     var pullRequestUrl: URL
     var pullRequestFilesUrl: URL
@@ -165,7 +167,7 @@ struct PullRequestEventView: View {
                 Spacer()
                 Text(pullRequestEvent.time.formatted(date: .numeric, time: .shortened))
                     .foregroundStyle(.secondary)
-                ModifierLink(destination: getEventUrl(), additionalAction: { modifierPressed in }) {
+                ModifierLink(destination: getEventUrl(), additionalAction: modifierLinkAction) {
                     Image(systemName: "square.and.arrow.up")
                 }
             }

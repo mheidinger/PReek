@@ -42,6 +42,9 @@ private func toRepository(repository: PullRequestDto.Repository) -> Repository {
 private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevEventData: PullRequestEventData?) -> (PullRequestEventData?, Bool) {
     switch timelineItem.type {
     case .ClosedEvent:
+        if (prevEventData is PullRequestEventMergedData) {
+            return (nil, false)
+        }
         return (PullRequestEventClosedData(), false)
     case .HeadRefForcePushedEvent:
         if let prevCommitEventData = prevEventData as? PullRequestEventCommitData {

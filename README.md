@@ -46,3 +46,4 @@
 - [x] Don't mark as unread if last modification is from user
 - [ ] Better link placement for events?
 - [ ] Link commits (and maybe force pushed?) not to commit directly but filtered files page
+- [ ] Update PRs also w/o new notifications: you don't get notifications e.g. if you yourself merged a PR

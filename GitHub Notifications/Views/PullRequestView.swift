@@ -15,11 +15,11 @@ private let statusToIcon = [
 ]
 
 struct PullRequestHeaderView: View {
+    @Environment(\.closeMenuBarWindowModifierLinkAction) var modifierLinkAction
+    
     var pullRequest: PullRequest
     var isRead: Bool
     var toggleRead: () -> Void
-    
-    var modifierLinkAction: ModifierLink.AdditionalActionProcessor?
     
     var body: some View {
         HStack(spacing: 10) {
@@ -55,7 +55,7 @@ struct PullRequestHeaderView: View {
                             Text("by \(pullRequest.author.displayName)")
                         }
                         Text("·")
-                        Text("updated at \(pullRequest.lastUpdated.formatted(date: .omitted, time: .shortened))")
+                        Text("\(pullRequest.lastUpdatedFormatted)")
                         Text("·")
                         
                         ModifierLink(destination: pullRequest.filesUrl, additionalAction: modifierLinkAction) {
@@ -136,7 +136,6 @@ struct PullRequestContentView: View {
 
 struct PullRequestView: View {
     var pullRequest: PullRequest
-    var modifierLinkAction: ModifierLink.AdditionalActionProcessor?
     
     @AppStorage("pullRequestReadMap") var pullRequestReadMap: [String: Date] = [:]
     @State var sectionExpanded: Bool = false
@@ -161,7 +160,7 @@ struct PullRequestView: View {
             DisclosureGroup(isExpanded: $sectionExpanded) {
                 PullRequestContentView(pullRequest: pullRequest)
             } label: {
-                PullRequestHeaderView(pullRequest: pullRequest, isRead: isRead, toggleRead: toggleRead, modifierLinkAction: modifierLinkAction)
+                PullRequestHeaderView(pullRequest: pullRequest, isRead: isRead, toggleRead: toggleRead)
             }
         }
     }

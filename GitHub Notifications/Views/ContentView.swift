@@ -37,7 +37,7 @@ struct ContentView: View {
     @ViewBuilder
     var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
-            PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests, modifierLinkAction: modifierLinkAction)
+            PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests)
         } else if pullRequestsViewModel.hasError {
             Image(systemName: "icloud.slash")
                 .font(.largeTitle)
@@ -62,6 +62,7 @@ struct ContentView: View {
                 settingsOpen: $settingsOpen
             )
         }
+        .environment(\.closeMenuBarWindowModifierLinkAction, modifierLinkAction)
     }
 }
 
