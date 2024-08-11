@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C19E97C2C68AE130035845C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6C19E97B2C68AE130035845C /* Localizable.xcstrings */; };
 		6C232DE72C08C51D00C003B1 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6C232DE62C08C51D00C003B1 /* KeychainAccess */; };
 		6C232DEB2C08C95E00C003B1 /* ConfigViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C232DEA2C08C95E00C003B1 /* ConfigViewModel.swift */; };
 		6C232DED2C08CB9600C003B1 /* KeychainStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C232DEC2C08CB9600C003B1 /* KeychainStorage.swift */; };
@@ -40,6 +41,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6C19E97B2C68AE130035845C /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		6C232DEA2C08C95E00C003B1 /* ConfigViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigViewModel.swift; sourceTree = "<group>"; };
 		6C232DEC2C08CB9600C003B1 /* KeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStorage.swift; sourceTree = "<group>"; };
 		6C232DEE2C08F6C600C003B1 /* ConfigService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigService.swift; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 		6CB027192BFF817E00C4C3B1 = {
 			isa = PBXGroup;
 			children = (
+				6C19E97B2C68AE130035845C /* Localizable.xcstrings */,
 				6CB027242BFF817E00C4C3B1 /* PReek */,
 				6CB027232BFF817E00C4C3B1 /* Products */,
 			);
@@ -197,7 +200,7 @@
 				6C232DE62C08C51D00C003B1 /* KeychainAccess */,
 				6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */,
 			);
-			productName = "PReek";
+			productName = PReek;
 			productReference = 6CB027222BFF817E00C4C3B1 /* PReek.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -223,6 +226,7 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
 			);
 			mainGroup = 6CB027192BFF817E00C4C3B1;
 			packageReferences = (
@@ -246,6 +250,7 @@
 			files = (
 				6CB0272D2BFF818000C4C3B1 /* Preview Assets.xcassets in Resources */,
 				6CB0272A2BFF818000C4C3B1 /* Assets.xcassets in Resources */,
+				6C19E97C2C68AE130035845C /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,12 +416,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PReek/PReek.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PReek/Preview Content\"";
 				DEVELOPMENT_TEAM = 68JNFYH5JF;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = PReek;
@@ -427,9 +433,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = mheidinger.PReek;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -441,12 +448,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PReek/PReek.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"PReek/Preview Content\"";
 				DEVELOPMENT_TEAM = 68JNFYH5JF;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = PReek;
@@ -457,9 +465,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = mheidinger.PReek;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};

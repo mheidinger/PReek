@@ -28,17 +28,17 @@ struct PullRequest: Identifiable {
     var lastUpdatedFormatted: String {
         let formattedTime = lastUpdated.formatted(date: .omitted, time: .shortened)
         if (Calendar.current.isDateInToday(lastUpdated)) {
-            return "updated at \(formattedTime)"
+            return String(localized: "updated at \(formattedTime)")
         }
         if (Calendar.current.isDateInYesterday(lastUpdated)) {
-            return "updated yesterday at \(formattedTime)"
+            return String(localized: "updated yesterday at \(formattedTime)")
         }
         let formattedDate = lastUpdated.formatted(
             Date.FormatStyle()
                 .month(.abbreviated)
                 .day(.defaultDigits)
         )
-        return "updated \(formattedDate) at \(formattedTime)"
+        return String(localized: "updated \(formattedDate) at \(formattedTime)")
     }
     
     var additionsFormatted: String {

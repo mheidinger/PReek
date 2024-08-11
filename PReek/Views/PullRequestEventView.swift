@@ -1,20 +1,22 @@
 import SwiftUI
 
-func reviewCommentToCommentPrefix(comment: PullRequestReviewComment) -> String? {
-    if let setFileReference = comment.fileReference {
-        if comment.isReply {
-            return "replied on \(setFileReference):"
-        }
-        return "commented on \(setFileReference):"
-    }
-    if comment.isReply {
-        return "replied:"
-    }
-    return nil
-}
+
 
 struct PullRequestEventDataView: View {
     var data: any PullRequestEventData
+    
+    private func reviewCommentToCommentPrefix(comment: PullRequestReviewComment) -> String? {
+        if let setFileReference = comment.fileReference {
+            if comment.isReply {
+                return String(localized: "replied on \(setFileReference):")
+            }
+            return String(localized: "commented on \(setFileReference):")
+        }
+        if comment.isReply {
+            return String(localized: "replied:")
+        }
+        return nil
+    }
     
     private func formatCommitCount(commitCount: Int) -> String {
         return "\(commitCount) Commit\(commitCount > 1 ? "s" : "")"
@@ -29,7 +31,7 @@ struct PullRequestEventDataView: View {
                 EmptyView()
             }
         case let commitData as PullRequestEventCommitData:
-            Text(formatCommitCount(commitCount: commitData.commitCount))
+            Text("\(commitData.commitCount) Commits")
         case let reviewData as PullRequestEventReviewData:
             if !reviewData.comments.isEmpty {
                 VStack(alignment: .leading, spacing: 5) {
