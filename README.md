@@ -36,6 +36,8 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
   - [x] Token
   - [x] Quit Button
   - [x] Exclude author list
+  - [x] Fetch and delete time windows
+  - [ ] Improve layout?
 - [x] Links / Buttons to open in Browser
   - [x] Repository
   - [x] PR itself
@@ -45,8 +47,10 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
 - [ ] Get rid of old data
   - [ ] Marked as read information older than X days + no longer in PR list
   - [x] Closed / Merged PRs older than X days
-- [ ] Filters on `PullRequestsView`
-- [ ] Mark all as read (all, selection, all closed, ?)
+- [x] Filters on `PullRequestsView`
+  - [x] Read
+  - [x] Closed
+- [x] Mark all as read (all currently displayed)
 - [x] Don't mark as unread if last modification is from user
 - [ ] Better link placement for events?
 - [ ] Link commits (and maybe force pushed?) not to commit directly but filtered files page
