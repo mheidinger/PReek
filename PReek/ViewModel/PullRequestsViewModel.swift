@@ -5,10 +5,19 @@ class PullRequestsViewModel: ObservableObject {
     @Published var isRefreshing = false
     @Published var hasError = false
     
+    @CodableAppStorage("pullRequestReadMap") private var storedPullRequestReadMap: [String: Date] = [:]
+    @Published private var pullRequestReadMap: [String: Date] = [:] {
+        didSet {
+            storedPullRequestReadMap = pullRequestReadMap
+        }
+    }
+    
     @Published private var pullRequestMap: [String: PullRequest] = [:]
     var pullRequests: [PullRequest] {
         return pullRequestMap.map { entry in
-            return entry.value
+            var pullRequest = entry.value
+            pullRequest.markedAsRead = isRead(pullRequest)
+            return pullRequest
         }.filter { pullRequest in
             return pullRequest.events.allSatisfy { event in
                 return !ConfigService.excludedUsers.contains(event.user.login)
@@ -16,6 +25,10 @@ class PullRequestsViewModel: ObservableObject {
         }.sorted {
             $0.lastUpdated > $1.lastUpdated
         }
+    }
+    
+    init() {
+        pullRequestReadMap = storedPullRequestReadMap
     }
     
     private var timer: Timer?
@@ -33,6 +46,30 @@ class PullRequestsViewModel: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { _ in
             self.triggerFetchPullRequests()
         }
+    }
+    
+    func toggleRead(_ pullRequest: PullRequest) {
+        if (isRead(pullRequest)) {
+            pullRequestReadMap.removeValue(forKey: pullRequest.id)
+        } else {
+            pullRequestReadMap[pullRequest.id] = Date()
+        }
+        objectWillChange.send()
+    }
+    
+    func markAllAsRead() {
+        let now = Date()
+        pullRequests.forEach { pullRequest in
+            pullRequestReadMap[pullRequest.id] = now
+        }
+        objectWillChange.send()
+    }
+    
+    private func isRead(_ pullRequest: PullRequest) -> Bool {
+        guard let markedRead = pullRequestReadMap[pullRequest.id] else {
+            return false
+        }
+        return markedRead > pullRequest.lastNonViewerUpdated
     }
     
     private func handleReceivedNotifications(notifications: [Notification]) async throws {

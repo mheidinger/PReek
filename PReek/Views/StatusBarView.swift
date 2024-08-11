@@ -19,32 +19,41 @@ struct StatusBarView: View {
     var hasError: Bool
     var onRefresh: () -> Void
     var isRefreshing: Bool
+    var markAllRead: () -> Void
     @Binding var settingsOpen: Bool
     
     var body: some View {
         HStack {
-            Group {
-                if isRefreshing && !hasError {
-                    ProgressView()
-                        .scaleEffect(0.6)
-                } else {
-                    StatusBarButtonView(imageSystemName: "arrow.clockwise.circle", action: onRefresh)
-                }
-            }
-            .frame(width: 30)
+            StatusBarButtonView(imageSystemName: "line.3.horizontal.decrease.circle", action: {})
+                .help("Filters")
+            StatusBarButtonView(imageSystemName: "eye.circle", action: markAllRead)
+                .help("Mark all as read")
+            
+            Spacer()
             
             if hasError {
                 Text("Failed to fetch notifications")
                     .foregroundStyle(.red)
             } else {
-                Text("Last updated at \(lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "?")")
+                Text("Last updated at \(lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "...")")
                     .foregroundStyle(.secondary)
             }
+            Group {
+                if isRefreshing && !hasError {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                        .padding(.leading, -4)
+                } else {
+                    StatusBarButtonView(imageSystemName: "arrow.clockwise.circle", action: onRefresh)
+                        .help("Refresh")
+                }
+            }
+            .frame(width: 25, alignment: .leading)
             
-            Spacer()
             StatusBarButtonView(imageSystemName: "gear", action: {
                 settingsOpen = true
             })
+            .help("Settings")
         }
         .padding(.horizontal)
         .background(.background.opacity(0.5))
@@ -57,6 +66,7 @@ struct StatusBarView: View {
         hasError: false,
         onRefresh: {},
         isRefreshing: false,
+        markAllRead: {},
         settingsOpen: .constant(false)
     )
 }

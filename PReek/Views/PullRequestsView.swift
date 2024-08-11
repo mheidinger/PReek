@@ -2,18 +2,19 @@ import SwiftUI
 
 struct PullRequestsView: View {
     var pullRequests: [PullRequest]
+    var toggleRead: (PullRequest) -> Void
     
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 4) {
                 DividedView {
                     ForEach(pullRequests) { pullRequest in
-                        PullRequestView(pullRequest: pullRequest)
+                        PullRequestView(pullRequest: pullRequest, toggleRead: { toggleRead(pullRequest) })
                     }
                 }
             }
             .padding(.horizontal)
-            .padding(.top, 5)
+            .padding(.top, 0)
         }
     }
 }
@@ -38,5 +39,5 @@ struct PullRequestsView: View {
         PullRequest.preview(),
         PullRequest.preview(),
         PullRequest.preview()
-    ])
+    ], toggleRead: {_ in })
 }

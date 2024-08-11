@@ -30,7 +30,7 @@ struct ContentView: View {
     @ViewBuilder
     var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
-            PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests)
+            PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests, toggleRead: pullRequestsViewModel.toggleRead)
         } else if pullRequestsViewModel.hasError {
             Image(systemName: "icloud.slash")
                 .font(.largeTitle)
@@ -52,6 +52,7 @@ struct ContentView: View {
                 hasError: pullRequestsViewModel.hasError,
                 onRefresh: pullRequestsViewModel.triggerFetchPullRequests,
                 isRefreshing: pullRequestsViewModel.isRefreshing,
+                markAllRead: pullRequestsViewModel.markAllAsRead,
                 settingsOpen: $settingsOpen
             )
         }

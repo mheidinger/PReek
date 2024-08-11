@@ -20,6 +20,7 @@ struct PullRequest: Identifiable {
     let url: URL
     let additions: Int
     let deletions: Int
+    var markedAsRead: Bool = false
     
     var numberFormatted: String {
         "#\(number.formatted(.number .grouping(.never)))"

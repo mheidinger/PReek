@@ -11,24 +11,27 @@ extension CaseIterableDefaultsLast {
     }
 }
 
-// Allow Dictionary [String: Date] to be annotated with @AppStorage by providing string/JSON serialize and deserialize
-extension Dictionary: RawRepresentable where Key == String, Value == Date {
-    public init?(rawValue: String) {
-        guard let data = rawValue.data(using: .utf8), // convert from String to Data
-              let result = try? JSONDecoder().decode([String:Date].self, from: data)
-        else {
-            return nil
-        }
-        self = result
+// Allow to store any `Codable` in AppStorage
+@propertyWrapper
+struct CodableAppStorage<T: Codable> {
+    private let key: String
+    private let defaultValue: T
+
+    init(wrappedValue: T, _ key: String) {
+        self.key = key
+        self.defaultValue = wrappedValue
     }
-    
-    public var rawValue: String {
-        guard let data = try? JSONEncoder().encode(self), // data is Data type
-              let result = String(data: data, encoding: .utf8)
-        else {
-            return "{}"  // empty Dictionary represented as String
+
+    var wrappedValue: T {
+        get {
+            guard let data = UserDefaults.standard.data(forKey: key) else { return defaultValue }
+            return (try? JSONDecoder().decode(T.self, from: data)) ?? defaultValue
         }
-        return result
+        set {
+            if let encoded = try? JSONEncoder().encode(newValue) {
+                UserDefaults.standard.set(encoded, forKey: key)
+            }
+        }
     }
 }
 

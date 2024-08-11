@@ -11,7 +11,6 @@ struct PullRequestHeaderView: View {
     @Environment(\.closeMenuBarWindowModifierLinkAction) var modifierLinkAction
     
     var pullRequest: PullRequest
-    var isRead: Bool
     var toggleRead: () -> Void
     
     var body: some View {
@@ -69,7 +68,7 @@ struct PullRequestHeaderView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             
-            Image(systemName: isRead ? "circle" : "circle.fill")
+            Image(systemName: pullRequest.markedAsRead ? "circle" : "circle.fill")
                 .imageScale(.medium)
                 .foregroundStyle(.blue)
                 .onTapGesture(perform: toggleRead)
@@ -129,31 +128,16 @@ struct PullRequestContentView: View {
 
 struct PullRequestView: View {
     var pullRequest: PullRequest
+    var toggleRead: () -> Void
     
-    @AppStorage("pullRequestReadMap") var pullRequestReadMap: [String: Date] = [:]
     @State var sectionExpanded: Bool = false
-    
-    var isRead: Bool {
-        guard let markedRead = pullRequestReadMap[pullRequest.id] else {
-            return false
-        }
-        return markedRead > pullRequest.lastNonViewerUpdated
-    }
-    
-    func toggleRead() {
-        if isRead {
-            pullRequestReadMap.removeValue(forKey: pullRequest.id)
-        } else {
-            pullRequestReadMap[pullRequest.id] = Date()
-        }
-    }
     
     var body: some View {
         VStack {
             DisclosureGroup(isExpanded: $sectionExpanded) {
                 PullRequestContentView(pullRequest: pullRequest)
             } label: {
-                PullRequestHeaderView(pullRequest: pullRequest, isRead: isRead, toggleRead: toggleRead)
+                PullRequestHeaderView(pullRequest: pullRequest, toggleRead: toggleRead)
             }
         }
     }
@@ -163,6 +147,7 @@ struct PullRequestView: View {
     ScrollView {
         PullRequestView(
             pullRequest: PullRequest.preview(),
+            toggleRead: {},
             sectionExpanded: true
         )
     }
