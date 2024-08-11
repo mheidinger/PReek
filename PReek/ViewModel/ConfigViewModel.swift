@@ -7,15 +7,17 @@ class ConfigViewModel: ObservableObject {
     @Published var useSeparateGraphUrl: Bool = ConfigService.graphUrl != nil
     @Published var graphUrl: String = ConfigService.graphUrl ?? ""
     @Published var token: String = ConfigService.token ?? ""
-    
+    @Published var closeWindowOnLinkClick: Bool = ConfigService.closeWindowOnLinkClick
+    @Published var onStartFetchWeeks: Int = ConfigService.onStartFetchWeeks
+    @Published var deleteAfterWeeks: Int = ConfigService.deleteAfterWeeks
+    @Published var deleteOnlyClosed: Bool = ConfigService.deleteOnlyClosed
+
     struct ExcludedUser: Identifiable {
         var id = UUID()
         var username: String
     }
     
     @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { username in return ExcludedUser(username: username)}
-    
-    @Published var closeWindowOnLinkClick: Bool = ConfigService.closeWindowOnLinkClick
     
     func saveSettings() {
         ConfigService.apiBaseUrl = apiBaseUrl
@@ -25,7 +27,10 @@ class ConfigViewModel: ObservableObject {
             ConfigService.graphUrl = nil
         }
         ConfigService.token = token
-        ConfigService.excludedUsers = excludedUsers.map { excludedUser in return excludedUser.username }
         ConfigService.closeWindowOnLinkClick = closeWindowOnLinkClick
+        ConfigService.onStartFetchWeeks = onStartFetchWeeks
+        ConfigService.deleteAfterWeeks = deleteAfterWeeks
+        ConfigService.deleteOnlyClosed = deleteOnlyClosed
+        ConfigService.excludedUsers = excludedUsers.map { excludedUser in return excludedUser.username }
     }
 }

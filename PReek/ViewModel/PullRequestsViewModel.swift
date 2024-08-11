@@ -25,6 +25,15 @@ class PullRequestsViewModel: ObservableObject {
             await fetchPullRequests()
         }
     }
+        
+    func startFetchTimer() {
+        if timer != nil {
+            return
+        }
+        timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { _ in
+            self.triggerFetchPullRequests()
+        }
+    }
     
     private func handleReceivedNotifications(notifications: [Notification]) async throws {
         print("Got \(notifications.count) notifications")
@@ -52,7 +61,7 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
     
-    func fetchPullRequests() async {
+    private func fetchPullRequests() async {
         do {
             print("Fetch notifications")
             
@@ -61,7 +70,10 @@ class PullRequestsViewModel: ObservableObject {
                 self.hasError = false
             }
             
-            try await GitHubService.fetchUserNotifications(since: lastUpdated, onNotificationsReceived: handleReceivedNotifications)
+            let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: Date())!
+            try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: handleReceivedNotifications)
+            
+            cleanupPullRequests()
             
             DispatchQueue.main.async {
                 self.lastUpdated = Date()
@@ -76,12 +88,18 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
     
-    func startFetchTimer() {
-        if timer != nil {
-            return
+    private func cleanupPullRequests() {
+        let deleteFrom = Calendar.current.date(byAdding: .day, value: ConfigService.deleteAfterWeeks * 7 * -1, to: Date())!
+
+        let filteredPullRequestMap = pullRequestMap.filter { _, pullRequest in
+            pullRequest.lastUpdated > deleteFrom || (ConfigService.deleteOnlyClosed && pullRequest.status != .merged && pullRequest.status != .merged)
         }
-        timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { _ in
-            self.triggerFetchPullRequests()
+        
+        if (filteredPullRequestMap.count != pullRequestMap.count) {
+            print("Removed \(pullRequestMap.count - filteredPullRequestMap.count) pull requests")
+            DispatchQueue.main.async {
+                self.pullRequestMap = filteredPullRequestMap
+            }
         }
     }
 }

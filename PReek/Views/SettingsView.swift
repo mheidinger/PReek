@@ -7,6 +7,9 @@ struct SettingsView: View {
     var body: some View {
         VStack {
             HStack {
+                Text("Settings")
+                    .font(.title)
+                    .bold()
                 Spacer()
                 Button(action: { settingsOpen = false }) {
                     Image(systemName: "xmark.circle")
@@ -44,20 +47,43 @@ struct SettingsView: View {
         })
     }
     
+    @State private var count: Int = 0
+    
     @ViewBuilder
     var content: some View {
-        Form {
-            Section("GitHub Connection:") {
-                TextField("GitHub API endpoint", text: $configViewModel.apiBaseUrl)
-                Toggle(isOn: $configViewModel.useSeparateGraphUrl) {
-                    Text("Use separate GraphQL endpoint")
+        VStack(alignment: .leading) {
+            Section(header: Text("GitHub Connection:").bold()) {
+                Form {
+                    SecureField("GitHub PAT", text: $configViewModel.token)
+                    TextField("GitHub API endpoint", text: $configViewModel.apiBaseUrl)
+                    Toggle(isOn: $configViewModel.useSeparateGraphUrl) {
+                        Text("Use separate GraphQL endpoint")
+                    }
+                    TextField("GitHub GraphQL endpoint", text: $configViewModel.graphUrl)
+                        .disabled(!configViewModel.useSeparateGraphUrl)
                 }
-                TextField("GitHub GraphQL endpoint", text: $configViewModel.graphUrl)
-                    .disabled(!configViewModel.useSeparateGraphUrl)
-                SecureField("GitHub PAT", text: $configViewModel.token)
             }
             Divider()
-            Section("Ignore PRs with only the following contributors:") {
+            Section(header: Text("Pull Requests").bold()) {
+                HStack {
+                    Text("On start fetch PRs from notifications of last")
+                    Stepper("\(configViewModel.onStartFetchWeeks) weeks",
+                            value: $configViewModel.onStartFetchWeeks,
+                            in: 0...100
+                    )
+                }
+                HStack {
+                    Text("Remove PRs not updated since")
+                    Stepper("\(configViewModel.deleteAfterWeeks) weeks",
+                            value: $configViewModel.deleteAfterWeeks,
+                            in: 1...100
+                    )
+                }
+                Toggle(isOn: $configViewModel.deleteOnlyClosed) {
+                    Text("Only remove closed PRs")
+                }
+                
+                Text("Ignore PRs with only the following contributors:")
                 VStack {
                     ForEach($configViewModel.excludedUsers.enumerated().map({$0}), id: \.element.id) { index, $item in
                         HStack {
@@ -67,16 +93,17 @@ struct SettingsView: View {
                         }
                     }
                 }
-                
                 Button("Add Entry", action: addExcludedUserEntry)
+                    .padding(.top, 5)
             }
             Divider()
-            Section("Additional Settings") {
+            Section(header: Text("Additional Settings").bold()) {
                 Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
                     Text("Close window when opening a link, press CMD on click to get opposite behaviour")
                 }
             }
         }
+        .padding(.bottom, 10)
     }
 }
 

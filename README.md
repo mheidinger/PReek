@@ -1,3 +1,7 @@
+<p align="center">
+ <img width="200" height="200" margin-right="100%" src="https://github.com/mheidinger/PReek/blob/main/icons/logo.png?raw=true">
+</p>
+
 # PReek
 
 PReek brings a quick peek into relevant GitHub Pull Requests directly into your MacOS MenuBar!
@@ -31,18 +35,16 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
   - [x] GitHub URL
   - [x] Token
   - [x] Quit Button
-  - [ ] Filters
-    - [ ] Only `participating` notifications
-    - [x] Exclude author list
+  - [x] Exclude author list
 - [x] Links / Buttons to open in Browser
   - [x] Repository
   - [x] PR itself
   - [x] Events
   - [x] Changes
 - [x] Data loading optimization
-- [ ] Get rid of old data?
+- [ ] Get rid of old data
   - [ ] Marked as read information older than X days + no longer in PR list
-  - [ ] Closed / Merged PRs older than X days
+  - [x] Closed / Merged PRs older than X days
 - [ ] Filters on `PullRequestsView`
 - [ ] Mark all as read (all, selection, all closed, ?)
 - [x] Don't mark as unread if last modification is from user

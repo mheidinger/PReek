@@ -16,4 +16,32 @@ class ConfigService {
         set { closeWindowOnLinkClickStr = newValue ? "true" : "false" }
         get { return closeWindowOnLinkClickStr == "true" }
     }
+    
+    @KeychainStorage("onStartFetchWeeks") static var onStartFetchWeeksStr: String = "1"
+    static var onStartFetchWeeks: Int {
+        set { onStartFetchWeeksStr = String(newValue) }
+        get {
+            guard let number = Int(onStartFetchWeeksStr) else {
+                return 1
+            }
+            return number
+        }
+    }
+    
+    @KeychainStorage("deleteAfterWeeks") static var deleteAfterWeeksStr: String = "1"
+    static var deleteAfterWeeks: Int {
+        set { deleteAfterWeeksStr = String(newValue) }
+        get {
+            guard let number = Int(deleteAfterWeeksStr) else {
+                return 1
+            }
+            return number
+        }
+    }
+    
+    @KeychainStorage("deleteOnlyClosed") private static var deleteOnlyClosedStr: String = "true"
+    static var deleteOnlyClosed: Bool {
+        set { deleteOnlyClosedStr = newValue ? "true" : "false" }
+        get { return deleteOnlyClosedStr == "true" }
+    }
 }

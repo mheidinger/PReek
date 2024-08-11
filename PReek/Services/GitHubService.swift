@@ -37,13 +37,11 @@ class GitHubService {
         return try baseUrl().appending(path: "graphql")
     }
     
-    // When since is set to nil, will default to notifications from the last week
-    static func fetchUserNotifications(since: Date? = nil, onNotificationsReceived: ([Notification]) async throws -> Void) async throws {
-        let fallbackSince = Date().addingTimeInterval(-604800) // substract 1 week in seconds
+    static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> Void) async throws {
         var url: URL? = try baseUrl().appending(path: "notifications")
             .appending(queryItems: [
                 URLQueryItem(name: "all", value: "true"),
-                URLQueryItem(name: "since", value: (since ?? fallbackSince).formatted(.iso8601))
+                URLQueryItem(name: "since", value: since.formatted(.iso8601))
             ])
         
         repeat {
