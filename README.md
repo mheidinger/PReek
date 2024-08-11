@@ -1,6 +1,6 @@
 # PReek
 
-PReek bring a quick peek into relevant GitHub Pull Requests directly into your MacOS MenuBar!
+PReek brings a quick peek into relevant GitHub Pull Requests directly into your MacOS MenuBar!
 
 *Project is very much in progress, use with caution!*
 
@@ -8,8 +8,8 @@ PReek bring a quick peek into relevant GitHub Pull Requests directly into your M
 
 - [x] Proper Name!
 - [x] Error Handling
-- [ ] Menu Bar Icon (size, customization?)
-- [ ] Menu Bar Icon w/ Unread Notification
+- [x] Menu Bar Icon
+- [ ] Menu Bar Icon w/ Unread Notification?
 - [x] Read / Unread Tracking + Updates
   - [x] Only requests notifications since last update
   - [x] Only fetch PRs for which updates should be there
