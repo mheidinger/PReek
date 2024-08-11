@@ -15,4 +15,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build
-        run: xcodebuild clean build analyze -scheme "PReek" -project "PReek.xcodeproj" -destination "generic/platform=macOS" | xcpretty && exit ${PIPESTATUS[0]}
+        run: xcodebuild clean build analyze -scheme "PReek" -project "PReek.xcodeproj" -destination "generic/platform=macOS" CODE_SIGNING_ALLOWED=NO | xcpretty && exit ${PIPESTATUS[0]}
