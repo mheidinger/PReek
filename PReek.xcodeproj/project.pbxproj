@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6C043E502C68DE6D00DEBF35 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6C043E4F2C68DE6D00DEBF35 /* README.md */; };
+		6C043E522C68DE9C00DEBF35 /* .github in Resources */ = {isa = PBXBuildFile; fileRef = 6C043E512C68DE9C00DEBF35 /* .github */; };
 		6C19E97C2C68AE130035845C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 6C19E97B2C68AE130035845C /* Localizable.xcstrings */; };
 		6C232DE72C08C51D00C003B1 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6C232DE62C08C51D00C003B1 /* KeychainAccess */; };
 		6C232DEB2C08C95E00C003B1 /* ConfigViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C232DEA2C08C95E00C003B1 /* ConfigViewModel.swift */; };
@@ -41,6 +43,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6C043E4F2C68DE6D00DEBF35 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6C043E512C68DE9C00DEBF35 /* .github */ = {isa = PBXFileReference; lastKnownFileType = folder; path = .github; sourceTree = "<group>"; };
 		6C19E97B2C68AE130035845C /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		6C232DEA2C08C95E00C003B1 /* ConfigViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigViewModel.swift; sourceTree = "<group>"; };
 		6C232DEC2C08CB9600C003B1 /* KeychainStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStorage.swift; sourceTree = "<group>"; };
@@ -90,6 +94,8 @@
 		6CB027192BFF817E00C4C3B1 = {
 			isa = PBXGroup;
 			children = (
+				6C043E512C68DE9C00DEBF35 /* .github */,
+				6C043E4F2C68DE6D00DEBF35 /* README.md */,
 				6C19E97B2C68AE130035845C /* Localizable.xcstrings */,
 				6CB027242BFF817E00C4C3B1 /* PReek */,
 				6CB027232BFF817E00C4C3B1 /* Products */,
@@ -250,7 +256,9 @@
 			files = (
 				6CB0272D2BFF818000C4C3B1 /* Preview Assets.xcassets in Resources */,
 				6CB0272A2BFF818000C4C3B1 /* Assets.xcassets in Resources */,
+				6C043E502C68DE6D00DEBF35 /* README.md in Resources */,
 				6C19E97C2C68AE130035845C /* Localizable.xcstrings in Resources */,
+				6C043E522C68DE9C00DEBF35 /* .github in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

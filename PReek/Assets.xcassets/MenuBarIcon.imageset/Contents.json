@@ -1,17 +1,28 @@
 {
   "images" : [
     {
-      "filename" : "git-pull-request_white.svg",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "filename" : "menu-bar.svg",
+      "idiom" : "universal"
     },
     {
-      "idiom" : "universal",
-      "scale" : "2x"
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "light"
+        }
+      ],
+      "filename" : "menu-bar 1.svg",
+      "idiom" : "universal"
     },
     {
-      "idiom" : "universal",
-      "scale" : "3x"
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "menu-bar-dark.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {
