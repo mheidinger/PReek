@@ -1,10 +1,12 @@
-# GitHub Notifications MacOS Menu Bar Widget
+# PReek
+
+PReek bring a quick peek into relevant GitHub Pull Requests directly into your MacOS MenuBar!
 
 *Project is very much in progress, use with caution!*
 
 ## TODOs
 
-- [ ] Proper Name!
+- [x] Proper Name!
 - [x] Error Handling
 - [ ] Menu Bar Icon (size, customization?)
 - [ ] Menu Bar Icon w/ Unread Notification
