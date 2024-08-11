@@ -1,6 +1,6 @@
 import SwiftUI
 
-private struct StatusBarButtonView: View {
+private struct StatusBarButton: View {
     var imageSystemName: String
     var action: () -> Void
     
@@ -14,43 +14,61 @@ private struct StatusBarButtonView: View {
     }
 }
 
-struct StatusBarView: View {
-    var lastUpdated: Date?
-    var hasError: Bool
-    var onRefresh: () -> Void
-    var isRefreshing: Bool
-    var markAllRead: () -> Void
-    @Binding var settingsOpen: Bool
+private struct PopoverFilterOption: View {
+    var label: LocalizedStringKey
+    @Binding var isOn: Bool
     
     var body: some View {
         HStack {
-            StatusBarButtonView(imageSystemName: "line.3.horizontal.decrease.circle", action: {})
+            Text(label)
+            Spacer()
+            Toggle(isOn: $isOn) {
+                Text(label)
+            }
+            .labelsHidden()
+            .toggleStyle(SwitchToggleStyle())
+        }
+    }
+}
+
+struct StatusBarView<ViewModel: PullRequestsViewModelProtocol>: View {
+    @ObservedObject var pullRequestsViewModel: ViewModel
+    @Binding var settingsOpen: Bool
+    
+    @State private var showFilterPopover: Bool = false
+    
+    var body: some View {
+        HStack {
+            StatusBarButton(imageSystemName: "line.3.horizontal.decrease.circle", action: { showFilterPopover = true })
                 .help("Filters")
-            StatusBarButtonView(imageSystemName: "eye.circle", action: markAllRead)
+                .popover(isPresented: $showFilterPopover, arrowEdge: .bottom) {
+                    filterPopover
+                }
+            StatusBarButton(imageSystemName: "eye.circle", action: pullRequestsViewModel.markAllAsRead)
                 .help("Mark all as read")
             
             Spacer()
             
-            if hasError {
+            if pullRequestsViewModel.hasError {
                 Text("Failed to fetch notifications")
                     .foregroundStyle(.red)
             } else {
-                Text("Last updated at \(lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "...")")
+                Text("Last updated at \(pullRequestsViewModel.lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "...")")
                     .foregroundStyle(.secondary)
             }
             Group {
-                if isRefreshing && !hasError {
+                if pullRequestsViewModel.isRefreshing && !pullRequestsViewModel.hasError {
                     ProgressView()
                         .scaleEffect(0.6)
                         .padding(.leading, -4)
                 } else {
-                    StatusBarButtonView(imageSystemName: "arrow.clockwise.circle", action: onRefresh)
+                    StatusBarButton(imageSystemName: "arrow.clockwise.circle", action: pullRequestsViewModel.triggerFetchPullRequests)
                         .help("Refresh")
                 }
             }
             .frame(width: 25, alignment: .leading)
             
-            StatusBarButtonView(imageSystemName: "gear", action: {
+            StatusBarButton(imageSystemName: "gear", action: {
                 settingsOpen = true
             })
             .help("Settings")
@@ -58,15 +76,19 @@ struct StatusBarView: View {
         .padding(.horizontal)
         .background(.background.opacity(0.5))
     }
+    
+    var filterPopover: some View {
+        VStack(alignment: .leading) {
+            PopoverFilterOption(label: "Hide closed", isOn: $pullRequestsViewModel.hideClosed)
+            PopoverFilterOption(label: "Hide read", isOn: $pullRequestsViewModel.hideRead)
+        }
+        .padding()
+    }
 }
 
 #Preview {
     StatusBarView(
-        lastUpdated: Date(),
-        hasError: false,
-        onRefresh: {},
-        isRefreshing: false,
-        markAllRead: {},
+        pullRequestsViewModel: MockPullRequestsViewModel(),
         settingsOpen: .constant(false)
     )
 }

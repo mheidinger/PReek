@@ -48,11 +48,7 @@ struct ContentView: View {
                 .frame(maxHeight: .infinity, alignment: .center)
             
             StatusBarView(
-                lastUpdated: pullRequestsViewModel.lastUpdated,
-                hasError: pullRequestsViewModel.hasError,
-                onRefresh: pullRequestsViewModel.triggerFetchPullRequests,
-                isRefreshing: pullRequestsViewModel.isRefreshing,
-                markAllRead: pullRequestsViewModel.markAllAsRead,
+                pullRequestsViewModel: pullRequestsViewModel,
                 settingsOpen: $settingsOpen
             )
         }

@@ -67,6 +67,7 @@ struct SettingsView: View {
             Section(header: Text("Pull Requests").bold()) {
                 HStack {
                     Text("On start fetch PRs from notifications of last")
+                    Spacer()
                     Stepper("\(configViewModel.onStartFetchWeeks) weeks",
                             value: $configViewModel.onStartFetchWeeks,
                             in: 0...100
@@ -74,6 +75,7 @@ struct SettingsView: View {
                 }
                 HStack {
                     Text("Remove PRs not updated since")
+                    Spacer()
                     Stepper("\(configViewModel.deleteAfterWeeks) weeks",
                             value: $configViewModel.deleteAfterWeeks,
                             in: 1...100

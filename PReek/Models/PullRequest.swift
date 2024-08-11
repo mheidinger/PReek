@@ -22,16 +22,20 @@ struct PullRequest: Identifiable {
     let deletions: Int
     var markedAsRead: Bool = false
     
+    var isClosed: Bool {
+        return status == .closed || status == .merged
+    }
+    
     var numberFormatted: String {
         "#\(number.formatted(.number .grouping(.never)))"
     }
     
     var lastUpdatedFormatted: String {
         let formattedTime = lastUpdated.formatted(date: .omitted, time: .shortened)
-        if (Calendar.current.isDateInToday(lastUpdated)) {
+        if Calendar.current.isDateInToday(lastUpdated) {
             return String(localized: "updated at \(formattedTime)")
         }
-        if (Calendar.current.isDateInYesterday(lastUpdated)) {
+        if Calendar.current.isDateInYesterday(lastUpdated) {
             return String(localized: "updated yesterday at \(formattedTime)")
         }
         let formattedDate = lastUpdated.formatted(

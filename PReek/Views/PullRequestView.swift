@@ -107,7 +107,7 @@ struct PullRequestContentView: View {
                         pullRequestFilesUrl: pullRequest.filesUrl
                     )
                 }
-                if (self.eventLimit < pullRequest.events.count) {
+                if self.eventLimit < pullRequest.events.count {
                     Button(action: loadMore) {
                         Label("Load More", systemImage: "ellipsis.circle")
                     }

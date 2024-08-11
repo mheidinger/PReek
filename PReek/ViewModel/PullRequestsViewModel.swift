@@ -1,9 +1,34 @@
 import Foundation
 
-class PullRequestsViewModel: ObservableObject {
+protocol PullRequestsViewModelProtocol: ObservableObject {
+    var lastUpdated: Date? { get set }
+    var isRefreshing: Bool { get set }
+    var hasError: Bool { get set }
+    var hideClosed: Bool { get set }
+    var hideRead: Bool { get set }
+    var pullRequests: [PullRequest] { get }
+    
+    func triggerFetchPullRequests()
+    func startFetchTimer()
+    func toggleRead(_ pullRequest: PullRequest)
+    func markAllAsRead()
+}
+
+class PullRequestsViewModel: PullRequestsViewModelProtocol {
     @Published var lastUpdated: Date? = nil
     @Published var isRefreshing = false
     @Published var hasError = false
+    
+    @Published var hideClosed = false {
+        didSet {
+            ConfigService.hideClosed = hideClosed
+        }
+    }
+    @Published var hideRead = false {
+        didSet {
+            ConfigService.hideRead = hideRead
+        }
+    }
     
     @CodableAppStorage("pullRequestReadMap") private var storedPullRequestReadMap: [String: Date] = [:]
     @Published private var pullRequestReadMap: [String: Date] = [:] {
@@ -19,9 +44,14 @@ class PullRequestsViewModel: ObservableObject {
             pullRequest.markedAsRead = isRead(pullRequest)
             return pullRequest
         }.filter { pullRequest in
-            return pullRequest.events.allSatisfy { event in
+            let containsNonExcludedUser = pullRequest.events.contains { event in
                 return !ConfigService.excludedUsers.contains(event.user.login)
             }
+            
+            let passesClosedFilter = !hideClosed || !pullRequest.isClosed
+            let passesReadFilter = !hideRead || !pullRequest.markedAsRead
+            
+            return containsNonExcludedUser && passesClosedFilter && passesReadFilter
         }.sorted {
             $0.lastUpdated > $1.lastUpdated
         }
@@ -49,7 +79,7 @@ class PullRequestsViewModel: ObservableObject {
     }
     
     func toggleRead(_ pullRequest: PullRequest) {
-        if (isRead(pullRequest)) {
+        if isRead(pullRequest) {
             pullRequestReadMap.removeValue(forKey: pullRequest.id)
         } else {
             pullRequestReadMap[pullRequest.id] = Date()
@@ -129,10 +159,10 @@ class PullRequestsViewModel: ObservableObject {
         let deleteFrom = Calendar.current.date(byAdding: .day, value: ConfigService.deleteAfterWeeks * 7 * -1, to: Date())!
 
         let filteredPullRequestMap = pullRequestMap.filter { _, pullRequest in
-            pullRequest.lastUpdated > deleteFrom || (ConfigService.deleteOnlyClosed && pullRequest.status != .merged && pullRequest.status != .merged)
+            pullRequest.lastUpdated > deleteFrom || (ConfigService.deleteOnlyClosed && !pullRequest.isClosed)
         }
         
-        if (filteredPullRequestMap.count != pullRequestMap.count) {
+        if filteredPullRequestMap.count != pullRequestMap.count {
             print("Removed \(pullRequestMap.count - filteredPullRequestMap.count) pull requests")
             DispatchQueue.main.async {
                 self.pullRequestMap = filteredPullRequestMap

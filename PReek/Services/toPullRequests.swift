@@ -35,7 +35,7 @@ private func toRepository(repository: PullRequestDto.Repository) -> Repository {
 private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevEventData: PullRequestEventData?) -> (PullRequestEventData?, Bool) {
     switch timelineItem.type {
     case .ClosedEvent:
-        if (prevEventData is PullRequestEventMergedData) {
+        if prevEventData is PullRequestEventMergedData {
             return (nil, false)
         }
         return (PullRequestEventClosedData(), false)
@@ -54,7 +54,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         }
         return (PullRequestEventCommitData(commitCount: 1), false)
     case .PullRequestReview:
-        if (timelineItem.state == .PENDING) {
+        if timelineItem.state == .PENDING {
             return (nil, false)
         }
         return (PullRequestEventReviewData(
