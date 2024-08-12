@@ -37,7 +37,8 @@ struct ContentView: View {
         } else if pullRequestsViewModel.isRefreshing {
             ProgressView()
         } else {
-            Text("Nothing here...")
+            Text("You are done for today! 🎉")
+                .font(.title2)
         }
     }
     

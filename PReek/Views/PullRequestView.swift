@@ -73,7 +73,7 @@ struct PullRequestHeaderView: View {
                 .foregroundStyle(.blue)
                 .onTapGesture(perform: toggleRead)
         }
-        .padding(.horizontal)
+        .padding(.leading)
         .frame(maxWidth: .infinity)
     }
 }

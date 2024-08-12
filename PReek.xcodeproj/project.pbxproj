@@ -130,7 +130,6 @@
 		6CB0272B2BFF818000C4C3B1 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				6C3980B02C693D3700E9B3C8 /* MockPullRequestViewModel.swift */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -181,6 +180,7 @@
 			children = (
 				6CE564192C013529008E9A4B /* PullRequestsViewModel.swift */,
 				6C232DEA2C08C95E00C003B1 /* ConfigViewModel.swift */,
+				6C3980B02C693D3700E9B3C8 /* MockPullRequestViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -427,7 +427,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"PReek/Preview Content\"";
 				DEVELOPMENT_TEAM = 68JNFYH5JF;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -459,7 +459,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"PReek/Preview Content\"";
 				DEVELOPMENT_TEAM = 68JNFYH5JF;
 				ENABLE_HARDENED_RUNTIME = YES;

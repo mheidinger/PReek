@@ -5,16 +5,19 @@ struct PullRequestsView: View {
     var toggleRead: (PullRequest) -> Void
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 4) {
-                DividedView {
-                    ForEach(pullRequests) { pullRequest in
-                        PullRequestView(pullRequest: pullRequest, toggleRead: { toggleRead(pullRequest) })
+        GeometryReader { geometry in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 4) {
+                    DividedView {
+                        ForEach(pullRequests) { pullRequest in
+                            PullRequestView(pullRequest: pullRequest, toggleRead: { toggleRead(pullRequest) })
+                        }
                     }
+                    .frame(width: geometry.size.width - 40) // full width - horizontal padding (explicit leading, implicit trailing)
                 }
+                .padding(.leading, 20)
+                .padding(.top, 5)
             }
-            .padding(.horizontal)
-            .padding(.top, 0)
         }
     }
 }
@@ -26,18 +29,18 @@ struct PullRequestsView: View {
         PullRequest.preview(lastUpdated: Calendar.current.date(byAdding: .day, value: -1, to: Date())!),
         PullRequest.preview(lastUpdated: Calendar.current.date(byAdding: .day, value: -3, to: Date())!),
         PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview(),
-        PullRequest.preview()
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview(),
+                PullRequest.preview()
     ], toggleRead: {_ in })
 }
