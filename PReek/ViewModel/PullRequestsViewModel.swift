@@ -8,7 +8,7 @@ protocol PullRequestsViewModelProtocol: ObservableObject {
     var hideRead: Bool { get set }
     var pullRequests: [PullRequest] { get }
     
-    func triggerFetchPullRequests()
+    func triggerUpdatePullRequests()
     func startFetchTimer()
     func toggleRead(_ pullRequest: PullRequest)
     func markAllAsRead()
@@ -66,9 +66,9 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
     
     private var timer: Timer?
     
-    func triggerFetchPullRequests() {
+    func triggerUpdatePullRequests() {
         Task {
-            await fetchPullRequests()
+            await updatePullRequests()
         }
     }
         
@@ -77,7 +77,7 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
             return
         }
         timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { _ in
-            self.triggerFetchPullRequests()
+            self.triggerUpdatePullRequests()
         }
     }
     
@@ -112,7 +112,7 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         setUnreadIcon(unreadPullRequest)
     }
     
-    private func handleReceivedNotifications(notifications: [Notification]) async throws {
+    private func handleReceivedNotifications(notifications: [Notification]) async throws -> [String] {
         print("Got \(notifications.count) notifications")
         
         let repoMap = notifications.reduce([String: [Int]]()) { repoMap, notification in
@@ -124,6 +124,10 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
             return repoMapClone
         }
         
+        return try await fetchPullRequestMap(repoMap: repoMap)
+    }
+    
+    private func fetchPullRequestMap(repoMap: [String: [Int]]) async throws -> [String] {
         if !repoMap.isEmpty {
             let pullRequests = try await GitHubService.fetchPullRequests(repoMap: repoMap)
             print("Got \(pullRequests.count) pull requests")
@@ -133,14 +137,16 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
                     self.pullRequestMap[pullRequest.id] = pullRequest
                 }
             }
+            return pullRequests.map { $0.id }
         } else {
             print("No new PRs to fetch")
         }
+        return []
     }
     
-    private func fetchPullRequests() async {
+    private func updatePullRequests() async {
         do {
-            print("Fetch notifications")
+            print("Start fetching notifications")
             
             DispatchQueue.main.async {
                 self.isRefreshing = true
@@ -148,7 +154,20 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
             }
             
             let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: Date())!
-            try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: handleReceivedNotifications)
+            let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: handleReceivedNotifications)
+            
+            print("Start fetching not updated pull requests")
+            let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
+                !updatedPullRequestIds.contains(pullRequest.id)
+            }.reduce([String: [Int]]()) { repoMap, pullRequest in
+                var repoMapClone = repoMap
+                
+                let existingPRs = repoMap[pullRequest.repository.name]
+                repoMapClone[pullRequest.repository.name] = (existingPRs ?? []) + [pullRequest.number]
+                
+                return repoMapClone
+            }
+            _ = try await fetchPullRequestMap(repoMap: notUpdatedRepoMap)
             
             cleanupPullRequests()
             

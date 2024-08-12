@@ -10,7 +10,7 @@ struct ContentView: View {
     init(closeWindow: @escaping () -> Void, setUnreadIcon: @escaping (Bool) -> Void) {
         self.closeWindow = closeWindow
         self.pullRequestsViewModel = PullRequestsViewModel(setUnreadIcon: setUnreadIcon)
-        pullRequestsViewModel.triggerFetchPullRequests()
+        pullRequestsViewModel.triggerUpdatePullRequests()
         pullRequestsViewModel.startFetchTimer()
     }
     

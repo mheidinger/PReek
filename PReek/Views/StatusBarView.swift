@@ -62,7 +62,7 @@ struct StatusBarView<ViewModel: PullRequestsViewModelProtocol>: View {
                         .scaleEffect(0.6)
                         .padding(.leading, -4)
                 } else {
-                    StatusBarButton(imageSystemName: "arrow.clockwise.circle", action: pullRequestsViewModel.triggerFetchPullRequests)
+                    StatusBarButton(imageSystemName: "arrow.clockwise.circle", action: pullRequestsViewModel.triggerUpdatePullRequests)
                         .help("Refresh")
                 }
             }

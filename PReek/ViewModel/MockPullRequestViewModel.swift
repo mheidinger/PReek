@@ -11,7 +11,7 @@ class MockPullRequestsViewModel: PullRequestsViewModelProtocol {
         PullRequest.preview()
     ]
     
-    func triggerFetchPullRequests() {
+    func triggerUpdatePullRequests() {
         // Simulate fetching
         isRefreshing = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {

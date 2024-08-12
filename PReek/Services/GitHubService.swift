@@ -37,13 +37,16 @@ class GitHubService {
         return try baseUrl().appending(path: "graphql")
     }
     
-    static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> Void) async throws {
+    // returns IDs of all fetched PRs to update all that did not have new notifications
+    static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> [String]) async throws -> [String] {
+        print("Fetching notifications since \(since.formatted())")
         var url: URL? = try baseUrl().appending(path: "notifications")
             .appending(queryItems: [
                 URLQueryItem(name: "all", value: "true"),
                 URLQueryItem(name: "since", value: since.formatted(.iso8601))
             ])
         
+        var updatedPullRequestIds: [String] = []
         repeat {
             var request = URLRequest(url: url!)
             request.httpMethod = "GET"
@@ -51,13 +54,14 @@ class GitHubService {
             let (data, response) = try await sendRequest(request: request)
             
             let parsedData = try decoder.decode([NotificationDto].self, from: data)
-            try await onNotificationsReceived(toNotifications(dtos: parsedData)) // TODO: Let this run async?
+            let batchUpdatedPullRequestIds = try await onNotificationsReceived(toNotifications(dtos: parsedData)) // TODO: Let this run async?
+            updatedPullRequestIds.append(contentsOf: batchUpdatedPullRequestIds)
             
             guard let httpResponse = response as? HTTPURLResponse else {
                 break
             }
             
-            guard let linkHeader = httpResponse.allHeaderFields["Link"] as? String else {
+            guard let linkHeader = httpResponse.value(forHTTPHeaderField: "Link") else {
                 break
             }
             let nextLink = LinkHeaderParser.parseLinkHeader(linkHeader, defaultContext: nil, contentLanguageHeader: nil)?.first { link in
@@ -66,10 +70,13 @@ class GitHubService {
             
             if nextLink != nil {
                 url = nextLink?.link
+                print("Next page available")
             } else {
                 url = nil
             }
         } while url != nil
+        
+        return updatedPullRequestIds
     }
     
     static func fetchPullRequests(repoMap: [String: [Int]]) async throws -> [PullRequest] {
