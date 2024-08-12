@@ -15,6 +15,8 @@ protocol PullRequestsViewModelProtocol: ObservableObject {
 }
 
 class PullRequestsViewModel: PullRequestsViewModelProtocol {
+    var setUnreadIcon: (Bool) -> Void
+    
     @Published var lastUpdated: Date? = nil
     @Published var isRefreshing = false
     @Published var hasError = false
@@ -57,8 +59,9 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         }
     }
     
-    init() {
-        pullRequestReadMap = storedPullRequestReadMap
+    init(setUnreadIcon: @escaping (Bool) -> Void) {
+        self.setUnreadIcon = setUnreadIcon
+        self.pullRequestReadMap = storedPullRequestReadMap
     }
     
     private var timer: Timer?
@@ -84,6 +87,7 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         } else {
             pullRequestReadMap[pullRequest.id] = Date()
         }
+        updateUnreadIcon()
         objectWillChange.send()
     }
     
@@ -92,6 +96,7 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         pullRequests.forEach { pullRequest in
             pullRequestReadMap[pullRequest.id] = now
         }
+        updateUnreadIcon()
         objectWillChange.send()
     }
     
@@ -100,6 +105,11 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
             return false
         }
         return markedRead > pullRequest.lastNonViewerUpdated
+    }
+    
+    private func updateUnreadIcon() {
+        let unreadPullRequest = pullRequests.first { pullRequest in !pullRequest.markedAsRead } != nil
+        setUnreadIcon(unreadPullRequest)
     }
     
     private func handleReceivedNotifications(notifications: [Notification]) async throws {
@@ -143,6 +153,7 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
             cleanupPullRequests()
             
             DispatchQueue.main.async {
+                self.updateUnreadIcon()
                 self.lastUpdated = Date()
                 self.isRefreshing = false
             }
@@ -162,10 +173,16 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
             pullRequest.lastUpdated > deleteFrom || (ConfigService.deleteOnlyClosed && !pullRequest.isClosed)
         }
         
-        if filteredPullRequestMap.count != pullRequestMap.count {
-            print("Removed \(pullRequestMap.count - filteredPullRequestMap.count) pull requests")
+        let filteredPullRequestReadMap = pullRequestReadMap.filter { pullRequestId, _ in
+            filteredPullRequestMap.index(forKey: pullRequestId) != nil
+        }
+        
+        if filteredPullRequestMap.count != pullRequestMap.count || filteredPullRequestReadMap.count != pullRequestReadMap.count {
+            print("Removing \(pullRequestMap.count - filteredPullRequestMap.count) pull requests")
+            print("Removing \(pullRequestReadMap.count - filteredPullRequestReadMap.count) pull requests read info")
             DispatchQueue.main.async {
                 self.pullRequestMap = filteredPullRequestMap
+                self.pullRequestReadMap = filteredPullRequestReadMap
             }
         }
     }

@@ -341,16 +341,6 @@
         }
       }
     },
-    "Nothing here..." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Noch leer..."
-          }
-        }
-      }
-    },
     "On start fetch PRs from notifications of last" : {
       "localizations" : {
         "de" : {
@@ -523,6 +513,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Separaten GraphQL Endpunk verwenden"
+          }
+        }
+      }
+    },
+    "You are done for today! 🎉" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles erledigt! 🎉"
           }
         }
       }

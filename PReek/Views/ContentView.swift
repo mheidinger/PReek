@@ -3,12 +3,13 @@ import SwiftUI
 struct ContentView: View {
     var closeWindow: () -> Void
     
-    @ObservedObject var pullRequestsViewModel = PullRequestsViewModel()
+    @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     @ObservedObject var configViewModel = ConfigViewModel()
     @State var settingsOpen = false
     
-    init(closeWindow: @escaping () -> Void) {
+    init(closeWindow: @escaping () -> Void, setUnreadIcon: @escaping (Bool) -> Void) {
         self.closeWindow = closeWindow
+        self.pullRequestsViewModel = PullRequestsViewModel(setUnreadIcon: setUnreadIcon)
         pullRequestsViewModel.triggerFetchPullRequests()
         pullRequestsViewModel.startFetchTimer()
     }
@@ -58,5 +59,5 @@ struct ContentView: View {
 }
 
 #Preview(traits: .fixedLayout(width: 600, height: 400)) {
-    ContentView(closeWindow: {})
+    ContentView(closeWindow: {}, setUnreadIcon: { _ in })
 }

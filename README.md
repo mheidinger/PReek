@@ -13,7 +13,7 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
 - [x] Proper Name!
 - [x] Error Handling
 - [x] Menu Bar Icon
-- [ ] Menu Bar Icon w/ Unread Notification?
+  - [x] Unread Indicator
 - [x] Read / Unread Tracking + Updates
   - [x] Only requests notifications since last update
   - [x] Only fetch PRs for which updates should be there
@@ -44,8 +44,8 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
   - [x] Events
   - [x] Changes
 - [x] Data loading optimization
-- [ ] Get rid of old data
-  - [ ] Marked as read information older than X days + no longer in PR list
+- [x] Get rid of old data
+  - [x] Marked as read information older than X days + no longer in PR list
   - [x] Closed / Merged PRs older than X days
 - [x] Filters on `PullRequestsView`
   - [x] Read
