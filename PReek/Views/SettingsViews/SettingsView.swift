@@ -53,15 +53,7 @@ struct SettingsView: View {
     var content: some View {
         VStack(alignment: .leading) {
             Section(header: Text("GitHub Connection:").bold()) {
-                Form {
-                    SecureField("GitHub PAT", text: $configViewModel.token)
-                    TextField("GitHub API endpoint", text: $configViewModel.apiBaseUrl)
-                    Toggle(isOn: $configViewModel.useSeparateGraphUrl) {
-                        Text("Use separate GraphQL endpoint")
-                    }
-                    TextField("GitHub GraphQL endpoint", text: $configViewModel.graphUrl)
-                        .disabled(!configViewModel.useSeparateGraphUrl)
-                }
+                ConnectionSettingsView(configViewModel: configViewModel)
             }
             Divider()
             Section(header: Text("Pull Requests").bold()) {

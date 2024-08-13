@@ -23,7 +23,7 @@ struct PullRequestEventDataView: View {
     }
     
     var body: some View {
-        switch (data) {
+        switch data {
         case let forcePushData as PullRequestEventForcePushedData:
             if let commitCount = forcePushData.commitCount {
                 Text(formatCommitCount(commitCount: commitCount))

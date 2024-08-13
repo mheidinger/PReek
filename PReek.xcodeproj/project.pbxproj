@@ -20,6 +20,9 @@
 		6C50F4362C0486BA008F5B66 /* NotificationDto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4352C0486BA008F5B66 /* NotificationDto.swift */; };
 		6C50F4382C04C590008F5B66 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4372C04C590008F5B66 /* Notification.swift */; };
 		6C50F43A2C04C830008F5B66 /* toNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4392C04C830008F5B66 /* toNotifications.swift */; };
+		6C5FBDED2C6AA3E200620B7A /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5FBDEC2C6AA3E200620B7A /* WelcomeView.swift */; };
+		6C5FBDF12C6B3C9D00620B7A /* HelpTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5FBDF02C6B3C9D00620B7A /* HelpTextField.swift */; };
+		6C5FBDF42C6B41C100620B7A /* ConnectionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5FBDF32C6B41C100620B7A /* ConnectionSettingsView.swift */; };
 		6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6C7C4CA02C071A0400B9B4DA /* LinkHeaderParser */; };
 		6C7C4CA32C087A9900B9B4DA /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C7C4CA22C087A9900B9B4DA /* extensions.swift */; };
 		6CB027262BFF817E00C4C3B1 /* PReekApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB027252BFF817E00C4C3B1 /* PReekApp.swift */; };
@@ -55,6 +58,9 @@
 		6C50F4352C0486BA008F5B66 /* NotificationDto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDto.swift; sourceTree = "<group>"; };
 		6C50F4372C04C590008F5B66 /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		6C50F4392C04C830008F5B66 /* toNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toNotifications.swift; sourceTree = "<group>"; };
+		6C5FBDEC2C6AA3E200620B7A /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		6C5FBDF02C6B3C9D00620B7A /* HelpTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpTextField.swift; sourceTree = "<group>"; };
+		6C5FBDF32C6B41C100620B7A /* ConnectionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionSettingsView.swift; sourceTree = "<group>"; };
 		6C7C4CA22C087A9900B9B4DA /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		6CB027222BFF817E00C4C3B1 /* PReek.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PReek.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB027252BFF817E00C4C3B1 /* PReekApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PReekApp.swift; sourceTree = "<group>"; };
@@ -91,6 +97,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6C5FBDEE2C6B3C5800620B7A /* PullRequestViews */ = {
+			isa = PBXGroup;
+			children = (
+				6CF15A512C038F9400A7CE3E /* PullRequestsView.swift */,
+				6CE563F82BFFDC8F008E9A4B /* PullRequestView.swift */,
+				6CE564012C0090BD008E9A4B /* PullRequestEventView.swift */,
+			);
+			path = PullRequestViews;
+			sourceTree = "<group>";
+		};
+		6C5FBDEF2C6B3C6F00620B7A /* UtilityViews */ = {
+			isa = PBXGroup;
+			children = (
+				6CE0CE6D2C410D0B00ECF4FA /* ModifierLink.swift */,
+				6C5FBDF02C6B3C9D00620B7A /* HelpTextField.swift */,
+				6CE563FA2C00862E008E9A4B /* DividedView.swift */,
+			);
+			path = UtilityViews;
+			sourceTree = "<group>";
+		};
+		6C5FBDF22C6B41A600620B7A /* SettingsViews */ = {
+			isa = PBXGroup;
+			children = (
+				6CF15A532C03909900A7CE3E /* SettingsView.swift */,
+				6C5FBDF32C6B41C100620B7A /* ConnectionSettingsView.swift */,
+			);
+			path = SettingsViews;
+			sourceTree = "<group>";
+		};
 		6CB027192BFF817E00C4C3B1 = {
 			isa = PBXGroup;
 			children = (
@@ -163,14 +198,12 @@
 		6CE564172C013117008E9A4B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				6C5FBDF22C6B41A600620B7A /* SettingsViews */,
+				6C5FBDEF2C6B3C6F00620B7A /* UtilityViews */,
+				6C5FBDEE2C6B3C5800620B7A /* PullRequestViews */,
 				6CE563F62BFFAD3E008E9A4B /* ContentView.swift */,
-				6CE563F82BFFDC8F008E9A4B /* PullRequestView.swift */,
-				6CE564012C0090BD008E9A4B /* PullRequestEventView.swift */,
-				6CE563FA2C00862E008E9A4B /* DividedView.swift */,
 				6CE5641B2C037996008E9A4B /* StatusBarView.swift */,
-				6CF15A512C038F9400A7CE3E /* PullRequestsView.swift */,
-				6CF15A532C03909900A7CE3E /* SettingsView.swift */,
-				6CE0CE6D2C410D0B00ECF4FA /* ModifierLink.swift */,
+				6C5FBDEC2C6AA3E200620B7A /* WelcomeView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -272,6 +305,7 @@
 				6CE564102C00FD22008E9A4B /* GitHubService.swift in Sources */,
 				6CF15A522C038F9400A7CE3E /* PullRequestsView.swift in Sources */,
 				6C50F43A2C04C830008F5B66 /* toNotifications.swift in Sources */,
+				6C5FBDED2C6AA3E200620B7A /* WelcomeView.swift in Sources */,
 				6CE564122C01068A008E9A4B /* FetchPullRequestsQuery.swift in Sources */,
 				6CE563FB2C00862E008E9A4B /* DividedView.swift in Sources */,
 				6C232DEB2C08C95E00C003B1 /* ConfigViewModel.swift in Sources */,
@@ -283,12 +317,14 @@
 				6C232DED2C08CB9600C003B1 /* KeychainStorage.swift in Sources */,
 				6CE5641A2C013529008E9A4B /* PullRequestsViewModel.swift in Sources */,
 				6C232DEF2C08F6C600C003B1 /* ConfigService.swift in Sources */,
+				6C5FBDF12C6B3C9D00620B7A /* HelpTextField.swift in Sources */,
 				6CE563F92BFFDC8F008E9A4B /* PullRequestView.swift in Sources */,
 				6C50F4362C0486BA008F5B66 /* NotificationDto.swift in Sources */,
 				6CE563F72BFFAD3E008E9A4B /* ContentView.swift in Sources */,
 				6CE564022C0090BD008E9A4B /* PullRequestEventView.swift in Sources */,
 				6CE563FE2C008D9A008E9A4B /* PullRequest.swift in Sources */,
 				6CB027262BFF817E00C4C3B1 /* PReekApp.swift in Sources */,
+				6C5FBDF42C6B41C100620B7A /* ConnectionSettingsView.swift in Sources */,
 				6C3980B12C693D3700E9B3C8 /* MockPullRequestViewModel.swift in Sources */,
 				6CE0CE6E2C410D0B00ECF4FA /* ModifierLink.swift in Sources */,
 				6CE564142C0119CF008E9A4B /* PullRequestDto.swift in Sources */,

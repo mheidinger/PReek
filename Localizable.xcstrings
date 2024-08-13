@@ -311,6 +311,9 @@
         }
       }
     },
+    "Let's get you started!" : {
+
+    },
     "Load More" : {
       "localizations" : {
         "de" : {
@@ -461,6 +464,46 @@
         }
       }
     },
+    "Some helpful help" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "Some helpful secure help" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "Some secure value" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
+    "Some value" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
+    },
     "To:" : {
       "localizations" : {
         "de" : {
@@ -470,6 +513,9 @@
           }
         }
       }
+    },
+    "TODO: The Personal Access Token requires Notifications permissions" : {
+
     },
     "updated %@ at %@" : {
       "localizations" : {
@@ -516,6 +562,9 @@
           }
         }
       }
+    },
+    "Welcome to PReek" : {
+
     },
     "You are done for today! 🎉" : {
       "localizations" : {
