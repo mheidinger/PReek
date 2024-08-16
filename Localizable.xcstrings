@@ -181,6 +181,12 @@
         }
       }
     },
+    "Could not parse GitHub Enterprise URL" : {
+
+    },
+    "Error: %@" : {
+
+    },
     "Excluded User #%lld" : {
       "localizations" : {
         "de" : {
@@ -200,6 +206,9 @@
           }
         }
       }
+    },
+    "Failed to send request to GitHub" : {
+
     },
     "Filters" : {
       "localizations" : {
@@ -231,16 +240,6 @@
         }
       }
     },
-    "GitHub API endpoint" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHub API Endpunkt"
-          }
-        }
-      }
-    },
     "GitHub Connection:" : {
       "localizations" : {
         "de" : {
@@ -251,12 +250,22 @@
         }
       }
     },
-    "GitHub GraphQL endpoint" : {
+    "GitHub Documentation" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GitHub GraphQL Endpunkt"
+            "value" : "GitHub Dokumentation"
+          }
+        }
+      }
+    },
+    "GitHub Enterprise URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub Enterprise URL"
           }
         }
       }
@@ -312,7 +321,14 @@
       }
     },
     "Let's get you started!" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los geht's!"
+          }
+        }
+      }
     },
     "Load More" : {
       "localizations" : {
@@ -344,6 +360,9 @@
         }
       }
     },
+    "No token provided" : {
+
+    },
     "On start fetch PRs from notifications of last" : {
       "localizations" : {
         "de" : {
@@ -364,12 +383,28 @@
         }
       }
     },
+    "PAT is invalid" : {
+
+    },
+    "PAT is missing permissions, does it have the 'notifications' scope?" : {
+
+    },
     "PReek" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PReek"
+          }
+        }
+      }
+    },
+    "Provide the base URL without any suffix. For example:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gebe die URL ohne Prefix an. Beispiel:"
           }
         }
       }
@@ -444,6 +479,16 @@
         }
       }
     },
+    "Save" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern"
+          }
+        }
+      }
+    },
     "Save Settings" : {
       "localizations" : {
         "de" : {
@@ -504,6 +549,16 @@
         }
       }
     },
+    "The Personal Access Token (PAT) requires 'notifications' permissions. See the documentation on how to generate a PAT." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Personal Access Token (PAT) benötigt die 'notifications' Berechtigung. Informationen zum Generieren eines PAT findest du in der GitHub Dokumentation."
+          }
+        }
+      }
+    },
     "To:" : {
       "localizations" : {
         "de" : {
@@ -514,7 +569,7 @@
         }
       }
     },
-    "TODO: The Personal Access Token requires Notifications permissions" : {
+    "Unknown error happened" : {
 
     },
     "updated %@ at %@" : {
@@ -553,18 +608,25 @@
         }
       }
     },
-    "Use separate GraphQL endpoint" : {
+    "Use GitHub Enterprise" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Separaten GraphQL Endpunk verwenden"
+            "value" : "Verwende GitHub Enterprise"
           }
         }
       }
     },
     "Welcome to PReek" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Willkommen bei PReek!"
+          }
+        }
+      }
     },
     "You are done for today! 🎉" : {
       "localizations" : {

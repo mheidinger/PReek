@@ -1,29 +1,44 @@
 import SwiftUI
 
 struct ContentView: View {
-    var closeWindow: () -> Void
-    
-    @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
-    @ObservedObject var configViewModel = ConfigViewModel()
-    @State var settingsOpen = false
-    
-    init(closeWindow: @escaping () -> Void, setUnreadIcon: @escaping (Bool) -> Void) {
-        self.closeWindow = closeWindow
-        self.pullRequestsViewModel = PullRequestsViewModel(setUnreadIcon: setUnreadIcon)
-        pullRequestsViewModel.triggerUpdatePullRequests()
-        pullRequestsViewModel.startFetchTimer()
+    enum Screen {
+        case settings
+        case welcome
+        case main
     }
     
-    func modifierLinkAction(modifierPressed: Bool) {
+    @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
+    @ObservedObject var configViewModel: ConfigViewModel
+    
+    var closeWindow: () -> Void
+    
+    @State var currentScreen: Screen
+    
+    init(pullRequestsViewModel: PullRequestsViewModel, configViewModel: ConfigViewModel, closeWindow: @escaping () -> Void) {
+        self.pullRequestsViewModel = pullRequestsViewModel
+        self.configViewModel = configViewModel
+        self.closeWindow = closeWindow
+        self.currentScreen = configViewModel.token.isEmpty ? .welcome : .main
+    }
+    
+    private func modifierLinkAction(modifierPressed: Bool) {
         if ConfigService.closeWindowOnLinkClick != modifierPressed {
             closeWindow()
         }
     }
     
+    private func testConnection() async -> Error? {
+        await pullRequestsViewModel.updatePullRequests()
+        return pullRequestsViewModel.error
+    }
+    
     var body: some View {
-        if settingsOpen {
-            SettingsView(settingsOpen: $settingsOpen, configViewModel: configViewModel)
-        } else {
+        switch currentScreen {
+        case .settings:
+            SettingsView(configViewModel: configViewModel, closeSettings: { currentScreen = .main })
+        case .welcome:
+            WelcomeView(configViewModel: configViewModel, testConnection: testConnection, dismissWelcomeView: { currentScreen = .main })
+        case .main:
             mainPage
         }
     }
@@ -32,7 +47,7 @@ struct ContentView: View {
     var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
             PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests, toggleRead: pullRequestsViewModel.toggleRead)
-        } else if pullRequestsViewModel.hasError {
+        } else if pullRequestsViewModel.error != nil {
             Image(systemName: "icloud.slash")
                 .font(.largeTitle)
         } else if pullRequestsViewModel.isRefreshing {
@@ -51,7 +66,7 @@ struct ContentView: View {
             
             StatusBarView(
                 pullRequestsViewModel: pullRequestsViewModel,
-                settingsOpen: $settingsOpen
+                openSettings: { currentScreen = .settings }
             )
         }
         .environment(\.closeMenuBarWindowModifierLinkAction, modifierLinkAction)
@@ -59,5 +74,5 @@ struct ContentView: View {
 }
 
 #Preview(traits: .fixedLayout(width: 600, height: 400)) {
-    ContentView(closeWindow: {}, setUnreadIcon: { _ in })
+    ContentView(pullRequestsViewModel: PullRequestsViewModel(), configViewModel: ConfigViewModel(), closeWindow: {})
 }

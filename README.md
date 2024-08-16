@@ -56,7 +56,8 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
 - [ ] Link commits (and maybe force pushed?) not to commit directly but filtered files page
 - [x] Update PRs also w/o new notifications: you don't get notifications e.g. if you yourself merged a PR
 - [ ] Start Screen
-  - [ ] Logo + Welcome
-  - [ ] Basic settings? PAT + URLs?
+  - [x] Logo + Welcome
+  - [x] Basic settings? PAT + URLs?
   - [ ] Notice around notification usage + PAT permissions?
+  - [x] Button to check settings and dismiss screen
 - [ ] Rate Limiting?

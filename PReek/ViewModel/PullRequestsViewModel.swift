@@ -1,43 +1,23 @@
-import Foundation
+import SwiftUI
 
-protocol PullRequestsViewModelProtocol: ObservableObject {
-    var lastUpdated: Date? { get set }
-    var isRefreshing: Bool { get set }
-    var hasError: Bool { get set }
-    var hideClosed: Bool { get set }
-    var hideRead: Bool { get set }
-    var pullRequests: [PullRequest] { get }
-    
-    func triggerUpdatePullRequests()
-    func startFetchTimer()
-    func toggleRead(_ pullRequest: PullRequest)
-    func markAllAsRead()
-}
-
-class PullRequestsViewModel: PullRequestsViewModelProtocol {
-    var setUnreadIcon: (Bool) -> Void
-    
+class PullRequestsViewModel: ObservableObject {
     @Published var lastUpdated: Date? = nil
     @Published var isRefreshing = false
-    @Published var hasError = false
+    @Published var error: Error? = nil
     
-    @Published var hideClosed = false {
+    @AppStorage("hideClosed") var hideClosed: Bool = true {
         didSet {
-            ConfigService.hideClosed = hideClosed
+            objectWillChange.send()
         }
     }
-    @Published var hideRead = false {
+    @AppStorage("hideRead") var hideRead: Bool = true {
         didSet {
-            ConfigService.hideRead = hideRead
+            objectWillChange.send()
         }
     }
     
-    @CodableAppStorage("pullRequestReadMap") private var storedPullRequestReadMap: [String: Date] = [:]
-    @Published private var pullRequestReadMap: [String: Date] = [:] {
-        didSet {
-            storedPullRequestReadMap = pullRequestReadMap
-        }
-    }
+    @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: Date] = [:]
+    @Published var hasUnread: Bool = false
     
     @Published private var pullRequestMap: [String: PullRequest] = [:]
     var pullRequests: [PullRequest] {
@@ -57,11 +37,6 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         }.sorted {
             $0.lastUpdated > $1.lastUpdated
         }
-    }
-    
-    init(setUnreadIcon: @escaping (Bool) -> Void) {
-        self.setUnreadIcon = setUnreadIcon
-        self.pullRequestReadMap = storedPullRequestReadMap
     }
     
     private var timer: Timer?
@@ -87,7 +62,7 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         } else {
             pullRequestReadMap[pullRequest.id] = Date()
         }
-        updateUnreadIcon()
+        updateHasUnread()
         objectWillChange.send()
     }
     
@@ -96,7 +71,7 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         pullRequests.forEach { pullRequest in
             pullRequestReadMap[pullRequest.id] = now
         }
-        updateUnreadIcon()
+        updateHasUnread()
         objectWillChange.send()
     }
     
@@ -107,9 +82,8 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         return markedRead > pullRequest.lastNonViewerUpdated
     }
     
-    private func updateUnreadIcon() {
-        let unreadPullRequest = pullRequests.first { pullRequest in !pullRequest.markedAsRead } != nil
-        setUnreadIcon(unreadPullRequest)
+    private func updateHasUnread() {
+        hasUnread = pullRequests.first { pullRequest in !pullRequest.markedAsRead } != nil
     }
     
     private func handleReceivedNotifications(notifications: [Notification]) async throws -> [String] {
@@ -144,13 +118,13 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         return []
     }
     
-    private func updatePullRequests() async {
+    func updatePullRequests() async {
         do {
             print("Start fetching notifications")
             
             DispatchQueue.main.async {
                 self.isRefreshing = true
-                self.hasError = false
+                self.error = nil
             }
             
             let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: Date())!
@@ -172,7 +146,7 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
             cleanupPullRequests()
             
             DispatchQueue.main.async {
-                self.updateUnreadIcon()
+                self.updateHasUnread()
                 self.lastUpdated = Date()
                 self.isRefreshing = false
             }
@@ -180,7 +154,8 @@ class PullRequestsViewModel: PullRequestsViewModelProtocol {
         } catch {
             print("Failed to get pull requests: \(error)")
             DispatchQueue.main.async {
-                self.hasError = true
+                self.isRefreshing = false
+                self.error = error
             }
         }
     }

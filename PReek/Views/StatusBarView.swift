@@ -26,14 +26,14 @@ private struct PopoverFilterOption: View {
                 Text(label)
             }
             .labelsHidden()
-            .toggleStyle(SwitchToggleStyle())
+            .toggleStyle(.switch)
         }
     }
 }
 
-struct StatusBarView<ViewModel: PullRequestsViewModelProtocol>: View {
-    @ObservedObject var pullRequestsViewModel: ViewModel
-    @Binding var settingsOpen: Bool
+struct StatusBarView: View {
+    @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
+    let openSettings: () -> Void
     
     @State private var showFilterPopover: Bool = false
     
@@ -49,15 +49,16 @@ struct StatusBarView<ViewModel: PullRequestsViewModelProtocol>: View {
             
             Spacer()
             
-            if pullRequestsViewModel.hasError {
+            if let error = pullRequestsViewModel.error {
                 Text("Failed to fetch notifications")
                     .foregroundStyle(.red)
+                    .help(error.localizedDescription)
             } else {
                 Text("Last updated at \(pullRequestsViewModel.lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "...")")
                     .foregroundStyle(.secondary)
             }
             Group {
-                if pullRequestsViewModel.isRefreshing && !pullRequestsViewModel.hasError {
+                if pullRequestsViewModel.isRefreshing {
                     ProgressView()
                         .scaleEffect(0.6)
                         .padding(.leading, -4)
@@ -68,9 +69,7 @@ struct StatusBarView<ViewModel: PullRequestsViewModelProtocol>: View {
             }
             .frame(width: 25, alignment: .leading)
             
-            StatusBarButton(imageSystemName: "gear", action: {
-                settingsOpen = true
-            })
+            StatusBarButton(imageSystemName: "gear", action: openSettings)
             .help("Settings")
         }
         .padding(.horizontal)
@@ -88,7 +87,5 @@ struct StatusBarView<ViewModel: PullRequestsViewModelProtocol>: View {
 
 #Preview {
     StatusBarView(
-        pullRequestsViewModel: MockPullRequestsViewModel(),
-        settingsOpen: .constant(false)
-    )
+        pullRequestsViewModel: PullRequestsViewModel(), openSettings: {})
 }

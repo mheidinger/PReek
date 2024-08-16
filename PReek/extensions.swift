@@ -1,9 +1,8 @@
-import Foundation
 import SwiftUI
 
 // During JSON deserialize default to last enum value
 protocol CaseIterableDefaultsLast: Decodable & CaseIterable & RawRepresentable
-where RawValue: Decodable, AllCases: BidirectionalCollection { }
+where RawValue: Decodable, AllCases: BidirectionalCollection {}
 
 extension CaseIterableDefaultsLast {
     init(from decoder: Decoder) throws {
@@ -30,22 +29,6 @@ struct CodableAppStorage<T: Codable> {
         set {
             if let encoded = try? JSONEncoder().encode(newValue) {
                 UserDefaults.standard.set(encoded, forKey: key)
-            }
-        }
-    }
-}
-
-// Allow strings to be thrown as error
-extension String: Error {}
-
-// Add changing cursor to hand and background higlight on link hover
-extension Link {
-    func pointingHandCursor() -> some View {
-        self.onHover { inside in
-            if inside {
-                NSCursor.pointingHand.set()
-            } else {
-                NSCursor.arrow.set()
             }
         }
     }

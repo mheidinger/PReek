@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @Binding var settingsOpen: Bool
     @ObservedObject var configViewModel: ConfigViewModel
+    let closeSettings: () -> Void
     
     var body: some View {
         VStack {
@@ -11,7 +11,7 @@ struct SettingsView: View {
                     .font(.title)
                     .bold()
                 Spacer()
-                Button(action: { settingsOpen = false }) {
+                Button(action: closeSettings) {
                     Image(systemName: "xmark.circle")
                         .font(.title)
                 }
@@ -102,5 +102,5 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView(settingsOpen: .constant(true), configViewModel: ConfigViewModel())
+    SettingsView(configViewModel: ConfigViewModel(), closeSettings: {})
 }

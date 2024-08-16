@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HelpTextField<Label: View>: View {
+struct HelpTextField<HelpContent: View>: View {
     enum FieldType {
         case secureField
         case textField
@@ -16,7 +16,7 @@ struct HelpTextField<Label: View>: View {
     let type: FieldType
     @Binding var text: String
     let label: LocalizedStringKey
-    let helpContent: () -> Label
+    let helpContent: () -> HelpContent
     
     @State private var showPopover = false
     

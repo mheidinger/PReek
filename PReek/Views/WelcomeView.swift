@@ -3,28 +3,56 @@ import SwiftUI
 struct WelcomeView: View {
     @ObservedObject var configViewModel: ConfigViewModel
     
+    var testConnection: () async -> Error?
+    var dismissWelcomeView: () -> Void
+    
+    @State private var error: Error?
+    
+    private func doSave() {
+        Task {
+            configViewModel.saveSettings()
+            error = await testConnection()
+            if error == nil {
+                dismissWelcomeView()
+            }
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 50) {
             HStack(spacing: 30) {
                 Image(.icon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 50)
+                    .frame(width: 60)
                 VStack {
                     Text("Welcome to PReek")
-                        .font(.title)
+                        .font(.largeTitle)
                     Text("Let's get you started!")
-                        .font(.title2)
+                        .font(.title)
                 }
             }
             
-            ConnectionSettingsView(configViewModel: configViewModel)
+            VStack(alignment: .trailing) {
+                ConnectionSettingsView(configViewModel: configViewModel)
+                
+                Button(action: doSave) {
+                    Text("Save")
+                }
+                
+                if let error = error {
+                    Text("Error: \(error.localizedDescription)")
+                        .foregroundStyle(.red)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
+            }
+            .frame(height: 150, alignment: .top)
         }
         .padding()
     }
 }
 
 #Preview {
-    WelcomeView(configViewModel: ConfigViewModel())
+    WelcomeView(configViewModel: ConfigViewModel(), testConnection: { return GitHubError.forbidden }, dismissWelcomeView: {})
         .frame(width: 600, height: 400)
 }
