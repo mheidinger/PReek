@@ -28,6 +28,8 @@
 		6CB0272A2BFF818000C4C3B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CB027292BFF818000C4C3B1 /* Assets.xcassets */; };
 		6CB720392C7091D00067CA1D /* Commit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB720382C7091D00067CA1D /* Commit.swift */; };
 		6CB7203B2C7096520067CA1D /* CommitsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB7203A2C7096520067CA1D /* CommitsView.swift */; };
+		6CB7203E2C70ED840067CA1D /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6CB7203D2C70ED840067CA1D /* MarkdownUI */; };
+		6CB720402C70F8630067CA1D /* ClippedMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB7203F2C70F8630067CA1D /* ClippedMarkdownView.swift */; };
 		6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */; };
 		6CE0CE6E2C410D0B00ECF4FA /* ModifierLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE0CE6D2C410D0B00ECF4FA /* ModifierLink.swift */; };
 		6CE563F72BFFAD3E008E9A4B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE563F62BFFAD3E008E9A4B /* ContentView.swift */; };
@@ -68,6 +70,7 @@
 		6CB0272E2BFF818000C4C3B1 /* PReek.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PReek.entitlements; sourceTree = "<group>"; };
 		6CB720382C7091D00067CA1D /* Commit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Commit.swift; sourceTree = "<group>"; };
 		6CB7203A2C7096520067CA1D /* CommitsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommitsView.swift; sourceTree = "<group>"; };
+		6CB7203F2C70F8630067CA1D /* ClippedMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClippedMarkdownView.swift; sourceTree = "<group>"; };
 		6CE0CE6D2C410D0B00ECF4FA /* ModifierLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifierLink.swift; sourceTree = "<group>"; };
 		6CE563F62BFFAD3E008E9A4B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6CE563F82BFFDC8F008E9A4B /* PullRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullRequestView.swift; sourceTree = "<group>"; };
@@ -93,6 +96,7 @@
 				6C232DE72C08C51D00C003B1 /* KeychainAccess in Frameworks */,
 				6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */,
 				6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */,
+				6CB7203E2C70ED840067CA1D /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +120,7 @@
 				6CE0CE6D2C410D0B00ECF4FA /* ModifierLink.swift */,
 				6C5FBDF02C6B3C9D00620B7A /* HelpTextField.swift */,
 				6CE563FA2C00862E008E9A4B /* DividedView.swift */,
+				6CB7203F2C70F8630067CA1D /* ClippedMarkdownView.swift */,
 			);
 			path = UtilityViews;
 			sourceTree = "<group>";
@@ -241,6 +246,7 @@
 				6C7C4CA02C071A0400B9B4DA /* LinkHeaderParser */,
 				6C232DE62C08C51D00C003B1 /* KeychainAccess */,
 				6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */,
+				6CB7203D2C70ED840067CA1D /* MarkdownUI */,
 			);
 			productName = PReek;
 			productReference = 6CB027222BFF817E00C4C3B1 /* PReek.app */;
@@ -275,6 +281,7 @@
 				6C7C4C9F2C071A0400B9B4DA /* XCRemoteSwiftPackageReference "LinkHeaderParser" */,
 				6C232DE52C08C51D00C003B1 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
+				6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			productRefGroup = 6CB027232BFF817E00C4C3B1 /* Products */;
 			projectDirPath = "";
@@ -325,6 +332,7 @@
 				6C5FBDF12C6B3C9D00620B7A /* HelpTextField.swift in Sources */,
 				6CE563F92BFFDC8F008E9A4B /* PullRequestView.swift in Sources */,
 				6C50F4362C0486BA008F5B66 /* NotificationDto.swift in Sources */,
+				6CB720402C70F8630067CA1D /* ClippedMarkdownView.swift in Sources */,
 				6CE563F72BFFAD3E008E9A4B /* ContentView.swift in Sources */,
 				6CE564022C0090BD008E9A4B /* PullRequestEventView.swift in Sources */,
 				6CE563FE2C008D9A008E9A4B /* PullRequest.swift in Sources */,
@@ -562,6 +570,14 @@
 				kind = branch;
 			};
 		};
+		6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.0;
+			};
+		};
 		6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/orchetect/MenuBarExtraAccess";
@@ -582,6 +598,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6C7C4C9F2C071A0400B9B4DA /* XCRemoteSwiftPackageReference "LinkHeaderParser" */;
 			productName = LinkHeaderParser;
+		};
+		6CB7203D2C70ED840067CA1D /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
 		};
 		6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */ = {
 			isa = XCSwiftPackageProductDependency;

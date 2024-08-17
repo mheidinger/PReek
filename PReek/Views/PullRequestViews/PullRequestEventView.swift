@@ -1,6 +1,5 @@
 import SwiftUI
-
-
+import MarkdownUI
 
 struct PullRequestEventDataView: View {
     var data: any PullRequestEventData
@@ -16,10 +15,6 @@ struct PullRequestEventDataView: View {
             return String(localized: "replied:")
         }
         return nil
-    }
-    
-    private func formatCommitCount(commitCount: Int) -> String {
-        return "\(commitCount) Commit\(commitCount > 1 ? "s" : "")"
     }
     
     var body: some View {
@@ -79,7 +74,7 @@ struct PullRequestEventDataView: View {
 }
 
 struct PullRequestCommentView: View {
-    var comment: String
+    var comment: MarkdownContent
     var prefix: String?
     
     var body: some View {
@@ -88,8 +83,7 @@ struct PullRequestCommentView: View {
                 Text(setPrefix)
                     .foregroundStyle(.secondary)
             }
-            Text(comment)
-                .lineLimit(3)
+            ClippedMarkdownView(content: comment)
         }
     }
 }
@@ -165,7 +159,7 @@ struct PullRequestEventView: View {
             Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!)
         ]),
         PullRequestEvent.previewMerged,
-        PullRequestEvent.previewReview(comments: []),
+        PullRequestEvent.previewReview(),
         PullRequestEvent.previewComment,
         PullRequestEvent.previewReopened,
         PullRequestEvent.previewForcePushed,

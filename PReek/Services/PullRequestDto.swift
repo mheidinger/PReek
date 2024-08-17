@@ -62,9 +62,9 @@ struct PullRequestDto: Decodable {
         var url: String?
         /// PullRequestCommit
         var commit: Commit?
-        /// PullRequestReview and IssueCommit
+        /// PullRequestReview and IssueComment
         var author: User?
-        var bodyText: String?
+        var body: String?
         /// PullRequestReview
         var state: ReviewState?
         var comments: ReviewComments?
@@ -93,7 +93,7 @@ struct PullRequestDto: Decodable {
     struct ReviewComment: Decodable {
         var id: String
         var author: User?
-        var bodyText: String
+        var body: String
         var createdAt: Date
         var diffHunk: String
         var outdated: Bool

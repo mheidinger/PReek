@@ -1,4 +1,5 @@
 import Foundation
+import MarkdownUI
 
 protocol PullRequestEventData {
     // Returning nil will default to the PR overview page
@@ -38,8 +39,16 @@ struct PullRequestEvent: Identifiable {
                 url: nil,
                 state: .changesRequested,
                 comments: comments ?? [
-                    PullRequestReviewComment(id: UUID().uuidString, comment: "Some important comment that also is not too short as we'll get long comments and it won't stop and go on and on and on", fileReference: nil, isReply: false),
-                    PullRequestReviewComment(id: UUID().uuidString, comment: "Some important comment that also is not too short as we'll get long comments", fileReference: "MyComponent.tsx#L123", isReply: true)
+                    PullRequestReviewComment(id: UUID().uuidString, comment: MarkdownContent("""
+                        # Heading
+                        
+                        > Some important comment that also is not too short as we'll get long comments and it won't stop and go on and on and on
+                        
+                        **Theres more to come.**
+                        
+                        *The End!*
+                        """), fileReference: nil, isReply: false),
+                    PullRequestReviewComment(id: UUID().uuidString, comment: MarkdownContent("Some important comment that also is not too short as we'll get long comments"), fileReference: "MyComponent.tsx#L123", isReply: true)
                 ]
             ),
             pullRequestUrl: URL(string: "https://example.com")!
@@ -49,7 +58,7 @@ struct PullRequestEvent: Identifiable {
         id: UUID().uuidString,
         user: User.preview(login: "person-6"),
         time: Date(),
-        data: PullRequestEventCommentData(url: nil, comment: "Hello World, this is some really long comment which basically has no content but it has to be long"),
+        data: PullRequestEventCommentData(url: nil, comment: MarkdownContent("Hello World, this is some really long comment which basically has no content but it has to be long")),
         pullRequestUrl: URL(string: "https://example.com")!
     )
     static let previewReadyForReview = PullRequestEvent(id: UUID().uuidString, user: User.preview(login: "person-7"), time: Date(), data: PullRequestEventReadyForReviewData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
@@ -83,7 +92,7 @@ struct PullRequestEventMergedData: PullRequestEventData {
 
 struct PullRequestReviewComment: Identifiable {
     let id: String
-    let comment: String
+    let comment: MarkdownContent
     let fileReference: String?
     let isReply: Bool
 }
@@ -103,7 +112,7 @@ struct PullRequestEventReviewData: PullRequestEventData {
 
 struct PullRequestEventCommentData: PullRequestEventData {
     let url: URL?
-    let comment: String
+    let comment: MarkdownContent
 }
 
 struct PullRequestEventReadyForReviewData: PullRequestEventData {

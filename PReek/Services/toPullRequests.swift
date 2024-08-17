@@ -1,4 +1,5 @@
 import Foundation
+import MarkdownUI
 
 private let pullRequestStatus = [
     PullRequestDto.State.OPEN: PullRequest.Status.open,
@@ -52,7 +53,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         }
         return (PullRequestEventPushedData(isForcePush: true, commits: []), false)
     case .IssueComment:
-        return (PullRequestEventCommentData(url: toOptionalUrl(timelineItem.url), comment: timelineItem.bodyText ?? "Unknown"), false)
+        return (PullRequestEventCommentData(url: toOptionalUrl(timelineItem.url), comment: MarkdownContent(timelineItem.body ?? "")), false)
     case .MergedEvent:
         return (PullRequestEventMergedData(url: toOptionalUrl(timelineItem.url)), false)
     case .PullRequestCommit:
@@ -75,7 +76,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
             comments: timelineItem.comments?.nodes?.map { comment in
                 PullRequestReviewComment(
                     id: comment.id,
-                    comment: comment.bodyText,
+                    comment: MarkdownContent(comment.body),
                     fileReference: comment.path,
                     isReply: comment.replyTo != nil
                 )

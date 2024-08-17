@@ -87,7 +87,7 @@ struct FetchPullRequestsQueryBuilder {
           author {
             ...ActorFragment
           }
-          bodyText
+          body
           state
           createdAt
           url
@@ -97,7 +97,7 @@ struct FetchPullRequestsQueryBuilder {
               author {
                 ...ActorFragment
               }
-              bodyText
+              body
               createdAt
               diffHunk
               outdated
@@ -149,7 +149,7 @@ struct FetchPullRequestsQueryBuilder {
                 author {
                   ...ActorFragment
                 }
-                bodyText
+                body
                 createdAt
                 url
               }
