@@ -21,46 +21,6 @@
         }
       }
     },
-    "%lld Commits" : {
-      "localizations" : {
-        "de" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Commit"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Commits"
-                }
-              }
-            }
-          }
-        },
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%lld Commit"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "new",
-                  "value" : "%lld Commits"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "%lld weeks" : {
       "localizations" : {
         "de" : {
@@ -97,6 +57,16 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "•" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "•"
           }
         }
       }
@@ -182,10 +152,24 @@
       }
     },
     "Could not parse GitHub Enterprise URL" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub Enterprise URL ist keine valide URL"
+          }
+        }
+      }
     },
     "Error: %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fehler: %@"
+          }
+        }
+      }
     },
     "Excluded User #%lld" : {
       "localizations" : {
@@ -208,7 +192,14 @@
       }
     },
     "Failed to send request to GitHub" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senden der Anfrage zu GitHub fehlgeschlagen"
+          }
+        }
+      }
     },
     "Filters" : {
       "localizations" : {
@@ -361,7 +352,14 @@
       }
     },
     "No token provided" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein Token"
+          }
+        }
+      }
     },
     "On start fetch PRs from notifications of last" : {
       "localizations" : {
@@ -384,10 +382,24 @@
       }
     },
     "PAT is invalid" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PAT ist ungültig"
+          }
+        }
+      }
     },
     "PAT is missing permissions, does it have the 'notifications' scope?" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PAT hat nicht genügend Rechte, ist die 'notifications' Berechtigung zugewiesen?"
+          }
+        }
+      }
     },
     "PReek" : {
       "localizations" : {
@@ -570,7 +582,14 @@
       }
     },
     "Unknown error happened" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein unbekannter Fehler ist aufgetreten"
+          }
+        }
+      }
     },
     "updated %@ at %@" : {
       "localizations" : {

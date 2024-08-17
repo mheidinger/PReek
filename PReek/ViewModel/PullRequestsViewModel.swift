@@ -132,7 +132,7 @@ class PullRequestsViewModel: ObservableObject {
             
             print("Start fetching not updated pull requests")
             let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
-                !updatedPullRequestIds.contains(pullRequest.id)
+                !updatedPullRequestIds.contains(pullRequest.id) && pullRequest.status != .merged
             }.reduce([String: [Int]]()) { repoMap, pullRequest in
                 var repoMapClone = repoMap
                 

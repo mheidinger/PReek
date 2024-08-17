@@ -101,11 +101,7 @@ struct PullRequestContentView: View {
         VStack {
             DividedView {
                 ForEach(pullRequest.events[0..<eventLimit]) { event in
-                    PullRequestEventView(
-                        pullRequestEvent: event,
-                        pullRequestUrl: pullRequest.url,
-                        pullRequestFilesUrl: pullRequest.filesUrl
-                    )
+                    PullRequestEventView(pullRequestEvent: event)
                 }
                 if self.eventLimit < pullRequest.events.count {
                     Button(action: loadMore) {

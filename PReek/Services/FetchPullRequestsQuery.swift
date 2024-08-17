@@ -168,8 +168,10 @@ struct FetchPullRequestsQueryBuilder {
                     }
                   }
                   committedDate
-                  url
+                  messageHeadline
+                  oid
                 }
+                url
               }
               ... on PullRequestReview {
                 ...PullRequestReviewFragment

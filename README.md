@@ -30,7 +30,7 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
   - [x] Button to update
   - [x] Settings Button
   - [x] Errors
-- [ ] Push / Force Push Commit Messages?
+- [x] Push / Force Push Commit Messages
 - [ ] Settings Page
   - [x] GitHub URL
   - [x] Token
@@ -53,7 +53,8 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
 - [x] Mark all as read (all currently displayed)
 - [x] Don't mark as unread if last modification is from user
 - [ ] Better link placement for events?
-- [ ] Link commits (and maybe force pushed?) not to commit directly but filtered files page
+- [x] Link commits to filtered files page
+- [ ] Link single commits?
 - [x] Update PRs also w/o new notifications: you don't get notifications e.g. if you yourself merged a PR
 - [ ] Start Screen
   - [x] Logo + Welcome

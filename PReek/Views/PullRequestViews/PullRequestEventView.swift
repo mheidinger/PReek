@@ -24,14 +24,8 @@ struct PullRequestEventDataView: View {
     
     var body: some View {
         switch data {
-        case let forcePushData as PullRequestEventForcePushedData:
-            if let commitCount = forcePushData.commitCount {
-                Text(formatCommitCount(commitCount: commitCount))
-            } else {
-                EmptyView()
-            }
-        case let commitData as PullRequestEventCommitData:
-            Text("\(commitData.commitCount) Commits")
+        case let pushedData as PullRequestEventPushedData:
+            CommitsView(commits: pushedData.commits)
         case let reviewData as PullRequestEventReviewData:
             if !reviewData.comments.isEmpty {
                 VStack(alignment: .leading, spacing: 5) {
@@ -108,15 +102,13 @@ func eventDataToActionLabel(data: any PullRequestEventData) -> String {
         PullRequestEventReviewData.State.dismissed: "reviewed (dismissed)"
     ]
     
-    switch (data) {
+    switch data {
     case is PullRequestEventClosedData:
         return "closed"
-    case is PullRequestEventForcePushedData:
-        return "force pushed"
+    case let pushedData as PullRequestEventPushedData:
+        return pushedData.isForcePush ? "force pushed" : "pushed"
     case is PullRequestEventMergedData:
         return "merged"
-    case is PullRequestEventCommitData:
-        return "pushed"
     case let reviewData as PullRequestEventReviewData:
         return reviewLabels[reviewData.state] ?? "reviewed"
     case is PullRequestEventCommentData:
@@ -138,20 +130,6 @@ struct PullRequestEventView: View {
     @Environment(\.closeMenuBarWindowModifierLinkAction) var modifierLinkAction
     
     var pullRequestEvent: PullRequestEvent
-    var pullRequestUrl: URL
-    var pullRequestFilesUrl: URL
-    
-    func getEventUrl() -> URL {
-        if let url = pullRequestEvent.url {
-            return url
-        }
-        switch pullRequestEvent.data.fallbackUrlType {
-        case .pullRequestFiles:
-            return pullRequestFilesUrl
-        default:
-            return pullRequestUrl
-        }
-    }
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -162,7 +140,7 @@ struct PullRequestEventView: View {
                 Spacer()
                 Text(pullRequestEvent.time.formatted(date: .numeric, time: .shortened))
                     .foregroundStyle(.secondary)
-                ModifierLink(destination: getEventUrl(), additionalAction: modifierLinkAction) {
+                ModifierLink(destination: pullRequestEvent.url, additionalAction: modifierLinkAction) {
                     Image(systemName: "square.and.arrow.up")
                 }
             }
@@ -178,7 +156,14 @@ struct PullRequestEventView: View {
     let pullRequestEvents: [PullRequestEvent] = [
         PullRequestEvent.previewClosed,
         PullRequestEvent.previewCommit(),
-        PullRequestEvent.previewCommit(commitCount: 3),
+        PullRequestEvent.previewCommit(commits: [
+            Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
+        ]),
+        PullRequestEvent.previewCommit(commits: [
+            Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
+            Commit(id: "2", messageHeadline: "my second commit!", url: URL(string: "https://example.com")!),
+            Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!)
+        ]),
         PullRequestEvent.previewMerged,
         PullRequestEvent.previewReview(comments: []),
         PullRequestEvent.previewComment,
@@ -193,7 +178,7 @@ struct PullRequestEventView: View {
         VStack {
             DividedView {
                 ForEach(pullRequestEvents) { pullRequestEvent in
-                    PullRequestEventView(pullRequestEvent: pullRequestEvent, pullRequestUrl: URL(string: "https://example.com")!, pullRequestFilesUrl: URL(string: "https://example.com")!)
+                    PullRequestEventView(pullRequestEvent: pullRequestEvent)
                 }
             }
         }.padding()

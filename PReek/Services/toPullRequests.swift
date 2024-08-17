@@ -13,6 +13,13 @@ private let pullRequestState = [
     PullRequestDto.TimelineItem.ReviewState.DISMISSED: PullRequestEventReviewData.State.dismissed
 ]
 
+private func toOptionalUrl(_ url: String?) -> URL? {
+    guard let url = url else {
+        return nil
+    }
+    return URL(string: url)
+}
+
 private func toUser(user: PullRequestDto.User?) -> User {
     guard let user = user else {
         return User(login: "Unknown", url: nil)
@@ -38,26 +45,32 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         if prevEventData is PullRequestEventMergedData {
             return (nil, false)
         }
-        return (PullRequestEventClosedData(), false)
+        return (PullRequestEventClosedData(url: toOptionalUrl(timelineItem.url)), false)
     case .HeadRefForcePushedEvent:
-        if let prevCommitEventData = prevEventData as? PullRequestEventCommitData {
-            return (PullRequestEventForcePushedData(commitCount: prevCommitEventData.commitCount), true)
+        if let prevCommitEventData = prevEventData as? PullRequestEventPushedData {
+            return (PullRequestEventPushedData(isForcePush: true, commits: prevCommitEventData.commits), true)
         }
-        return (PullRequestEventForcePushedData(), false)
+        return (PullRequestEventPushedData(isForcePush: true, commits: []), false)
     case .IssueComment:
-        return (PullRequestEventCommentData(comment: timelineItem.bodyText ?? "Unknown"), false)
+        return (PullRequestEventCommentData(url: toOptionalUrl(timelineItem.url), comment: timelineItem.bodyText ?? "Unknown"), false)
     case .MergedEvent:
-        return (PullRequestEventMergedData(), false)
+        return (PullRequestEventMergedData(url: toOptionalUrl(timelineItem.url)), false)
     case .PullRequestCommit:
-        if let prevCommitEventData = prevEventData as? PullRequestEventCommitData {
-            return (PullRequestEventCommitData(commitCount: prevCommitEventData.commitCount + 1), true)
+        var newCommit: [Commit] = []
+        if let commit = timelineItem.commit {
+            newCommit.append(Commit(id: commit.oid, messageHeadline: commit.messageHeadline, url: toOptionalUrl(timelineItem.url)))
         }
-        return (PullRequestEventCommitData(commitCount: 1), false)
+        
+        if let prevCommitEventData = prevEventData as? PullRequestEventPushedData {
+            return (PullRequestEventPushedData(isForcePush: false, commits: prevCommitEventData.commits + newCommit), true)
+        }
+        return (PullRequestEventPushedData(isForcePush: false, commits: newCommit), false)
     case .PullRequestReview:
         if timelineItem.state == .PENDING {
             return (nil, false)
         }
         return (PullRequestEventReviewData(
+            url: toOptionalUrl(timelineItem.url),
             state: (timelineItem.state != nil) ? pullRequestState[timelineItem.state!] ?? .dismissed : .dismissed,
             comments: timelineItem.comments?.nodes?.map { comment in
                 PullRequestReviewComment(
@@ -69,7 +82,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
             } ?? []
         ), false)
     case .ReadyForReviewEvent:
-        return (PullRequestEventReadyForReviewData(), false)
+        return (PullRequestEventReadyForReviewData(url: toOptionalUrl(timelineItem.url)), false)
     case .RenamedTitleEvent:
         return (PullRequestEventRenamedTitleData(
             currentTitle: timelineItem.currentTitle ?? "Unknown",
@@ -84,7 +97,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
     }
 }
 
-private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]) -> [PullRequestEvent] {
+private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem], pullRequestUrl: URL) -> [PullRequestEvent] {
     // Step 1: Convert timeline items to data and merge information
     var prevEventData: PullRequestEventData? = nil
     let dataArray: [(PullRequestEventData, PullRequestDto.TimelineItem, Bool)] = timelineItems.compactMap { timelineItem in
@@ -111,61 +124,21 @@ private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem])
     }
     
     // Step 3: Convert to PullRequestEvent objects
-    return mergedDataArray.map { result in
-        let (data, timelineItem) = result
-        
-        let finalUrl: URL? = {
-            if let url = timelineItem.url, let parsedUrl = URL(string: url) {
-                return parsedUrl
-            }
-            if let commitUrl = timelineItem.commit?.url, let parsedCommitUrl = URL(string: commitUrl) {
-                return parsedCommitUrl
-            }
-            return nil
-        }()
-        
-        return PullRequestEvent(
+    return mergedDataArray.map { data, timelineItem in
+        PullRequestEvent(
             id: timelineItem.id!,
             user: toUser(user: timelineItem.actor ?? timelineItem.author ?? timelineItem.commit?.author?.user),
             time: timelineItem.createdAt ?? timelineItem.commit?.committedDate ?? Date(),
-            url: finalUrl,
-            data: data
+            data: data,
+            pullRequestUrl: pullRequestUrl
         )
     }
-    
-    //    return timelineItems.reduce([(PullRequestEventData, PullRequestDto.TimelineItem)]()) {dataArray, timelineItem in
-    //        let dataAndMerge = timelineItemToData(timelineItem: timelineItem, prevEventData: prevEventData)
-    //        if dataAndMerge.0 == nil {
-    //            return dataArray
-    //        }
-    //        prevEventData = dataAndMerge.0
-    //
-    //        var newDataArray = dataArray
-    //        let newItem = (dataAndMerge.0!, timelineItem)
-    //
-    //        if timelineItem.id == nil {
-    //            return dataArray
-    //        }
-    //
-    //        if dataAndMerge.1 {
-    //            newDataArray[newDataArray.endIndex-1] = newItem
-    //        } else {
-    //            newDataArray.append(newItem)
-    //        }
-    //        return newDataArray
-    //    }.map { result in
-    //        PullRequestEvent(
-    //            id: result.1.id!,
-    //            user: toUser(user: result.1.actor ?? result.1.author ?? result.1.commit?.author?.user),
-    //            time: result.1.createdAt ?? result.1.commit?.committedDate ?? Date(),
-    //            url: result.1.url ?? result.1.commit?.url,
-    //            data: result.0
-    //        )
-    //    }
 }
 
 private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> PullRequest {
-    let events = timelineItemsToEvents(timelineItems: dto.timelineItems.nodes ?? []).sorted {
+    let pullRequestUrl = URL(string: dto.url) ?? URL(string: "https://invalid.data")!
+    
+    let events = timelineItemsToEvents(timelineItems: dto.timelineItems.nodes ?? [], pullRequestUrl: pullRequestUrl).sorted {
         $0.time > $1.time
     }
     
@@ -183,7 +156,7 @@ private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> 
         lastUpdated: dto.updatedAt,
         lastNonViewerUpdated: lastNonViewerUpdated?.time ?? dto.updatedAt,
         events: events,
-        url: URL(string: dto.url) ?? URL(string: "https://invalid.data")!,
+        url: pullRequestUrl,
         additions: dto.additions,
         deletions: dto.deletions
     )
