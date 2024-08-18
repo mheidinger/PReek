@@ -19,20 +19,19 @@ struct ModifierLink<Label: View>: View {
     let destination: URL
     let modifiers: EventModifiers = .command
     let label: () -> Label
-    let additionalAction: AdditionalActionProcessor?
     
+    @Environment(\.modifierLinkAction) var additionalAction
     @Environment(\.openURL) private var openURL
     
-    init(destination: URL, additionalAction: AdditionalActionProcessor?, label: @escaping () -> Label) {
+    init(destination: URL, label: @escaping () -> Label) {
         self.destination = destination
         self.label = label
-        self.additionalAction = additionalAction
     }
     
     var body: some View {
         Button(action: {
             openURL(destination)
-            additionalAction?(NSEvent.modifierFlags.contains(convertToNSEventModifierFlags(modifiers)))
+            additionalAction(NSEvent.modifierFlags.contains(convertToNSEventModifierFlags(modifiers)))
         }, label: label)
         .buttonStyle(PlainButtonStyle())
         .onHover { inside in
@@ -45,11 +44,23 @@ struct ModifierLink<Label: View>: View {
     }
 }
 
+private struct ModifierLinkActionKey: EnvironmentKey {
+    static let defaultValue: ModifierLink.AdditionalActionProcessor = { _ in }
+}
+
+extension EnvironmentValues {
+    var modifierLinkAction: ModifierLink.AdditionalActionProcessor {
+        get { self[ModifierLinkActionKey.self] }
+        set { self[ModifierLinkActionKey.self] = newValue }
+    }
+}
+
 #Preview {
-    ModifierLink(destination: URL(string: "https://example.com")!, additionalAction: { modifierPressed in
-        print("Action! Modifier Pressed: \(modifierPressed)")
-    }) {
+    ModifierLink(destination: URL(string: "https://example.com")!) {
         Text("Click Me!")
     }
+    .environment(\.modifierLinkAction, { modifierPressed in
+        print("Action! Modifier Pressed: \(modifierPressed)")
+    })
     .padding()
 }

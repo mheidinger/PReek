@@ -8,8 +8,6 @@ private let statusToIcon: [PullRequest.Status: ImageResource] = [
 ]
 
 struct PullRequestHeaderView: View {
-    @Environment(\.closeMenuBarWindowModifierLinkAction) var modifierLinkAction
-    
     var pullRequest: PullRequest
     var toggleRead: () -> Void
     
@@ -22,16 +20,16 @@ struct PullRequestHeaderView: View {
             HStack(alignment: .top) {
                 VStack(alignment:.leading, spacing: 3) {
                     HStack {
-                        ModifierLink(destination: pullRequest.repository.url, additionalAction: modifierLinkAction) {
+                        ModifierLink(destination: pullRequest.repository.url) {
                             Text(pullRequest.repository.name)
                         }
-                        ModifierLink(destination: pullRequest.url, additionalAction: modifierLinkAction){
+                        ModifierLink(destination: pullRequest.url){
                             Text(pullRequest.numberFormatted)
                         }
                         .foregroundColor(.secondary)
                     }
                     HStack {
-                        ModifierLink(destination: pullRequest.url, additionalAction: modifierLinkAction) {
+                        ModifierLink(destination: pullRequest.url) {
                             Text(pullRequest.title)
                                 .multilineTextAlignment(.leading)
                                 .lineLimit(2)
@@ -40,7 +38,7 @@ struct PullRequestHeaderView: View {
                     }
                     HStack(spacing: 5) {
                         if let authorUrl = pullRequest.author.url {
-                            ModifierLink(destination: authorUrl, additionalAction: modifierLinkAction) {
+                            ModifierLink(destination: authorUrl) {
                                 Text("by \(pullRequest.author.displayName)")
                             }
                         } else {
@@ -50,7 +48,7 @@ struct PullRequestHeaderView: View {
                         Text("\(pullRequest.lastUpdatedFormatted)")
                         Text("·")
                         
-                        ModifierLink(destination: pullRequest.filesUrl, additionalAction: modifierLinkAction) {
+                        ModifierLink(destination: pullRequest.filesUrl) {
                             HStack(spacing: 2) {
                                 Text(pullRequest.additionsFormatted)
                                     .foregroundStyle(.green)

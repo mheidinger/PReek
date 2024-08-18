@@ -1,64 +1,31 @@
 <p align="center">
- <img width="200" height="200" margin-right="100%" src="https://github.com/mheidinger/PReek/blob/main/icons/logo.png?raw=true">
+ <img alt="PReek Logo" width="200" height="200" margin-right="100%" src="https://github.com/mheidinger/PReek/blob/main/icons/logo.png?raw=true">
 </p>
 
 # PReek
 
 PReek brings a quick peek into relevant GitHub Pull Requests directly into your MacOS MenuBar!
 
-*Project is very much in progress, use with caution!*
+<p align="center">
+ <img alt="Screenshot of PReek" width="400" src="img/screenshot-1.png">
+ <img alt="Screenshot of PReek" width="400" src="img/screenshot-2.png">
+</p>
 
-## TODOs
+## Install
 
-- [x] Proper Name!
-- [x] Error Handling
-- [x] Menu Bar Icon
-  - [x] Unread Indicator
-- [x] Read / Unread Tracking + Updates
-  - [x] Only requests notifications since last update
-  - [x] Only fetch PRs for which updates should be there
-  - [x] Mark PRs with updates as unread
-- [x] Get correct PRs
-- [x] PR Icons
-- [x] Squash / Filter Events
-  - [x] Multiple Commits into one Event
-  - [x] Multiple Commits + Force Push into one Event
-- [x] Figure out proper "Review Requested" Event Stuff
-  - Seems like it only returns `null` for requested team reviews? => adapted display
-- [x] Status Bar?
-  - [x] Last Updated
-  - [x] Button to update
-  - [x] Settings Button
-  - [x] Errors
-- [x] Push / Force Push Commit Messages
-- [ ] Settings Page
-  - [x] GitHub URL
-  - [x] Token
-  - [x] Quit Button
-  - [x] Exclude author list
-  - [x] Fetch and delete time windows
-  - [ ] Improve layout?
-- [x] Links / Buttons to open in Browser
-  - [x] Repository
-  - [x] PR itself
-  - [x] Events
-  - [x] Changes
-- [x] Data loading optimization
-- [x] Get rid of old data
-  - [x] Marked as read information older than X days + no longer in PR list
-  - [x] Closed / Merged PRs older than X days
-- [x] Filters on `PullRequestsView`
-  - [x] Read
-  - [x] Closed
-- [x] Mark all as read (all currently displayed)
-- [x] Don't mark as unread if last modification is from user
-- [ ] Better link placement for events?
-- [x] Link commits to filtered files page
-- [ ] Link single commits?
-- [x] Update PRs also w/o new notifications: you don't get notifications e.g. if you yourself merged a PR
-- [ ] Start Screen
-  - [x] Logo + Welcome
-  - [x] Basic settings? PAT + URLs?
-  - [ ] Notice around notification usage + PAT permissions?
-  - [x] Button to check settings and dismiss screen
-- [ ] Rate Limiting?
+Currently PReek can only be installed by locally building the project.
+
+GitHub Releases with signed installer, Brew and maybe an App Store installation will come soon!
+
+## FAQ
+
+### Why is the notification scope required for the GitHub PAT?
+
+PReek shows Pull Requests for which you got notifications for.
+To be able to fetch your notifications, the notifications scope is required.
+
+### Why is a given Pull Request not shown?
+
+As PReek shows Pull Requests for which you got notifications for, please check whether you received a notification for the missing Pull Request in the [Notifications Inbox](https://github.com/notifications).
+If you did not get a notification, verify that you have not disabled them for a given repository.
+See the [GitHub documentation](https://docs.github.com/en/account-and-profile/managing-subscriptions-and-notifications-on-github/setting-up-notifications/configuring-notifications) for more information.

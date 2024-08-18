@@ -33,15 +33,3 @@ struct CodableAppStorage<T: Codable> {
         }
     }
 }
-
-// Add function to close the menu bar window into the global environment
-private struct CloseMenuBarWindowModifierLinkActionKey: EnvironmentKey {
-    static let defaultValue: (Bool) -> Void = { _ in }
-}
-
-extension EnvironmentValues {
-    var closeMenuBarWindowModifierLinkAction: (Bool) -> Void {
-        get { self[CloseMenuBarWindowModifierLinkActionKey.self] }
-        set { self[CloseMenuBarWindowModifierLinkActionKey.self] = newValue }
-    }
-}

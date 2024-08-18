@@ -127,6 +127,7 @@ class PullRequestsViewModel: ObservableObject {
                 self.error = nil
             }
             
+            let newLastUpdated = Date()
             let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: Date())!
             let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: handleReceivedNotifications)
             
@@ -147,7 +148,7 @@ class PullRequestsViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 self.updateHasUnread()
-                self.lastUpdated = Date()
+                self.lastUpdated = newLastUpdated
                 self.isRefreshing = false
             }
             print("Finished fetching notifications")

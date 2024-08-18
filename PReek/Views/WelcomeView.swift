@@ -48,6 +48,14 @@ struct WelcomeView: View {
             }
             .frame(height: 150, alignment: .top)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(alignment: .bottom) {
+            ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek")!) {
+                Text("Made by Max Heidinger")
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+            }
+        }
         .padding()
     }
 }

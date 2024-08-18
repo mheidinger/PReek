@@ -71,6 +71,16 @@
         }
       }
     },
+    "< Image >" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "< Bild >"
+          }
+        }
+      }
+    },
     "Add Entry" : {
       "localizations" : {
         "de" : {
@@ -121,6 +131,16 @@
         }
       }
     },
+    "by Max Heidinger" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "von Max Heidinger"
+          }
+        }
+      }
+    },
     "Click Me!" : {
       "localizations" : {
         "de" : {
@@ -161,6 +181,16 @@
         }
       }
     },
+    "Create Issue" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Issue erstellen"
+          }
+        }
+      }
+    },
     "Error: %@" : {
       "localizations" : {
         "de" : {
@@ -197,6 +227,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Senden der Anfrage zu GitHub fehlgeschlagen"
+          }
+        }
+      }
+    },
+    "FAQ" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FAQ"
           }
         }
       }
@@ -271,6 +311,16 @@
         }
       }
     },
+    "GitHub Repository" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub Repository"
+          }
+        }
+      }
+    },
     "Hide closed" : {
       "localizations" : {
         "de" : {
@@ -327,6 +377,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mehr Laden"
+          }
+        }
+      }
+    },
+    "Made by Max Heidinger" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von Max Heidinger"
           }
         }
       }
@@ -411,12 +471,12 @@
         }
       }
     },
-    "Provide the base URL without any suffix. For example:" : {
+    "Provide the base URL without any suffix.\nFor example:" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gebe die URL ohne Prefix an. Beispiel:"
+            "value" : "Gebe die URL ohne Prefix an.\nBeispiel:"
           }
         }
       }
@@ -561,7 +621,7 @@
         }
       }
     },
-    "The Personal Access Token (PAT) requires 'notifications' permissions. See the documentation on how to generate a PAT." : {
+    "The Personal Access Token (PAT) requires 'notifications' permissions. Notifications are used to get the Pull Requests that are shown yo you. See the GitHub documentation on how to generate a PAT." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {

@@ -65,12 +65,14 @@ struct StatusBarView: View {
                 } else {
                     StatusBarButton(imageSystemName: "arrow.clockwise.circle", action: pullRequestsViewModel.triggerUpdatePullRequests)
                         .help("Refresh")
+                        .keyboardShortcut("r")
                 }
             }
             .frame(width: 25, alignment: .leading)
             
             StatusBarButton(imageSystemName: "gear", action: openSettings)
-            .help("Settings")
+                .help("Settings")
+                .keyboardShortcut(",")
         }
         .padding(.horizontal)
         .background(.background.opacity(0.5))

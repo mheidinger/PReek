@@ -69,7 +69,7 @@ struct ContentView: View {
                 openSettings: { currentScreen = .settings }
             )
         }
-        .environment(\.closeMenuBarWindowModifierLinkAction, modifierLinkAction)
+        .environment(\.modifierLinkAction, modifierLinkAction)
     }
 }
 

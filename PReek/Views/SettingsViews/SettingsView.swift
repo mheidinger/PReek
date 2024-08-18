@@ -52,10 +52,44 @@ struct SettingsView: View {
     @ViewBuilder
     var content: some View {
         VStack(alignment: .leading) {
+            HStack(spacing: 15) {
+                Image(.icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50)
+                VStack(alignment: .leading) {
+                    Text("PReek")
+                        .font(.title)
+                    Text("by Max Heidinger")
+                        .font(.title3)
+                }
+                
+                Spacer()
+                
+                VStack(alignment: .trailing, spacing: 5) {
+                    ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek")!) {
+                        Text("GitHub Repository")
+                            .foregroundStyle(.link)
+                    }
+                    ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek#faq")!) {
+                        Text("FAQ")
+                            .foregroundStyle(.link)
+                    }
+                    ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek/issues/new")!) {
+                        Text("Create Issue")
+                            .foregroundStyle(.link)
+                    }
+                }
+            }
+            
+            Divider()
+            
             Section(header: Text("GitHub Connection:").bold()) {
                 ConnectionSettingsView(configViewModel: configViewModel)
             }
+            
             Divider()
+            
             Section(header: Text("Pull Requests").bold()) {
                 HStack {
                     Text("On start fetch PRs from notifications of last")
@@ -90,7 +124,9 @@ struct SettingsView: View {
                 Button("Add Entry", action: addExcludedUserEntry)
                     .padding(.top, 5)
             }
+            
             Divider()
+            
             Section(header: Text("Additional Settings").bold()) {
                 Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
                     Text("Close window when opening a link, press CMD on click to get opposite behaviour")

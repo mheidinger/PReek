@@ -19,16 +19,18 @@ class ConfigViewModel: ObservableObject {
     @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { username in return ExcludedUser(username: username)}
     
     func saveSettings() {
-        if useGitHubEnterprise {
-            ConfigService.gitHubEnterpriseUrl = gitHubEnterpriseUrl
-        } else {
-            ConfigService.gitHubEnterpriseUrl = nil
+        Task {
+            if useGitHubEnterprise {
+                ConfigService.gitHubEnterpriseUrl = gitHubEnterpriseUrl
+            } else {
+                ConfigService.gitHubEnterpriseUrl = nil
+            }
+            ConfigService.token = token
+            ConfigService.closeWindowOnLinkClick = closeWindowOnLinkClick
+            ConfigService.onStartFetchWeeks = onStartFetchWeeks
+            ConfigService.deleteAfterWeeks = deleteAfterWeeks
+            ConfigService.deleteOnlyClosed = deleteOnlyClosed
+            ConfigService.excludedUsers = excludedUsers.map { excludedUser in return excludedUser.username }
         }
-        ConfigService.token = token
-        ConfigService.closeWindowOnLinkClick = closeWindowOnLinkClick
-        ConfigService.onStartFetchWeeks = onStartFetchWeeks
-        ConfigService.deleteAfterWeeks = deleteAfterWeeks
-        ConfigService.deleteOnlyClosed = deleteOnlyClosed
-        ConfigService.excludedUsers = excludedUsers.map { excludedUser in return excludedUser.username }
     }
 }

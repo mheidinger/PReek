@@ -129,7 +129,7 @@ class GitHubService {
         intRequest.cachePolicy = .reloadIgnoringLocalCacheData
         
         do {
-           let (data, response) = try await URLSession.shared.data(for: intRequest)
+            let (data, response) = try await URLSession.shared.data(for: intRequest)
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw GitHubError.unknown
             }
@@ -142,6 +142,8 @@ class GitHubService {
             }
             
             return (data, httpResponse)
+        } catch let error as GitHubError {
+            throw error
         } catch {
             throw GitHubError.networkError
         }
