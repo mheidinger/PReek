@@ -32,6 +32,7 @@
 		6CB720402C70F8630067CA1D /* ClippedMarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB7203F2C70F8630067CA1D /* ClippedMarkdownView.swift */; };
 		6CB720422C7238030067CA1D /* PullRequestEventDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB720412C7238030067CA1D /* PullRequestEventDataView.swift */; };
 		6CB720442C7239FF0067CA1D /* CommentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB720432C7239FF0067CA1D /* CommentView.swift */; };
+		6CB720462C725FA70067CA1D /* ExportOptions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6CB720452C725FA70067CA1D /* ExportOptions.plist */; };
 		6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */; };
 		6CE0CE6E2C410D0B00ECF4FA /* ModifierLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE0CE6D2C410D0B00ECF4FA /* ModifierLink.swift */; };
 		6CE563F72BFFAD3E008E9A4B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE563F62BFFAD3E008E9A4B /* ContentView.swift */; };
@@ -75,6 +76,7 @@
 		6CB7203F2C70F8630067CA1D /* ClippedMarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClippedMarkdownView.swift; sourceTree = "<group>"; };
 		6CB720412C7238030067CA1D /* PullRequestEventDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullRequestEventDataView.swift; sourceTree = "<group>"; };
 		6CB720432C7239FF0067CA1D /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
+		6CB720452C725FA70067CA1D /* ExportOptions.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ExportOptions.plist; sourceTree = "<group>"; };
 		6CE0CE6D2C410D0B00ECF4FA /* ModifierLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModifierLink.swift; sourceTree = "<group>"; };
 		6CE563F62BFFAD3E008E9A4B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6CE563F82BFFDC8F008E9A4B /* PullRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullRequestView.swift; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				6C043E512C68DE9C00DEBF35 /* .github */,
 				6C043E4F2C68DE6D00DEBF35 /* README.md */,
 				6C19E97B2C68AE130035845C /* Localizable.xcstrings */,
+				6CB720452C725FA70067CA1D /* ExportOptions.plist */,
 				6CB027242BFF817E00C4C3B1 /* PReek */,
 				6CB027232BFF817E00C4C3B1 /* Products */,
 			);
@@ -296,6 +299,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6CB0272A2BFF818000C4C3B1 /* Assets.xcassets in Resources */,
+				6CB720462C725FA70067CA1D /* ExportOptions.plist in Resources */,
 				6C043E502C68DE6D00DEBF35 /* README.md in Resources */,
 				6C19E97C2C68AE130035845C /* Localizable.xcstrings in Resources */,
 				6C043E522C68DE9C00DEBF35 /* .github in Resources */,
