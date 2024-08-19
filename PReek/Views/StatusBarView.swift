@@ -75,7 +75,7 @@ struct StatusBarView: View {
                 .keyboardShortcut(",")
         }
         .padding(.horizontal)
-        .background(.background.opacity(0.5))
+        .background(.background.opacity(0.7))
     }
     
     var filterPopover: some View {

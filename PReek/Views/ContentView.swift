@@ -70,6 +70,7 @@ struct ContentView: View {
             )
         }
         .environment(\.modifierLinkAction, modifierLinkAction)
+        .background(.background.opacity(0.5))
     }
 }
 

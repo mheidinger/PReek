@@ -11,6 +11,8 @@ struct PullRequestHeaderView: View {
     var pullRequest: PullRequest
     var toggleRead: () -> Void
     
+    @Environment(\.colorScheme) var colorScheme
+    
     var body: some View {
         HStack(spacing: 10) {
             Image(statusToIcon[pullRequest.status] ?? .prOpen)
@@ -52,11 +54,18 @@ struct PullRequestHeaderView: View {
                             HStack(spacing: 2) {
                                 Text(pullRequest.additionsFormatted)
                                     .foregroundStyle(.green)
+                                    .if(colorScheme == .light) { view in
+                                        view
+                                            .brightness(-0.4)
+                                    }
                                 Text(pullRequest.deletionsFormatted)
                                     .foregroundStyle(.red)
+                                    .if(colorScheme == .light) { view in
+                                        view
+                                            .brightness(-0.4)
+                                    }
                             }
                         }
-                        
                     }
                     .foregroundStyle(.secondary)
                     .textScale(.secondary)

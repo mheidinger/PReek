@@ -51,7 +51,7 @@ struct ClippedMarkdownView: View {
                     view
                         .overlay(alignment: .bottomTrailing) {
                             Button(action: { isExpanded = !isExpanded }) {
-                                Image(systemName: isExpanded ? "arrowtriangle.up.square.fill" : "arrowtriangle.down.square.fill")
+                                Image(systemName: isExpanded ? "arrowtriangle.up.square" : "arrowtriangle.down.square")
                                     .imageScale(.large)
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -68,17 +68,6 @@ struct HeightPreferenceKey: PreferenceKey {
         value = max(value, nextValue())
     }
 }
-
-extension View {
-    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
-        }
-    }
-}
-
 
 #Preview {
     VStack {
