@@ -13,9 +13,17 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
 
 ## Install
 
-Currently PReek can only be installed by locally building the project.
+### Direct Download
 
-GitHub Releases with signed installer, Brew and maybe an App Store installation will come soon!
+A signed and notarized DMG installer can be found in the the [latest release](https://github.com/mheidinger/PReek/releases/latest).
+
+### Brew - Coming Soon
+
+Installation through Brew will come as soon as the project got some [popularity required for Brew](https://docs.brew.sh/Acceptable-Casks#rejected-casks), so feel free to ⭐ this repository!
+
+### App Store - Maybe Coming Soon
+
+Depending on the success of the project I'll decide whether it is worth the effort to publish to the App Store or not.
 
 ## FAQ
 
