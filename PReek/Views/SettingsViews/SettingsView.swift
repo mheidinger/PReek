@@ -4,6 +4,12 @@ struct SettingsView: View {
     @ObservedObject var configViewModel: ConfigViewModel
     let closeSettings: () -> Void
     
+    private func saveSettings() {
+        Task {
+            configViewModel.saveSettings()
+        }
+    }
+    
     var body: some View {
         VStack {
             HStack {
@@ -29,7 +35,7 @@ struct SettingsView: View {
             HStack {
                 Button("Quit App", action: { NSApplication.shared.terminate(nil) })
                 Spacer()
-                Button("Save Settings", action: configViewModel.saveSettings)
+                Button("Save Settings", action: saveSettings)
             }
             .padding(.horizontal)
             .padding(.bottom)
