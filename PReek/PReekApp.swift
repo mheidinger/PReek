@@ -8,6 +8,8 @@ struct PReekApp: App {
     
     @State private var isMenuPresented: Bool = false
     
+    @FocusState private var isContentFocused: Bool
+    
     init() {
         let pullRequestsViewModel = PullRequestsViewModel()
         self._pullRequestsViewModel = StateObject(wrappedValue: pullRequestsViewModel)
@@ -27,9 +29,15 @@ struct PReekApp: App {
         MenuBarExtra("PReek", image: pullRequestsViewModel.hasUnread ? "MenuBarIconUnread" : "MenuBarIcon") {
             ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: { isMenuPresented = false })
                 .frame(width: 600, height: 400)
+                .focused($isContentFocused)
         }
         .menuBarExtraStyle(.window)
         .defaultSize(width: 600, height: 400)
         .menuBarExtraAccess(isPresented: $isMenuPresented)
+        .onChange(of: isMenuPresented) {
+            if isMenuPresented {
+                isContentFocused = true
+            }
+        }
     }
 }

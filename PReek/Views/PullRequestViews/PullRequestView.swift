@@ -143,6 +143,9 @@ struct PullRequestView: View {
                 PullRequestHeaderView(pullRequest: pullRequest, toggleRead: toggleRead)
             }
         }
+        .onDisappear {
+            sectionExpanded = false
+        }
     }
 }
 
