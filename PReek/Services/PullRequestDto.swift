@@ -92,10 +92,15 @@ struct PullRequestDto: Decodable {
         var createdAt: Date
         var path: String
         var replyTo: ReviewCommentReplyTo?
+        var url: String
     }
 
     struct ReviewCommentReplyTo: Decodable {
         var id: String
+    }
+
+    struct ReviewThreads: Decodable {
+        var nodes: [ReviewComments]?
     }
 
     var id: String
@@ -106,6 +111,7 @@ struct PullRequestDto: Decodable {
     var updatedAt: Date
     var author: User?
     var repository: Repository
+    var reviewThreads: ReviewThreads
     var timelineItems: TimelineItems
     var url: String
     var additions: Int
