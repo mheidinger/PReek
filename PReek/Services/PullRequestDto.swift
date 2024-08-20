@@ -100,7 +100,11 @@ struct PullRequestDto: Decodable {
     }
 
     struct ReviewThreads: Decodable {
-        var nodes: [ReviewComments]?
+        var nodes: [ReviewThread]?
+    }
+
+    struct ReviewThread: Decodable {
+        var comments: ReviewComments
     }
 
     var id: String

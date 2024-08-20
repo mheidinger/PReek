@@ -16,7 +16,7 @@ struct PullRequest: Identifiable {
     let status: Status
     let lastUpdated: Date
     let lastNonViewerUpdated: Date
-    let events: [PullRequestEvent]
+    let events: [Event]
     let url: URL
     let additions: Int
     let deletions: Int
@@ -58,7 +58,7 @@ struct PullRequest: Identifiable {
         url.appendingPathComponent("files")
     }
 
-    static func preview(title: String? = nil, status: Status? = nil, events: [PullRequestEvent]? = nil, lastUpdated: Date? = nil) -> PullRequest {
+    static func preview(title: String? = nil, status: Status? = nil, events: [Event]? = nil, lastUpdated: Date? = nil) -> PullRequest {
         PullRequest(
             id: UUID().uuidString,
             repository: Repository(name: "t2/t2-graphql", url: URL(string: "https://example.com")!),
@@ -69,9 +69,9 @@ struct PullRequest: Identifiable {
             lastUpdated: lastUpdated ?? Date(),
             lastNonViewerUpdated: Date(),
             events: events ?? [
-                PullRequestEvent.previewMerged,
-                PullRequestEvent.previewReview(),
-                PullRequestEvent.previewComment,
+                Event.previewMerged,
+                Event.previewReview(),
+                Event.previewComment,
             ],
             url: URL(string: "https://example.com")!,
             additions: 123_456,

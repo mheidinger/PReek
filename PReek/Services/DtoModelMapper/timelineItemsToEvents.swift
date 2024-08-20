@@ -1,13 +1,6 @@
 import Foundation
 import MarkdownUI
 
-private func toOptionalUrl(_ url: String?) -> URL? {
-    guard let url = url else {
-        return nil
-    }
-    return URL(string: url)
-}
-
 private let reviewStateMap = [
     PullRequestDto.TimelineItem.ReviewState.COMMENTED: PullRequestEventReviewData.State.comment,
     PullRequestDto.TimelineItem.ReviewState.APPROVED: PullRequestEventReviewData.State.approve,
@@ -15,7 +8,7 @@ private let reviewStateMap = [
     PullRequestDto.TimelineItem.ReviewState.DISMISSED: PullRequestEventReviewData.State.dismissed,
 ]
 
-private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevEventData: PullRequestEventData?) -> (PullRequestEventData?, Bool) {
+private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevEventData: EventData?) -> (EventData?, Bool) {
     switch timelineItem.type {
     case .ClosedEvent:
         if prevEventData is PullRequestEventMergedData {
@@ -28,7 +21,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         }
         return (PullRequestEventPushedData(isForcePush: true, commits: []), false)
     case .IssueComment:
-        return (PullRequestEventCommentData(url: toOptionalUrl(timelineItem.url), comment: MarkdownContent(timelineItem.body ?? "")), false)
+        return (PullRequestEventCommentData(url: toOptionalUrl(timelineItem.url), comment: Comment(id: timelineItem.id ?? UUID().uuidString, content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)), false)
     case .MergedEvent:
         return (PullRequestEventMergedData(url: toOptionalUrl(timelineItem.url)), false)
     case .PullRequestCommit:
@@ -48,14 +41,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         return (PullRequestEventReviewData(
             url: toOptionalUrl(timelineItem.url),
             state: (timelineItem.state != nil) ? reviewStateMap[timelineItem.state!] ?? .dismissed : .dismissed,
-            comments: timelineItem.comments?.nodes?.map { comment in
-                PullRequestReviewComment(
-                    id: comment.id,
-                    comment: MarkdownContent(comment.body),
-                    fileReference: comment.path,
-                    isReply: comment.replyTo != nil
-                )
-            } ?? []
+            comments: timelineItem.comments?.nodes?.map(toComment) ?? []
         ), false)
     case .ReadyForReviewEvent:
         return (PullRequestEventReadyForReviewData(url: toOptionalUrl(timelineItem.url)), false)
@@ -75,10 +61,14 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
     }
 }
 
-func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem], pullRequestUrl: URL) -> [PullRequestEvent] {
+func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRequestUrl: URL) -> [Event] {
+    guard let timelineItems = timelineItems else {
+        return []
+    }
+
     // Step 1: Convert timeline items to data and merge information
-    var prevEventData: PullRequestEventData?
-    let dataArray: [(PullRequestEventData, PullRequestDto.TimelineItem, Bool)] = timelineItems.compactMap { timelineItem in
+    var prevEventData: EventData?
+    let dataArray: [(EventData, PullRequestDto.TimelineItem, Bool)] = timelineItems.compactMap { timelineItem in
         let (data, merge) = timelineItemToData(timelineItem: timelineItem, prevEventData: prevEventData)
         guard let data, let _ = timelineItem.id else {
             return nil
@@ -88,7 +78,7 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem], pullReq
     }
 
     // Step 2: Merge items if necessary
-    let mergedDataArray = dataArray.reduce([(PullRequestEventData, PullRequestDto.TimelineItem)]()) { dataArray, element in
+    let mergedDataArray = dataArray.reduce([(EventData, PullRequestDto.TimelineItem)]()) { dataArray, element in
         let (data, timelineItem, merge) = element
 
         var newDataArray = dataArray
@@ -103,7 +93,7 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem], pullReq
 
     // Step 3: Convert to PullRequestEvent objects
     return mergedDataArray.map { data, timelineItem in
-        PullRequestEvent(
+        Event(
             id: timelineItem.id!,
             user: toUser(user: timelineItem.actor ?? timelineItem.author ?? timelineItem.commit?.author?.user),
             time: timelineItem.createdAt ?? timelineItem.commit?.committedDate ?? Date(),

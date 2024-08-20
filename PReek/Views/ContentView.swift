@@ -75,7 +75,7 @@ struct ContentView: View {
 }
 
 #Preview(traits: .fixedLayout(width: 600, height: 400)) {
-    @StateObject var pullRequestViewModel = PullRequestsViewModel()
+    @ObservedObject var pullRequestViewModel = PullRequestsViewModel()
     pullRequestViewModel.triggerUpdatePullRequests()
     return ContentView(pullRequestsViewModel: pullRequestViewModel, configViewModel: ConfigViewModel(), closeWindow: {})
 }

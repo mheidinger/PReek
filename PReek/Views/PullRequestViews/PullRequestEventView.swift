@@ -1,7 +1,7 @@
 import MarkdownUI
 import SwiftUI
 
-func eventDataToActionLabel(data: any PullRequestEventData) -> String {
+func eventDataToActionLabel(data: any EventData) -> String {
     let reviewLabels = [
         PullRequestEventReviewData.State.approve: String(localized: "approved"),
         PullRequestEventReviewData.State.changesRequested: String(localized: "requested changes"),
@@ -36,7 +36,7 @@ func eventDataToActionLabel(data: any PullRequestEventData) -> String {
 }
 
 struct PullRequestEventView: View {
-    var pullRequestEvent: PullRequestEvent
+    var pullRequestEvent: Event
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -60,26 +60,26 @@ struct PullRequestEventView: View {
 }
 
 #Preview {
-    let pullRequestEvents: [PullRequestEvent] = [
-        PullRequestEvent.previewClosed,
-        PullRequestEvent.previewCommit(),
-        PullRequestEvent.previewCommit(commits: [
+    let pullRequestEvents: [Event] = [
+        Event.previewClosed,
+        Event.previewCommit(),
+        Event.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
         ]),
-        PullRequestEvent.previewCommit(commits: [
+        Event.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
             Commit(id: "2", messageHeadline: "my second commit!", url: URL(string: "https://example.com")!),
             Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!),
         ]),
-        PullRequestEvent.previewMerged,
-        PullRequestEvent.previewReview(),
-        PullRequestEvent.previewComment,
-        PullRequestEvent.previewReopened,
-        PullRequestEvent.previewForcePushed,
-        PullRequestEvent.previewRenamedTitle,
-        PullRequestEvent.previewReviewRequested,
-        PullRequestEvent.previewReadyForReview,
-        PullRequestEvent.previewConvertToDraft,
+        Event.previewMerged,
+        Event.previewReview(),
+        Event.previewComment,
+        Event.previewReopened,
+        Event.previewForcePushed,
+        Event.previewRenamedTitle,
+        Event.previewReviewRequested,
+        Event.previewReadyForReview,
+        Event.previewConvertToDraft,
     ]
 
     return ScrollView {
