@@ -124,7 +124,6 @@ class PullRequestsViewModel: ObservableObject {
             
             DispatchQueue.main.async {
                 self.isRefreshing = true
-                self.error = nil
             }
             
             let newLastUpdated = Date()
@@ -150,6 +149,7 @@ class PullRequestsViewModel: ObservableObject {
                 self.updateHasUnread()
                 self.lastUpdated = newLastUpdated
                 self.isRefreshing = false
+                self.error = nil
             }
             print("Finished fetching notifications")
         } catch {

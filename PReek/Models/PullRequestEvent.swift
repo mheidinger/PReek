@@ -65,6 +65,7 @@ struct PullRequestEvent: Identifiable {
     static let previewRenamedTitle = PullRequestEvent(id: UUID().uuidString, user: User.preview(login: "person-8"), time: Date(), data: PullRequestEventRenamedTitleData(currentTitle: "current title", previousTitle: "previous title"), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewReopened = PullRequestEvent(id: UUID().uuidString, user: User.preview(login: "person-9"), time: Date(), data: PullRequestEventReopenedData(), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewReviewRequested = PullRequestEvent(id: UUID().uuidString, user: User.preview(login: "person-10"), time: Date(), data: PullRequestEventReviewRequestedData(requestedReviewer: "me"), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewConvertToDraft = PullRequestEvent(id: UUID().uuidString, user: User.preview(login: "person-11"), time: Date(), data: PullRequestEventConvertToDraftData(url: URL(string: "https://example.com")!), pullRequestUrl: URL(string: "https://example.com")!)
 }
 
 struct PullRequestEventClosedData: PullRequestEventData {
@@ -132,4 +133,8 @@ struct PullRequestEventReopenedData: PullRequestEventData {
 struct PullRequestEventReviewRequestedData: PullRequestEventData {
     let url: URL? = nil
     let requestedReviewer: String?
+}
+
+struct PullRequestEventConvertToDraftData: PullRequestEventData {
+    let url: URL?
 }

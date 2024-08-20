@@ -40,6 +40,7 @@ struct PullRequestDto: Decodable {
             case RenamedTitleEvent
             case ReopenedEvent
             case ReviewRequestedEvent
+            case ConvertToDraftEvent
             case Unknown
         }
         
