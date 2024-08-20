@@ -84,6 +84,20 @@ enum FetchPullRequestsQueryBuilder {
       }
     }
 
+    fragment CommentFragment on PullRequestReviewComment {
+      id
+      author {
+        ...ActorFragment
+      }
+      body
+      createdAt
+      path
+      replyTo {
+        id
+      }
+      url
+    }
+
     fragment PullRequestReviewFragment on PullRequestReview {
       author {
         ...ActorFragment
@@ -94,18 +108,7 @@ enum FetchPullRequestsQueryBuilder {
       url
       comments(last: 30) {
         nodes {
-          id
-          author {
-            ...ActorFragment
-          }
-          body
-          createdAt
-          diffHunk
-          outdated
-          path
-          replyTo {
-            id
-          }
+          ...CommentFragment
         }
       }
     }
@@ -127,6 +130,15 @@ enum FetchPullRequestsQueryBuilder {
       url
       additions
       deletions
+      reviewThreads(last: 30) {
+        nodes {
+          comments(last: 30) {
+            nodes {
+              ...CommentFragment
+            }
+          }
+        }
+      }
       timelineItems(last: 30, itemTypes: [PULL_REQUEST_COMMIT, PULL_REQUEST_REVIEW, HEAD_REF_FORCE_PUSHED_EVENT, MERGED_EVENT, REVIEW_REQUESTED_EVENT, READY_FOR_REVIEW_EVENT, CONVERT_TO_DRAFT_EVENT, ISSUE_COMMENT, CLOSED_EVENT, RENAMED_TITLE_EVENT, REOPENED_EVENT]) {
         nodes {
           type: __typename

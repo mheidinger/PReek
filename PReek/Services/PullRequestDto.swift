@@ -18,10 +18,6 @@ struct PullRequestDto: Decodable {
         var url: String
     }
 
-    struct Comment: Decodable {
-        var id: String
-    }
-
     struct TimelineItems: Decodable {
         var nodes: [TimelineItem]?
     }
@@ -94,14 +90,21 @@ struct PullRequestDto: Decodable {
         var author: User?
         var body: String
         var createdAt: Date
-        var diffHunk: String
-        var outdated: Bool
         var path: String
         var replyTo: ReviewCommentReplyTo?
+        var url: String
     }
 
     struct ReviewCommentReplyTo: Decodable {
         var id: String
+    }
+
+    struct ReviewThreads: Decodable {
+        var nodes: [ReviewThread]?
+    }
+
+    struct ReviewThread: Decodable {
+        var comments: ReviewComments
     }
 
     var id: String
@@ -112,6 +115,7 @@ struct PullRequestDto: Decodable {
     var updatedAt: Date
     var author: User?
     var repository: Repository
+    var reviewThreads: ReviewThreads
     var timelineItems: TimelineItems
     var url: String
     var additions: Int

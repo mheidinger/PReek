@@ -1,20 +1,7 @@
 import SwiftUI
 
 struct PullRequestEventDataView: View {
-    var data: any PullRequestEventData
-
-    private func reviewCommentToCommentPrefix(comment: PullRequestReviewComment) -> String? {
-        if let setFileReference = comment.fileReference {
-            if comment.isReply {
-                return String(localized: "replied on \(setFileReference):")
-            }
-            return String(localized: "commented on \(setFileReference):")
-        }
-        if comment.isReply {
-            return String(localized: "replied:")
-        }
-        return nil
-    }
+    var data: any EventData
 
     var body: some View {
         switch data {
@@ -24,7 +11,7 @@ struct PullRequestEventDataView: View {
             if !reviewData.comments.isEmpty {
                 VStack(alignment: .leading, spacing: 5) {
                     ForEach(reviewData.comments) { comment in
-                        CommentView(comment: comment.comment, prefix: reviewCommentToCommentPrefix(comment: comment))
+                        CommentView(comment: comment)
                     }
                 }
             } else {
@@ -71,25 +58,25 @@ struct PullRequestEventDataView: View {
 }
 
 #Preview {
-    let pullRequestEvents: [PullRequestEvent] = [
-        PullRequestEvent.previewClosed,
-        PullRequestEvent.previewCommit(),
-        PullRequestEvent.previewCommit(commits: [
+    let pullRequestEvents: [Event] = [
+        Event.previewClosed,
+        Event.previewCommit(),
+        Event.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
         ]),
-        PullRequestEvent.previewCommit(commits: [
+        Event.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
             Commit(id: "2", messageHeadline: "my second commit!", url: URL(string: "https://example.com")!),
             Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!),
         ]),
-        PullRequestEvent.previewMerged,
-        PullRequestEvent.previewReview(),
-        PullRequestEvent.previewComment,
-        PullRequestEvent.previewReopened,
-        PullRequestEvent.previewForcePushed,
-        PullRequestEvent.previewRenamedTitle,
-        PullRequestEvent.previewReviewRequested,
-        PullRequestEvent.previewReadyForReview,
+        Event.previewMerged,
+        Event.previewReview(),
+        Event.previewComment,
+        Event.previewReopened,
+        Event.previewForcePushed,
+        Event.previewRenamedTitle,
+        Event.previewReviewRequested,
+        Event.previewReadyForReview,
     ]
 
     return ScrollView {

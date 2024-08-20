@@ -2,33 +2,32 @@ import MarkdownUI
 import SwiftUI
 
 struct CommentView: View {
-    var comment: MarkdownContent
-    var prefix: String?
+    var comment: Comment
 
     var body: some View {
         VStack(alignment: .leading) {
-            if let setPrefix = prefix {
+            if let setPrefix = comment.displayPrefix {
                 Text(setPrefix)
                     .foregroundStyle(.secondary)
             }
-            ClippedMarkdownView(content: comment)
+            ClippedMarkdownView(content: comment.content)
         }
     }
 }
 
 #Preview {
     VStack {
-        CommentView(comment: MarkdownContent("""
+        CommentView(comment: Comment(id: UUID().uuidString, content: MarkdownContent("""
         # Heading
 
         Some text
-        """))
+        """), fileReference: "file.abc:L123", isReply: true))
         Divider()
-        CommentView(comment: MarkdownContent("""
+        CommentView(comment: Comment(id: UUID().uuidString, content: MarkdownContent("""
         # Heading
 
         Some other text
-        """), prefix: "One File xyz.abc")
+        """), fileReference: nil, isReply: false))
     }
     .padding()
 }
