@@ -17,6 +17,7 @@
 		6C232DF52C3F174A00C003B1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C232DF42C3F174A00C003B1 /* User.swift */; };
 		6C232DF72C3F1ACA00C003B1 /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C232DF62C3F1ACA00C003B1 /* Repository.swift */; };
 		6C3605BC2C751DB100664E66 /* swiftformat in Frameworks */ = {isa = PBXBuildFile; productRef = 6C3605BB2C751DB100664E66 /* swiftformat */; };
+		6C3605BE2C751F7D00664E66 /* SwiftFormat in Frameworks */ = {isa = PBXBuildFile; productRef = 6C3605BD2C751F7D00664E66 /* SwiftFormat */; };
 		6C50F4362C0486BA008F5B66 /* NotificationDto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4352C0486BA008F5B66 /* NotificationDto.swift */; };
 		6C50F4382C04C590008F5B66 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4372C04C590008F5B66 /* Notification.swift */; };
 		6C50F43A2C04C830008F5B66 /* toNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4392C04C830008F5B66 /* toNotifications.swift */; };
@@ -101,6 +102,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6C232DE72C08C51D00C003B1 /* KeychainAccess in Frameworks */,
+				6C3605BE2C751F7D00664E66 /* SwiftFormat in Frameworks */,
 				6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */,
 				6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */,
 				6C3605BC2C751DB100664E66 /* swiftformat in Frameworks */,
@@ -251,6 +253,7 @@
 				6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */,
 				6CB7203D2C70ED840067CA1D /* MarkdownUI */,
 				6C3605BB2C751DB100664E66 /* swiftformat */,
+				6C3605BD2C751F7D00664E66 /* SwiftFormat */,
 			);
 			productName = PReek;
 			productReference = 6CB027222BFF817E00C4C3B1 /* PReek.app */;
@@ -620,6 +623,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6C3605BA2C751DB100664E66 /* XCRemoteSwiftPackageReference "SwiftFormat" */;
 			productName = swiftformat;
+		};
+		6C3605BD2C751F7D00664E66 /* SwiftFormat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6C3605BA2C751DB100664E66 /* XCRemoteSwiftPackageReference "SwiftFormat" */;
+			productName = SwiftFormat;
 		};
 		6C7C4CA02C071A0400B9B4DA /* LinkHeaderParser */ = {
 			isa = XCSwiftPackageProductDependency;
