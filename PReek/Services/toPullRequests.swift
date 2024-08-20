@@ -4,14 +4,14 @@ import MarkdownUI
 private let pullRequestStatus = [
     PullRequestDto.State.OPEN: PullRequest.Status.open,
     PullRequestDto.State.MERGED: PullRequest.Status.merged,
-    PullRequestDto.State.CLOSED: PullRequest.Status.closed
+    PullRequestDto.State.CLOSED: PullRequest.Status.closed,
 ]
 
 private let pullRequestState = [
     PullRequestDto.TimelineItem.ReviewState.COMMENTED: PullRequestEventReviewData.State.comment,
     PullRequestDto.TimelineItem.ReviewState.APPROVED: PullRequestEventReviewData.State.approve,
     PullRequestDto.TimelineItem.ReviewState.CHANGES_REQUESTED: PullRequestEventReviewData.State.changesRequested,
-    PullRequestDto.TimelineItem.ReviewState.DISMISSED: PullRequestEventReviewData.State.dismissed
+    PullRequestDto.TimelineItem.ReviewState.DISMISSED: PullRequestEventReviewData.State.dismissed,
 ]
 
 private func toOptionalUrl(_ url: String?) -> URL? {
@@ -25,7 +25,7 @@ private func toUser(user: PullRequestDto.User?) -> User {
     guard let user = user else {
         return User(login: "Unknown", url: nil)
     }
-    
+
     return User(
         login: user.login,
         displayName: user.name,
@@ -61,7 +61,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         if let commit = timelineItem.commit {
             newCommit.append(Commit(id: commit.oid, messageHeadline: commit.messageHeadline, url: toOptionalUrl(timelineItem.url)))
         }
-        
+
         if let prevCommitEventData = prevEventData as? PullRequestEventPushedData {
             return (PullRequestEventPushedData(isForcePush: false, commits: prevCommitEventData.commits + newCommit), true)
         }
@@ -102,7 +102,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
 
 private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem], pullRequestUrl: URL) -> [PullRequestEvent] {
     // Step 1: Convert timeline items to data and merge information
-    var prevEventData: PullRequestEventData? = nil
+    var prevEventData: PullRequestEventData?
     let dataArray: [(PullRequestEventData, PullRequestDto.TimelineItem, Bool)] = timelineItems.compactMap { timelineItem in
         let (data, merge) = timelineItemToData(timelineItem: timelineItem, prevEventData: prevEventData)
         guard let data, let _ = timelineItem.id else {
@@ -111,21 +111,21 @@ private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem],
         prevEventData = data
         return (data, timelineItem, merge)
     }
-    
+
     // Step 2: Merge items if necessary
     let mergedDataArray = dataArray.reduce([(PullRequestEventData, PullRequestDto.TimelineItem)]()) { dataArray, element in
         let (data, timelineItem, merge) = element
-        
+
         var newDataArray = dataArray
         let newItem = (data, timelineItem)
-        if !dataArray.isEmpty && merge {
-            newDataArray[newDataArray.endIndex-1] = newItem
+        if !dataArray.isEmpty, merge {
+            newDataArray[newDataArray.endIndex - 1] = newItem
         } else {
             newDataArray.append(newItem)
         }
         return newDataArray
     }
-    
+
     // Step 3: Convert to PullRequestEvent objects
     return mergedDataArray.map { data, timelineItem in
         PullRequestEvent(
@@ -140,15 +140,15 @@ private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem],
 
 private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> PullRequest {
     let pullRequestUrl = URL(string: dto.url) ?? URL(string: "https://invalid.data")!
-    
+
     let events = timelineItemsToEvents(timelineItems: dto.timelineItems.nodes ?? [], pullRequestUrl: pullRequestUrl).sorted {
         $0.time > $1.time
     }
-    
+
     let lastNonViewerUpdated = events.first { event in
         event.user.login != viewer.login
     }
-    
+
     return PullRequest(
         id: dto.id,
         repository: toRepository(repository: dto.repository),
@@ -166,5 +166,5 @@ private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> 
 }
 
 func toPullRequests(dtos: [PullRequestDto], viewer: PullRequestDto.User) -> [PullRequest] {
-    return dtos.map({ toPullRequest(dto: $0, viewer: viewer) })
+    return dtos.map { toPullRequest(dto: $0, viewer: viewer) }
 }

@@ -1,5 +1,5 @@
-import SwiftUI
 import KeychainAccess
+import SwiftUI
 
 @propertyWrapper
 struct KeychainStorage: DynamicProperty {
@@ -10,7 +10,7 @@ struct KeychainStorage: DynamicProperty {
             keychainManager[key] = wrappedValue
         }
     }
-    
+
     init(wrappedValue: String = "", _ key: String) {
         self.key = key
         let initialValue = (keychainManager[key] ?? wrappedValue)
@@ -27,7 +27,7 @@ struct OptionalKeychainStorage: DynamicProperty {
             keychainManager[key] = wrappedValue
         }
     }
-    
+
     init(wrappedValue: String? = nil, _ key: String) {
         self.key = key
         let initialValue = (keychainManager[key] ?? wrappedValue)

@@ -1,33 +1,31 @@
 import Foundation
 
-
 struct PullRequestDto: Decodable {
     enum State: String, Decodable {
         case OPEN
         case CLOSED
         case MERGED
     }
-    
+
     struct User: Decodable {
         var login: String
         var url: String
         var name: String?
     }
-    
+
     struct Repository: Decodable {
         var nameWithOwner: String
         var url: String
     }
-    
+
     struct Comment: Decodable {
         var id: String
-        
     }
-    
+
     struct TimelineItems: Decodable {
         var nodes: [TimelineItem]?
     }
-    
+
     struct TimelineItem: Decodable {
         enum ItemType: String, CaseIterableDefaultsLast {
             case ClosedEvent
@@ -43,7 +41,7 @@ struct PullRequestDto: Decodable {
             case ConvertToDraftEvent
             case Unknown
         }
-        
+
         enum ReviewState: String, Decodable {
             case PENDING
             case COMMENTED
@@ -51,10 +49,10 @@ struct PullRequestDto: Decodable {
             case CHANGES_REQUESTED
             case DISMISSED
         }
-        
+
         var id: String?
         var type: ItemType
-        
+
         /// all except PullRequestCommit (commit.committedDate)
         var createdAt: Date?
         /// all except PullRequestReview (author.user), PullRequestCommit (commit.author.user)
@@ -75,22 +73,22 @@ struct PullRequestDto: Decodable {
         /// ReviewRequestedEvent
         var requestedReviewer: User?
     }
-    
+
     struct Commit: Decodable {
         var author: CommitAuthor?
         var committedDate: Date
         var messageHeadline: String
         var oid: String
     }
-    
+
     struct CommitAuthor: Decodable {
         var user: User?
     }
-    
+
     struct ReviewComments: Decodable {
         var nodes: [ReviewComment]?
     }
-    
+
     struct ReviewComment: Decodable {
         var id: String
         var author: User?
@@ -101,11 +99,11 @@ struct PullRequestDto: Decodable {
         var path: String
         var replyTo: ReviewCommentReplyTo?
     }
-    
+
     struct ReviewCommentReplyTo: Decodable {
         var id: String
     }
-    
+
     var id: String
     var state: State
     var isDraft: Bool

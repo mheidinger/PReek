@@ -2,7 +2,7 @@ import SwiftUI
 
 struct PullRequestEventDataView: View {
     var data: any PullRequestEventData
-    
+
     private func reviewCommentToCommentPrefix(comment: PullRequestReviewComment) -> String? {
         if let setFileReference = comment.fileReference {
             if comment.isReply {
@@ -15,7 +15,7 @@ struct PullRequestEventDataView: View {
         }
         return nil
     }
-    
+
     var body: some View {
         switch data {
         case let pushedData as PullRequestEventPushedData:
@@ -80,7 +80,7 @@ struct PullRequestEventDataView: View {
         PullRequestEvent.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
             Commit(id: "2", messageHeadline: "my second commit!", url: URL(string: "https://example.com")!),
-            Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!)
+            Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!),
         ]),
         PullRequestEvent.previewMerged,
         PullRequestEvent.previewReview(),
@@ -91,7 +91,7 @@ struct PullRequestEventDataView: View {
         PullRequestEvent.previewReviewRequested,
         PullRequestEvent.previewReadyForReview,
     ]
-    
+
     return ScrollView {
         VStack(alignment: .leading) {
             DividedView {

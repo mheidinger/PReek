@@ -3,7 +3,7 @@ import SwiftUI
 private struct StatusBarButton: View {
     var imageSystemName: String
     var action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             Image(systemName: imageSystemName)
@@ -17,7 +17,7 @@ private struct StatusBarButton: View {
 private struct PopoverFilterOption: View {
     var label: LocalizedStringKey
     @Binding var isOn: Bool
-    
+
     var body: some View {
         HStack {
             Text(label)
@@ -34,9 +34,9 @@ private struct PopoverFilterOption: View {
 struct StatusBarView: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     let openSettings: () -> Void
-    
+
     @State private var showFilterPopover: Bool = false
-    
+
     var body: some View {
         HStack {
             StatusBarButton(imageSystemName: "line.3.horizontal.decrease.circle", action: { showFilterPopover = true })
@@ -46,9 +46,9 @@ struct StatusBarView: View {
                 }
             StatusBarButton(imageSystemName: "eye.circle", action: pullRequestsViewModel.markAllAsRead)
                 .help("Mark all as read")
-            
+
             Spacer()
-            
+
             if let error = pullRequestsViewModel.error {
                 Text("Failed to fetch notifications")
                     .foregroundStyle(.red)
@@ -69,7 +69,7 @@ struct StatusBarView: View {
                 }
             }
             .frame(width: 25, alignment: .leading)
-            
+
             StatusBarButton(imageSystemName: "gear", action: openSettings)
                 .help("Settings")
                 .keyboardShortcut(",")
@@ -77,7 +77,7 @@ struct StatusBarView: View {
         .padding(.horizontal)
         .background(.background.opacity(0.7))
     }
-    
+
     var filterPopover: some View {
         VStack(alignment: .leading) {
             PopoverFilterOption(label: "Hide closed", isOn: $pullRequestsViewModel.hideClosed)
@@ -89,5 +89,6 @@ struct StatusBarView: View {
 
 #Preview {
     StatusBarView(
-        pullRequestsViewModel: PullRequestsViewModel(), openSettings: {})
+        pullRequestsViewModel: PullRequestsViewModel(), openSettings: {}
+    )
 }

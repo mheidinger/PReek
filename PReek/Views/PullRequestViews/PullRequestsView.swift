@@ -3,7 +3,7 @@ import SwiftUI
 struct PullRequestsView: View {
     var pullRequests: [PullRequest]
     var toggleRead: (PullRequest) -> Void
-    
+
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
@@ -29,18 +29,18 @@ struct PullRequestsView: View {
         PullRequest.preview(lastUpdated: Calendar.current.date(byAdding: .day, value: -1, to: Date())!),
         PullRequest.preview(lastUpdated: Calendar.current.date(byAdding: .day, value: -3, to: Date())!),
         PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview(),
-                PullRequest.preview()
-    ], toggleRead: {_ in })
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+        PullRequest.preview(),
+    ], toggleRead: { _ in })
 }

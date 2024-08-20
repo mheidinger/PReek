@@ -1,14 +1,14 @@
-import SwiftUI
 import MarkdownUI
+import SwiftUI
 
 func eventDataToActionLabel(data: any PullRequestEventData) -> String {
     let reviewLabels = [
         PullRequestEventReviewData.State.approve: String(localized: "approved"),
         PullRequestEventReviewData.State.changesRequested: String(localized: "requested changes"),
         PullRequestEventReviewData.State.comment: String(localized: "commented"),
-        PullRequestEventReviewData.State.dismissed: String(localized: "reviewed (dismissed)")
+        PullRequestEventReviewData.State.dismissed: String(localized: "reviewed (dismissed)"),
     ]
-    
+
     switch data {
     case is PullRequestEventClosedData:
         return String(localized: "closed")
@@ -37,7 +37,7 @@ func eventDataToActionLabel(data: any PullRequestEventData) -> String {
 
 struct PullRequestEventView: View {
     var pullRequestEvent: PullRequestEvent
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -69,7 +69,7 @@ struct PullRequestEventView: View {
         PullRequestEvent.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
             Commit(id: "2", messageHeadline: "my second commit!", url: URL(string: "https://example.com")!),
-            Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!)
+            Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!),
         ]),
         PullRequestEvent.previewMerged,
         PullRequestEvent.previewReview(),
@@ -79,9 +79,9 @@ struct PullRequestEventView: View {
         PullRequestEvent.previewRenamedTitle,
         PullRequestEvent.previewReviewRequested,
         PullRequestEvent.previewReadyForReview,
-        PullRequestEvent.previewConvertToDraft
+        PullRequestEvent.previewConvertToDraft,
     ]
-    
+
     return ScrollView {
         VStack {
             DividedView {

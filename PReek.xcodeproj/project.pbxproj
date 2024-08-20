@@ -16,6 +16,7 @@
 		6C232DEF2C08F6C600C003B1 /* ConfigService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C232DEE2C08F6C600C003B1 /* ConfigService.swift */; };
 		6C232DF52C3F174A00C003B1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C232DF42C3F174A00C003B1 /* User.swift */; };
 		6C232DF72C3F1ACA00C003B1 /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C232DF62C3F1ACA00C003B1 /* Repository.swift */; };
+		6C3605BC2C751DB100664E66 /* swiftformat in Frameworks */ = {isa = PBXBuildFile; productRef = 6C3605BB2C751DB100664E66 /* swiftformat */; };
 		6C50F4362C0486BA008F5B66 /* NotificationDto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4352C0486BA008F5B66 /* NotificationDto.swift */; };
 		6C50F4382C04C590008F5B66 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4372C04C590008F5B66 /* Notification.swift */; };
 		6C50F43A2C04C830008F5B66 /* toNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4392C04C830008F5B66 /* toNotifications.swift */; };
@@ -102,6 +103,7 @@
 				6C232DE72C08C51D00C003B1 /* KeychainAccess in Frameworks */,
 				6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */,
 				6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */,
+				6C3605BC2C751DB100664E66 /* swiftformat in Frameworks */,
 				6CB7203E2C70ED840067CA1D /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -248,6 +250,7 @@
 				6C232DE62C08C51D00C003B1 /* KeychainAccess */,
 				6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */,
 				6CB7203D2C70ED840067CA1D /* MarkdownUI */,
+				6C3605BB2C751DB100664E66 /* swiftformat */,
 			);
 			productName = PReek;
 			productReference = 6CB027222BFF817E00C4C3B1 /* PReek.app */;
@@ -283,6 +286,7 @@
 				6C232DE52C08C51D00C003B1 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
 				6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				6C3605BA2C751DB100664E66 /* XCRemoteSwiftPackageReference "SwiftFormat" */,
 			);
 			productRefGroup = 6CB027232BFF817E00C4C3B1 /* Products */;
 			projectDirPath = "";
@@ -357,6 +361,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -386,6 +391,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -420,6 +426,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -449,6 +456,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -480,6 +488,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 68JNFYH5JF;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -512,6 +521,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 68JNFYH5JF;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -566,6 +576,14 @@
 				kind = branch;
 			};
 		};
+		6C3605BA2C751DB100664E66 /* XCRemoteSwiftPackageReference "SwiftFormat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nicklockwood/SwiftFormat";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.54.3;
+			};
+		};
 		6C7C4C9F2C071A0400B9B4DA /* XCRemoteSwiftPackageReference "LinkHeaderParser" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Frizlab/LinkHeaderParser.git";
@@ -597,6 +615,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6C232DE52C08C51D00C003B1 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		6C3605BB2C751DB100664E66 /* swiftformat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6C3605BA2C751DB100664E66 /* XCRemoteSwiftPackageReference "SwiftFormat" */;
+			productName = swiftformat;
 		};
 		6C7C4CA02C071A0400B9B4DA /* LinkHeaderParser */ = {
 			isa = XCSwiftPackageProductDependency;

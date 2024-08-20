@@ -2,7 +2,7 @@ import Foundation
 
 class ConfigViewModel: ObservableObject {
     @Published var currentUser: String? = nil
-    
+
     @Published var useGitHubEnterprise: Bool = ConfigService.gitHubEnterpriseUrl != nil
     @Published var gitHubEnterpriseUrl: String = ConfigService.gitHubEnterpriseUrl ?? ""
     @Published var token: String = ConfigService.token ?? ""
@@ -15,9 +15,9 @@ class ConfigViewModel: ObservableObject {
         var id = UUID()
         var username: String
     }
-    
-    @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { username in return ExcludedUser(username: username)}
-    
+
+    @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { username in ExcludedUser(username: username) }
+
     func saveSettings() {
         if useGitHubEnterprise {
             ConfigService.gitHubEnterpriseUrl = gitHubEnterpriseUrl
@@ -29,6 +29,6 @@ class ConfigViewModel: ObservableObject {
         ConfigService.onStartFetchWeeks = onStartFetchWeeks
         ConfigService.deleteAfterWeeks = deleteAfterWeeks
         ConfigService.deleteOnlyClosed = deleteOnlyClosed
-        ConfigService.excludedUsers = excludedUsers.map { excludedUser in return excludedUser.username }
+        ConfigService.excludedUsers = excludedUsers.map { excludedUser in excludedUser.username }
     }
 }

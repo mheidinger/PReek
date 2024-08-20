@@ -4,28 +4,28 @@ private let statusToIcon: [PullRequest.Status: ImageResource] = [
     PullRequest.Status.draft: .prDraft,
     PullRequest.Status.open: .prOpen,
     PullRequest.Status.merged: .prMerged,
-    PullRequest.Status.closed: .prClosed
+    PullRequest.Status.closed: .prClosed,
 ]
 
 struct PullRequestHeaderView: View {
     var pullRequest: PullRequest
     var toggleRead: () -> Void
-    
+
     @Environment(\.colorScheme) var colorScheme
-    
+
     var body: some View {
         HStack(spacing: 10) {
             Image(statusToIcon[pullRequest.status] ?? .prOpen)
                 .foregroundStyle(.primary)
                 .imageScale(.large)
-            
+
             HStack(alignment: .top) {
-                VStack(alignment:.leading, spacing: 3) {
+                VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         ModifierLink(destination: pullRequest.repository.url) {
                             Text(pullRequest.repository.name)
                         }
-                        ModifierLink(destination: pullRequest.url){
+                        ModifierLink(destination: pullRequest.url) {
                             Text(pullRequest.numberFormatted)
                         }
                         .foregroundColor(.secondary)
@@ -49,7 +49,7 @@ struct PullRequestHeaderView: View {
                         Text("·")
                         Text("\(pullRequest.lastUpdatedFormatted)")
                         Text("·")
-                        
+
                         ModifierLink(destination: pullRequest.filesUrl) {
                             HStack(spacing: 2) {
                                 Text(pullRequest.additionsFormatted)
@@ -74,7 +74,7 @@ struct PullRequestHeaderView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            
+
             Image(systemName: pullRequest.markedAsRead ? "circle" : "circle.fill")
                 .imageScale(.medium)
                 .foregroundStyle(.blue)
@@ -86,28 +86,28 @@ struct PullRequestHeaderView: View {
 }
 
 struct PullRequestContentView: View {
-    @State var eventLimit = 0;
-    
+    @State var eventLimit = 0
+
     var pullRequest: PullRequest
-    
+
     init(pullRequest: PullRequest) {
-        self.eventLimit =  min(pullRequest.events.count, 5)
+        eventLimit = min(pullRequest.events.count, 5)
         self.pullRequest = pullRequest
     }
-    
+
     func loadMore() {
-        self.eventLimit = min(pullRequest.events.count, eventLimit + 5)
+        eventLimit = min(pullRequest.events.count, eventLimit + 5)
     }
-    
+
     @ViewBuilder var noEventsBody: some View {
         Text("No Events")
             .foregroundStyle(.secondary)
     }
-    
+
     @ViewBuilder var eventsBody: some View {
         VStack {
             DividedView {
-                ForEach(pullRequest.events[0..<eventLimit]) { event in
+                ForEach(pullRequest.events[0 ..< eventLimit]) { event in
                     PullRequestEventView(pullRequestEvent: event)
                 }
                 if self.eventLimit < pullRequest.events.count {
@@ -120,7 +120,7 @@ struct PullRequestContentView: View {
         .padding(.leading, 30)
         .padding(.vertical, 5)
     }
-    
+
     var body: some View {
         if pullRequest.events.isEmpty {
             noEventsBody
@@ -132,9 +132,9 @@ struct PullRequestContentView: View {
 struct PullRequestView: View {
     var pullRequest: PullRequest
     var toggleRead: () -> Void
-    
+
     @State var sectionExpanded: Bool = false
-    
+
     var body: some View {
         VStack {
             DisclosureGroup(isExpanded: $sectionExpanded) {

@@ -1,8 +1,8 @@
-import SwiftUI
 import MarkdownUI
+import SwiftUI
 
 private struct NoneImageProvider: ImageProvider {
-    public func makeImage(url: URL?) -> some View {
+    public func makeImage(url _: URL?) -> some View {
         Text("< Image >")
     }
 }
@@ -11,22 +11,22 @@ private struct NoneInlineImageProvider: InlineImageProvider {
     enum SomeError: Error {
         case someError
     }
-    
-    public func image(with url: URL, label: String) async throws -> Image {
+
+    public func image(with _: URL, label _: String) async throws -> Image {
         throw SomeError.someError
     }
 }
 
 struct ClippedMarkdownView: View {
     let content: MarkdownContent
-    
+
     @State private var contentHeight: CGFloat = 0
     @State private var isExpanded = false
-    
+
     let maxHeight: CGFloat = 100
-    
+
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { _ in
             Markdown(content)
                 .markdownImageProvider(NoneImageProvider())
                 .markdownInlineImageProvider(NoneInlineImageProvider())
@@ -72,27 +72,27 @@ struct HeightPreferenceKey: PreferenceKey {
 #Preview {
     VStack {
         ClippedMarkdownView(content: MarkdownContent("""
-    # Too Large
-    
-    > This is a quote
-    
-    *More to come.*
-    
-    ![Some Image](https://example.com/some/image)
-    
-    Text with an inline ![Some Image](https://example.com/some/image) embedded.
-    
-    *Bla.*
-    
-    *Bla.*
-    """))
+        # Too Large
+
+        > This is a quote
+
+        *More to come.*
+
+        ![Some Image](https://example.com/some/image)
+
+        Text with an inline ![Some Image](https://example.com/some/image) embedded.
+
+        *Bla.*
+
+        *Bla.*
+        """))
         ClippedMarkdownView(content: MarkdownContent("""
-    # Fits
-    
-    > This is a quote
-    
-    *Bla.*
-    """))
+        # Fits
+
+        > This is a quote
+
+        *Bla.*
+        """))
     }
     .frame(height: 300, alignment: .top)
     .padding()

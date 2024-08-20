@@ -1,10 +1,10 @@
-import SwiftUI
 import MarkdownUI
+import SwiftUI
 
 struct CommentView: View {
     var comment: MarkdownContent
     var prefix: String?
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             if let setPrefix = prefix {
@@ -19,16 +19,16 @@ struct CommentView: View {
 #Preview {
     VStack {
         CommentView(comment: MarkdownContent("""
-    # Heading
-    
-    Some text
-    """))
+        # Heading
+
+        Some text
+        """))
         Divider()
         CommentView(comment: MarkdownContent("""
-    # Heading
-    
-    Some other text
-    """), prefix: "One File xyz.abc")
+        # Heading
+
+        Some other text
+        """), prefix: "One File xyz.abc")
     }
     .padding()
 }

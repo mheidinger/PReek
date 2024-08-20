@@ -12,14 +12,14 @@ struct HelpTextField<HelpContent: View>: View {
         case secureField
         case textField
     }
-    
+
     let type: FieldType
     @Binding var text: String
     let label: LocalizedStringKey
     let helpContent: () -> HelpContent
-    
+
     @State private var showPopover = false
-    
+
     var body: some View {
         switch type {
         case .secureField:
@@ -28,19 +28,19 @@ struct HelpTextField<HelpContent: View>: View {
             textField
         }
     }
-    
+
     var secureField: some View {
         SecureField(text: $text) {
             labelContent
         }
     }
-    
+
     var textField: some View {
         TextField(text: $text) {
             labelContent
         }
     }
-    
+
     var labelContent: some View {
         HStack(spacing: 3) {
             Text(label)
