@@ -18,10 +18,6 @@ struct PullRequestDto: Decodable {
         var url: String
     }
 
-    struct Comment: Decodable {
-        var id: String
-    }
-
     struct TimelineItems: Decodable {
         var nodes: [TimelineItem]?
     }
@@ -94,8 +90,6 @@ struct PullRequestDto: Decodable {
         var author: User?
         var body: String
         var createdAt: Date
-        var diffHunk: String
-        var outdated: Bool
         var path: String
         var replyTo: ReviewCommentReplyTo?
     }

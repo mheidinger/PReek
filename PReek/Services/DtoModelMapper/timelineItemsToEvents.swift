@@ -1,19 +1,6 @@
 import Foundation
 import MarkdownUI
 
-private let pullRequestStatus = [
-    PullRequestDto.State.OPEN: PullRequest.Status.open,
-    PullRequestDto.State.MERGED: PullRequest.Status.merged,
-    PullRequestDto.State.CLOSED: PullRequest.Status.closed,
-]
-
-private let pullRequestState = [
-    PullRequestDto.TimelineItem.ReviewState.COMMENTED: PullRequestEventReviewData.State.comment,
-    PullRequestDto.TimelineItem.ReviewState.APPROVED: PullRequestEventReviewData.State.approve,
-    PullRequestDto.TimelineItem.ReviewState.CHANGES_REQUESTED: PullRequestEventReviewData.State.changesRequested,
-    PullRequestDto.TimelineItem.ReviewState.DISMISSED: PullRequestEventReviewData.State.dismissed,
-]
-
 private func toOptionalUrl(_ url: String?) -> URL? {
     guard let url = url else {
         return nil
@@ -21,24 +8,12 @@ private func toOptionalUrl(_ url: String?) -> URL? {
     return URL(string: url)
 }
 
-private func toUser(user: PullRequestDto.User?) -> User {
-    guard let user = user else {
-        return User(login: "Unknown", url: nil)
-    }
-
-    return User(
-        login: user.login,
-        displayName: user.name,
-        url: URL(string: user.url)
-    )
-}
-
-private func toRepository(repository: PullRequestDto.Repository) -> Repository {
-    Repository(
-        name: repository.nameWithOwner,
-        url: URL(string: repository.url) ?? URL(string: "https://invalid.data")!
-    )
-}
+private let reviewStateMap = [
+    PullRequestDto.TimelineItem.ReviewState.COMMENTED: PullRequestEventReviewData.State.comment,
+    PullRequestDto.TimelineItem.ReviewState.APPROVED: PullRequestEventReviewData.State.approve,
+    PullRequestDto.TimelineItem.ReviewState.CHANGES_REQUESTED: PullRequestEventReviewData.State.changesRequested,
+    PullRequestDto.TimelineItem.ReviewState.DISMISSED: PullRequestEventReviewData.State.dismissed,
+]
 
 private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevEventData: PullRequestEventData?) -> (PullRequestEventData?, Bool) {
     switch timelineItem.type {
@@ -72,7 +47,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         }
         return (PullRequestEventReviewData(
             url: toOptionalUrl(timelineItem.url),
-            state: (timelineItem.state != nil) ? pullRequestState[timelineItem.state!] ?? .dismissed : .dismissed,
+            state: (timelineItem.state != nil) ? reviewStateMap[timelineItem.state!] ?? .dismissed : .dismissed,
             comments: timelineItem.comments?.nodes?.map { comment in
                 PullRequestReviewComment(
                     id: comment.id,
@@ -100,7 +75,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
     }
 }
 
-private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem], pullRequestUrl: URL) -> [PullRequestEvent] {
+func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem], pullRequestUrl: URL) -> [PullRequestEvent] {
     // Step 1: Convert timeline items to data and merge information
     var prevEventData: PullRequestEventData?
     let dataArray: [(PullRequestEventData, PullRequestDto.TimelineItem, Bool)] = timelineItems.compactMap { timelineItem in
@@ -136,35 +111,4 @@ private func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem],
             pullRequestUrl: pullRequestUrl
         )
     }
-}
-
-private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> PullRequest {
-    let pullRequestUrl = URL(string: dto.url) ?? URL(string: "https://invalid.data")!
-
-    let events = timelineItemsToEvents(timelineItems: dto.timelineItems.nodes ?? [], pullRequestUrl: pullRequestUrl).sorted {
-        $0.time > $1.time
-    }
-
-    let lastNonViewerUpdated = events.first { event in
-        event.user.login != viewer.login
-    }
-
-    return PullRequest(
-        id: dto.id,
-        repository: toRepository(repository: dto.repository),
-        author: toUser(user: dto.author),
-        title: dto.title,
-        number: dto.number,
-        status: dto.isDraft ? PullRequest.Status.draft : (pullRequestStatus[dto.state] ?? PullRequest.Status.open),
-        lastUpdated: dto.updatedAt,
-        lastNonViewerUpdated: lastNonViewerUpdated?.time ?? dto.updatedAt,
-        events: events,
-        url: pullRequestUrl,
-        additions: dto.additions,
-        deletions: dto.deletions
-    )
-}
-
-func toPullRequests(dtos: [PullRequestDto], viewer: PullRequestDto.User) -> [PullRequest] {
-    return dtos.map { toPullRequest(dto: $0, viewer: viewer) }
 }
