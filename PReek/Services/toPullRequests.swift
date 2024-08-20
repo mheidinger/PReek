@@ -93,6 +93,8 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         return (PullRequestEventReopenedData(), false)
     case .ReviewRequestedEvent:
         return (PullRequestEventReviewRequestedData(requestedReviewer: timelineItem.requestedReviewer?.name ?? timelineItem.requestedReviewer?.login), false)
+    case .ConvertToDraftEvent:
+        return (PullRequestEventConvertToDraftData(url: toOptionalUrl(timelineItem.url)), false)
     default:
         return (nil, false)
     }

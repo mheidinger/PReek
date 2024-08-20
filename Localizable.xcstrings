@@ -111,6 +111,16 @@
         }
       }
     },
+    "approved" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat genehmigt"
+          }
+        }
+      }
+    },
     "Beta" : {
       "localizations" : {
         "de" : {
@@ -161,12 +171,42 @@
         }
       }
     },
+    "closed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat geschlossen"
+          }
+        }
+      }
+    },
+    "commented" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat kommentiert"
+          }
+        }
+      }
+    },
     "commented on %@:" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "kommentiert in %@:"
+            "value" : "hat kommentiert in %@:"
+          }
+        }
+      }
+    },
+    "converted to draft" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat in einen Entwurf umgewandelt"
           }
         }
       }
@@ -247,6 +287,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Filter"
+          }
+        }
+      }
+    },
+    "force pushed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat force gepusht"
           }
         }
       }
@@ -401,6 +451,26 @@
         }
       }
     },
+    "marked ready" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat als bereit markiert"
+          }
+        }
+      }
+    },
+    "merged" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat gemergt"
+          }
+        }
+      }
+    },
     "No Events" : {
       "localizations" : {
         "de" : {
@@ -476,7 +546,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gebe die URL ohne Prefix an.\nBeispiel:"
+            "value" : "Gebe die URL ohne Suffix an.\nBeispiel:"
           }
         }
       }
@@ -487,6 +557,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pull Requests"
+          }
+        }
+      }
+    },
+    "pushed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat gepusht"
           }
         }
       }
@@ -531,6 +611,26 @@
         }
       }
     },
+    "renamed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat umbenannt"
+          }
+        }
+      }
+    },
+    "reopened" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat wieder geöffnet"
+          }
+        }
+      }
+    },
     "replied on %@:" : {
       "localizations" : {
         "de" : {
@@ -547,6 +647,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "antwortet:"
+          }
+        }
+      }
+    },
+    "requested changes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat Änderungen angefordert"
+          }
+        }
+      }
+    },
+    "requested review" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat eine Review angefordert"
+          }
+        }
+      }
+    },
+    "reviewed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat reviewed"
+          }
+        }
+      }
+    },
+    "reviewed (dismissed)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat reviewed (verworfen)"
           }
         }
       }
@@ -621,12 +761,12 @@
         }
       }
     },
-    "The Personal Access Token (PAT) requires 'notifications' permissions. Notifications are used to get the Pull Requests that are shown yo you. See the GitHub documentation on how to generate a PAT." : {
+    "The Personal Access Token (PAT) needs to be of type 'classic' and requires the 'notifications' scope. Notifications are used to get the Pull Requests that are shown yo you. See the GitHub documentation on how to generate a PAT." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Personal Access Token (PAT) benötigt die 'notifications' Berechtigung. Informationen zum Generieren eines PAT findest du in der GitHub Dokumentation."
+            "value" : "Der Personal Access Token (PAT) muss vom Typ 'Classic' sein und benötigt die 'notifications' Berechtigung. Benachrichtigungen werden verwendet, um die für dich relevanten Pull Requests zu identifizieren. Informationen zum Generieren eines PAT findest du in der GitHub Dokumentation."
           }
         }
       }
@@ -637,6 +777,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zu:"
+          }
+        }
+      }
+    },
+    "unknown" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unbekannt"
           }
         }
       }

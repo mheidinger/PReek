@@ -3,33 +3,35 @@ import MarkdownUI
 
 func eventDataToActionLabel(data: any PullRequestEventData) -> String {
     let reviewLabels = [
-        PullRequestEventReviewData.State.approve: "approved",
-        PullRequestEventReviewData.State.changesRequested: "requested changes",
-        PullRequestEventReviewData.State.comment: "commented",
-        PullRequestEventReviewData.State.dismissed: "reviewed (dismissed)"
+        PullRequestEventReviewData.State.approve: String(localized: "approved"),
+        PullRequestEventReviewData.State.changesRequested: String(localized: "requested changes"),
+        PullRequestEventReviewData.State.comment: String(localized: "commented"),
+        PullRequestEventReviewData.State.dismissed: String(localized: "reviewed (dismissed)")
     ]
     
     switch data {
     case is PullRequestEventClosedData:
-        return "closed"
+        return String(localized: "closed")
     case let pushedData as PullRequestEventPushedData:
-        return pushedData.isForcePush ? "force pushed" : "pushed"
+        return pushedData.isForcePush ? String(localized: "force pushed") : String(localized: "pushed")
     case is PullRequestEventMergedData:
-        return "merged"
+        return String(localized: "merged")
     case let reviewData as PullRequestEventReviewData:
-        return reviewLabels[reviewData.state] ?? "reviewed"
+        return reviewLabels[reviewData.state] ?? String(localized: "reviewed")
     case is PullRequestEventCommentData:
-        return "commented"
+        return String(localized: "commented")
     case is PullRequestEventReadyForReviewData:
-        return "marked ready"
+        return String(localized: "marked ready")
     case is PullRequestEventRenamedTitleData:
-        return "renamed"
+        return String(localized: "renamed")
     case is PullRequestEventReopenedData:
-        return "reopened"
+        return String(localized: "reopened")
     case is PullRequestEventReviewRequestedData:
-        return "requested review"
+        return String(localized: "requested review")
+    case is PullRequestEventConvertToDraftData:
+        return String(localized: "converted to draft")
     default:
-        return "unknown"
+        return String(localized: "unknown")
     }
 }
 
@@ -77,6 +79,7 @@ struct PullRequestEventView: View {
         PullRequestEvent.previewRenamedTitle,
         PullRequestEvent.previewReviewRequested,
         PullRequestEvent.previewReadyForReview,
+        PullRequestEvent.previewConvertToDraft
     ]
     
     return ScrollView {
