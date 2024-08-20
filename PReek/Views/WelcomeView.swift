@@ -2,12 +2,12 @@ import SwiftUI
 
 struct WelcomeView: View {
     @ObservedObject var configViewModel: ConfigViewModel
-    
+
     var testConnection: () async -> Error?
     var dismissWelcomeView: () -> Void
-    
+
     @State private var error: Error?
-    
+
     private func doSave() {
         Task {
             configViewModel.saveSettings()
@@ -17,7 +17,7 @@ struct WelcomeView: View {
             }
         }
     }
-    
+
     var body: some View {
         VStack(spacing: 50) {
             HStack(spacing: 30) {
@@ -32,14 +32,14 @@ struct WelcomeView: View {
                         .font(.title)
                 }
             }
-            
+
             VStack(alignment: .trailing) {
                 ConnectionSettingsView(configViewModel: configViewModel)
-                
+
                 Button(action: doSave) {
                     Text("Save")
                 }
-                
+
                 if let error = error {
                     Text("Error: \(error.localizedDescription)")
                         .foregroundStyle(.red)
@@ -61,6 +61,6 @@ struct WelcomeView: View {
 }
 
 #Preview {
-    WelcomeView(configViewModel: ConfigViewModel(), testConnection: { return GitHubError.forbidden }, dismissWelcomeView: {})
+    WelcomeView(configViewModel: ConfigViewModel(), testConnection: { GitHubError.forbidden }, dismissWelcomeView: {})
         .frame(width: 600, height: 400)
 }

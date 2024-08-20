@@ -7,7 +7,7 @@ struct PullRequest: Identifiable {
         case merged
         case draft
     }
-    
+
     let id: String
     let repository: Repository
     let author: User
@@ -21,15 +21,15 @@ struct PullRequest: Identifiable {
     let additions: Int
     let deletions: Int
     var markedAsRead: Bool = false
-    
+
     var isClosed: Bool {
         return status == .closed || status == .merged
     }
-    
+
     var numberFormatted: String {
-        "#\(number.formatted(.number .grouping(.never)))"
+        "#\(number.formatted(.number.grouping(.never)))"
     }
-    
+
     var lastUpdatedFormatted: String {
         let formattedTime = lastUpdated.formatted(date: .omitted, time: .shortened)
         if Calendar.current.isDateInToday(lastUpdated) {
@@ -45,19 +45,19 @@ struct PullRequest: Identifiable {
         )
         return String(localized: "updated \(formattedDate) at \(formattedTime)")
     }
-    
+
     var additionsFormatted: String {
         "+\(additions.formatted(.number))"
     }
-    
+
     var deletionsFormatted: String {
         "-\(deletions.formatted(.number))"
     }
-    
+
     var filesUrl: URL {
         url.appendingPathComponent("files")
     }
-    
+
     static func preview(title: String? = nil, status: Status? = nil, events: [PullRequestEvent]? = nil, lastUpdated: Date? = nil) -> PullRequest {
         PullRequest(
             id: UUID().uuidString,
@@ -71,11 +71,11 @@ struct PullRequest: Identifiable {
             events: events ?? [
                 PullRequestEvent.previewMerged,
                 PullRequestEvent.previewReview(),
-                PullRequestEvent.previewComment
+                PullRequestEvent.previewComment,
             ],
             url: URL(string: "https://example.com")!,
-            additions: 123456,
-            deletions: 654321
+            additions: 123_456,
+            deletions: 654_321
         )
     }
 }

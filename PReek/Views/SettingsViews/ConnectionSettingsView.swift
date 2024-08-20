@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ConnectionSettingsView: View {
     @ObservedObject var configViewModel: ConfigViewModel
-    
+
     var body: some View {
         Form {
             HelpTextField(type: .secureField, text: $configViewModel.token, label: "GitHub PAT") {
@@ -19,7 +19,7 @@ struct ConnectionSettingsView: View {
                     .frame(width: 170, alignment: .trailing)
             }
             .toggleStyle(.switch)
-            if (configViewModel.useGitHubEnterprise) {
+            if configViewModel.useGitHubEnterprise {
                 HelpTextField(type: .textField, text: $configViewModel.gitHubEnterpriseUrl, label: "GitHub Enterprise URL") {
                     VStack(alignment: .leading) {
                         Text("Provide the base URL without any suffix.\nFor example:")

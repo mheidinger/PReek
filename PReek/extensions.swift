@@ -2,7 +2,7 @@ import SwiftUI
 
 // During JSON deserialize default to last enum value
 protocol CaseIterableDefaultsLast: Decodable & CaseIterable & RawRepresentable
-where RawValue: Decodable, AllCases: BidirectionalCollection {}
+    where RawValue: Decodable, AllCases: BidirectionalCollection {}
 
 extension CaseIterableDefaultsLast {
     init(from decoder: Decoder) throws {
@@ -18,7 +18,7 @@ struct CodableAppStorage<T: Codable> {
 
     init(wrappedValue: T, _ key: String) {
         self.key = key
-        self.defaultValue = wrappedValue
+        defaultValue = wrappedValue
     }
 
     var wrappedValue: T {

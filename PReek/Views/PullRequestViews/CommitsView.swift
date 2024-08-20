@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CommitsView: View {
     let commits: [Commit]
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             ForEach(commits) { commit in
@@ -16,7 +16,7 @@ struct CommitsView: View {
             }
         }
     }
-    
+
     private func commitBulletPoint(_ commit: Commit) -> some View {
         HStack {
             Text("•")

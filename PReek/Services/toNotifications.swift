@@ -5,11 +5,11 @@ func toNotifications(dtos: [NotificationDto]) -> [Notification] {
         if notificationDto.subject.type != "PullRequest" {
             return notificationArray
         }
-        
+
         guard let url = notificationDto.subject.url else {
             return notificationArray
         }
-        
+
         let prNumberStr = url.split(separator: "/").last
         if prNumberStr == nil {
             return notificationArray
@@ -18,7 +18,7 @@ func toNotifications(dtos: [NotificationDto]) -> [Notification] {
         if prNumber == nil {
             return notificationArray
         }
-        
+
         return notificationArray + [Notification(
             repo: "\(notificationDto.repository.owner.login)/\(notificationDto.repository.name)",
             prNumber: prNumber!

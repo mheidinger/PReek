@@ -6,32 +6,32 @@ struct ContentView: View {
         case welcome
         case main
     }
-    
+
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     @ObservedObject var configViewModel: ConfigViewModel
-    
+
     var closeWindow: () -> Void
-    
+
     @State var currentScreen: Screen
-    
+
     init(pullRequestsViewModel: PullRequestsViewModel, configViewModel: ConfigViewModel, closeWindow: @escaping () -> Void) {
         self.pullRequestsViewModel = pullRequestsViewModel
         self.configViewModel = configViewModel
         self.closeWindow = closeWindow
-        self.currentScreen = configViewModel.token.isEmpty ? .welcome : .main
+        currentScreen = configViewModel.token.isEmpty ? .welcome : .main
     }
-    
+
     private func modifierLinkAction(modifierPressed: Bool) {
         if ConfigService.closeWindowOnLinkClick != modifierPressed {
             closeWindow()
         }
     }
-    
+
     private func testConnection() async -> Error? {
         await pullRequestsViewModel.updatePullRequests()
         return pullRequestsViewModel.error
     }
-    
+
     var body: some View {
         switch currentScreen {
         case .settings:
@@ -42,7 +42,7 @@ struct ContentView: View {
             mainPage
         }
     }
-    
+
     @ViewBuilder
     var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
@@ -57,13 +57,13 @@ struct ContentView: View {
                 .font(.title2)
         }
     }
-    
+
     @ViewBuilder
     var mainPage: some View {
         VStack {
             content
                 .frame(maxHeight: .infinity, alignment: .center)
-            
+
             StatusBarView(
                 pullRequestsViewModel: pullRequestsViewModel,
                 openSettings: { currentScreen = .settings }
