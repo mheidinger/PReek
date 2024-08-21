@@ -2,7 +2,7 @@ import Foundation
 import MarkdownUI
 
 private func commentToEvent(commentDto: PullRequestDto.ReviewComment, pullRequestUrl: URL) -> Event {
-    let data = PullRequestEventCommentData(url: toOptionalUrl(commentDto.url), comment: toComment(commentDto: commentDto))
+    let data = EventCommentData(url: toOptionalUrl(commentDto.url), comment: toComment(commentDto: commentDto))
 
     return Event(
         id: commentDto.id,

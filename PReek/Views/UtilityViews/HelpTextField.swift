@@ -1,10 +1,3 @@
-//
-//  HelpTextField.swift
-//  PReek
-//
-//  Created by Max Heidinger on 13.08.24.
-//
-
 import SwiftUI
 
 struct HelpTextField<HelpContent: View>: View {

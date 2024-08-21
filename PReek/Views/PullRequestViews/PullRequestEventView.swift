@@ -3,32 +3,32 @@ import SwiftUI
 
 func eventDataToActionLabel(data: any EventData) -> String {
     let reviewLabels = [
-        PullRequestEventReviewData.State.approve: String(localized: "approved"),
-        PullRequestEventReviewData.State.changesRequested: String(localized: "requested changes"),
-        PullRequestEventReviewData.State.comment: String(localized: "commented"),
-        PullRequestEventReviewData.State.dismissed: String(localized: "reviewed (dismissed)"),
+        EventReviewData.State.approve: String(localized: "approved"),
+        EventReviewData.State.changesRequested: String(localized: "requested changes"),
+        EventReviewData.State.comment: String(localized: "commented"),
+        EventReviewData.State.dismissed: String(localized: "reviewed (dismissed)"),
     ]
 
     switch data {
-    case is PullRequestEventClosedData:
+    case is EventClosedData:
         return String(localized: "closed")
-    case let pushedData as PullRequestEventPushedData:
+    case let pushedData as EventPushedData:
         return pushedData.isForcePush ? String(localized: "force pushed") : String(localized: "pushed")
-    case is PullRequestEventMergedData:
+    case is EventMergedData:
         return String(localized: "merged")
-    case let reviewData as PullRequestEventReviewData:
+    case let reviewData as EventReviewData:
         return reviewLabels[reviewData.state] ?? String(localized: "reviewed")
-    case is PullRequestEventCommentData:
+    case is EventCommentData:
         return String(localized: "commented")
-    case is PullRequestEventReadyForReviewData:
+    case is ReadyForReviewData:
         return String(localized: "marked ready")
-    case is PullRequestEventRenamedTitleData:
+    case is EventRenamedTitleData:
         return String(localized: "renamed")
-    case is PullRequestEventReopenedData:
+    case is EventReopenedData:
         return String(localized: "reopened")
-    case is PullRequestEventReviewRequestedData:
+    case is EventReviewRequestedData:
         return String(localized: "requested review")
-    case is PullRequestEventConvertToDraftData:
+    case is EventConvertToDraftData:
         return String(localized: "converted to draft")
     default:
         return String(localized: "unknown")
