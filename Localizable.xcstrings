@@ -21,6 +21,16 @@
         }
       }
     },
+    "%lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        }
+      }
+    },
     "%lld weeks" : {
       "localizations" : {
         "de" : {

@@ -19,6 +19,7 @@
 		6C3605B42C751AD300664E66 /* timelineItemsToEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3605B32C751AD300664E66 /* timelineItemsToEvents.swift */; };
 		6C3605B62C751B4C00664E66 /* toUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3605B52C751B4C00664E66 /* toUser.swift */; };
 		6C3605B82C751B6900664E66 /* toRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3605B72C751B6900664E66 /* toRepository.swift */; };
+		6C45077D2C7686C3008EA76D /* IconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C45077C2C7686C3008EA76D /* IconView.swift */; };
 		6C50F4362C0486BA008F5B66 /* NotificationDto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4352C0486BA008F5B66 /* NotificationDto.swift */; };
 		6C50F4382C04C590008F5B66 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4372C04C590008F5B66 /* Notification.swift */; };
 		6C50F43A2C04C830008F5B66 /* toNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4392C04C830008F5B66 /* toNotifications.swift */; };
@@ -76,6 +77,7 @@
 		6C3605B32C751AD300664E66 /* timelineItemsToEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = timelineItemsToEvents.swift; sourceTree = "<group>"; };
 		6C3605B52C751B4C00664E66 /* toUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toUser.swift; sourceTree = "<group>"; };
 		6C3605B72C751B6900664E66 /* toRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toRepository.swift; sourceTree = "<group>"; };
+		6C45077C2C7686C3008EA76D /* IconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconView.swift; sourceTree = "<group>"; };
 		6C50F4352C0486BA008F5B66 /* NotificationDto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationDto.swift; sourceTree = "<group>"; };
 		6C50F4372C04C590008F5B66 /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		6C50F4392C04C830008F5B66 /* toNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toNotifications.swift; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 				6C5FBDF02C6B3C9D00620B7A /* HelpTextField.swift */,
 				6CE563FA2C00862E008E9A4B /* DividedView.swift */,
 				6CB7203F2C70F8630067CA1D /* ClippedMarkdownView.swift */,
+				6C45077C2C7686C3008EA76D /* IconView.swift */,
 			);
 			path = UtilityViews;
 			sourceTree = "<group>";
@@ -374,6 +377,7 @@
 				6CE564122C01068A008E9A4B /* FetchPullRequestsQuery.swift in Sources */,
 				6CE563FB2C00862E008E9A4B /* DividedView.swift in Sources */,
 				6C232DEB2C08C95E00C003B1 /* ConfigViewModel.swift in Sources */,
+				6C45077D2C7686C3008EA76D /* IconView.swift in Sources */,
 				6C7C4CA32C087A9900B9B4DA /* extensions.swift in Sources */,
 				6CB720442C7239FF0067CA1D /* CommentView.swift in Sources */,
 				6CE564162C011BAE008E9A4B /* toPullRequests.swift in Sources */,
@@ -559,7 +563,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -592,7 +596,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -15,6 +15,27 @@ private func extractReviewCommentIds(timelineItems: [PullRequestDto.TimelineItem
     return timelineItems.flatMap { timelineItem in timelineItem.comments?.nodes ?? [] }.map { comment in comment.id }
 }
 
+private func extractReviewCount(opinionatedReviews: [PullRequestDto.LatestOpinionatedReview]?) -> ([User], [User]) {
+    guard let opinionatedReviews = opinionatedReviews else {
+        return ([], [])
+    }
+
+    var approvalFrom: [User] = []
+    var changesRequestedFrom: [User] = []
+
+    for review in opinionatedReviews {
+        switch review.state {
+        case .APPROVED:
+            approvalFrom.append(toUser(review.author))
+        case .CHANGES_REQUESTED:
+            changesRequestedFrom.append(toUser(review.author))
+        default:
+            break
+        }
+    }
+    return (approvalFrom, changesRequestedFrom)
+}
+
 private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> PullRequest {
     let pullRequestUrl = URL(string: dto.url) ?? URL(string: "https://invalid.data")!
 
@@ -30,10 +51,12 @@ private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> 
         event.user.login != viewer.login
     }
 
+    let (approvalFrom, changesRequestedFrom) = extractReviewCount(opinionatedReviews: dto.latestOpinionatedReviews?.nodes)
+
     return PullRequest(
         id: dto.id,
         repository: toRepository(repository: dto.repository),
-        author: toUser(user: dto.author),
+        author: toUser(dto.author),
         title: dto.title,
         number: dto.number,
         status: dto.isDraft ? PullRequest.Status.draft : (pullRequestStatusMap[dto.state] ?? PullRequest.Status.open),
@@ -42,7 +65,9 @@ private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> 
         events: events,
         url: pullRequestUrl,
         additions: dto.additions,
-        deletions: dto.deletions
+        deletions: dto.deletions,
+        approvalFrom: approvalFrom,
+        changesRequestedFrom: changesRequestedFrom
     )
 }
 

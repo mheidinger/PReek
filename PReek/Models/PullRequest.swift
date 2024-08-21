@@ -20,6 +20,8 @@ struct PullRequest: Identifiable {
     let url: URL
     let additions: Int
     let deletions: Int
+    var approvalFrom: [User]
+    var changesRequestedFrom: [User]
     var markedAsRead: Bool = false
 
     var isClosed: Bool {
@@ -75,7 +77,9 @@ struct PullRequest: Identifiable {
             ],
             url: URL(string: "https://example.com")!,
             additions: 123_456,
-            deletions: 654_321
+            deletions: 654_321,
+            approvalFrom: [User(login: "user-1"), User(login: "user-2")],
+            changesRequestedFrom: [User(login: "user-3")]
         )
     }
 }

@@ -6,7 +6,8 @@
     {
       "label": "SwiftFormat",
       "type": "shell",
-      "command": "swiftformat ."
+      "command": "swiftformat .",
+      "problemMatcher": []
     }
   ]
 }
