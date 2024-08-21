@@ -187,6 +187,7 @@
 			isa = PBXGroup;
 			children = (
 				6C043E512C68DE9C00DEBF35 /* .github */,
+				6CB027242BFF817E00C4C3B1 /* PReek */,
 				6CDC9FAA2C75C8C4005FAFFD /* .gitignore */,
 				6CDC9FB02C75C8FB005FAFFD /* .swiftformat */,
 				6CDC9FAB2C75C8C5005FAFFD /* .swift-version */,
@@ -194,7 +195,6 @@
 				6C043E4F2C68DE6D00DEBF35 /* README.md */,
 				6C19E97B2C68AE130035845C /* Localizable.xcstrings */,
 				6CB720452C725FA70067CA1D /* ExportOptions.plist */,
-				6CB027242BFF817E00C4C3B1 /* PReek */,
 				6CB027232BFF817E00C4C3B1 /* Products */,
 			);
 			sourceTree = "<group>";
