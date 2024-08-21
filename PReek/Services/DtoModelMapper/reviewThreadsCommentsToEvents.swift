@@ -6,7 +6,7 @@ private func commentToEvent(commentDto: PullRequestDto.ReviewComment, pullReques
 
     return Event(
         id: commentDto.id,
-        user: toUser(user: commentDto.author),
+        user: toUser(commentDto.author),
         time: commentDto.createdAt,
         data: data,
         pullRequestUrl: pullRequestUrl

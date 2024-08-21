@@ -130,6 +130,14 @@ enum FetchPullRequestsQueryBuilder {
       url
       additions
       deletions
+      latestOpinionatedReviews(last: 30) {
+        nodes {
+          state
+          author {
+            ...ActorFragment
+          }
+        }
+      }
       reviewThreads(last: 30) {
         nodes {
           comments(last: 30) {

@@ -7,6 +7,14 @@ struct PullRequestDto: Decodable {
         case MERGED
     }
 
+    enum ReviewState: String, Decodable {
+        case PENDING
+        case COMMENTED
+        case APPROVED
+        case CHANGES_REQUESTED
+        case DISMISSED
+    }
+
     struct User: Decodable {
         var login: String
         var url: String
@@ -36,14 +44,6 @@ struct PullRequestDto: Decodable {
             case ReviewRequestedEvent
             case ConvertToDraftEvent
             case Unknown
-        }
-
-        enum ReviewState: String, Decodable {
-            case PENDING
-            case COMMENTED
-            case APPROVED
-            case CHANGES_REQUESTED
-            case DISMISSED
         }
 
         var id: String?
@@ -107,6 +107,15 @@ struct PullRequestDto: Decodable {
         var comments: ReviewComments
     }
 
+    struct LatestOpinionatedReviews: Decodable {
+        var nodes: [LatestOpinionatedReview]?
+    }
+
+    struct LatestOpinionatedReview: Decodable {
+        var state: ReviewState
+        var author: User
+    }
+
     var id: String
     var state: State
     var isDraft: Bool
@@ -115,6 +124,7 @@ struct PullRequestDto: Decodable {
     var updatedAt: Date
     var author: User?
     var repository: Repository
+    var latestOpinionatedReviews: LatestOpinionatedReviews?
     var reviewThreads: ReviewThreads
     var timelineItems: TimelineItems
     var url: String

@@ -7,6 +7,12 @@ private let statusToIcon: [PullRequest.Status: ImageResource] = [
     PullRequest.Status.closed: .prClosed,
 ]
 
+private func usersToString(_ users: [User]) -> String {
+    return users.map {
+        $0.displayName
+    }.joined(separator: "\n")
+}
+
 struct PullRequestHeaderView: View {
     var pullRequest: PullRequest
     var toggleRead: () -> Void
@@ -46,24 +52,45 @@ struct PullRequestHeaderView: View {
                         } else {
                             Text("by \(pullRequest.author.displayName)")
                         }
+
                         Text("·")
+
                         Text("\(pullRequest.lastUpdatedFormatted)")
+
                         Text("·")
 
                         ModifierLink(destination: pullRequest.filesUrl) {
                             HStack(spacing: 2) {
                                 Text(pullRequest.additionsFormatted)
-                                    .foregroundStyle(.green)
-                                    .if(colorScheme == .light) { view in
-                                        view
-                                            .brightness(-0.4)
-                                    }
+                                    .foregroundStyle(.success)
                                 Text(pullRequest.deletionsFormatted)
-                                    .foregroundStyle(.red)
-                                    .if(colorScheme == .light) { view in
-                                        view
-                                            .brightness(-0.4)
+                                    .foregroundStyle(.failure)
+                            }
+                        }
+
+                        if !pullRequest.approvalFrom.isEmpty || !pullRequest.changesRequestedFrom.isEmpty {
+                            Text("·")
+
+                            HStack(spacing: 5) {
+                                if !pullRequest.approvalFrom.isEmpty {
+                                    HStack(spacing: 1) {
+                                        Text("\(pullRequest.approvalFrom.count)")
+                                        IconView(image: .check)
+                                            .frame(width: 13)
+                                            .foregroundColor(.success)
                                     }
+                                    .help(usersToString(pullRequest.approvalFrom))
+                                }
+                                if !pullRequest.changesRequestedFrom.isEmpty {
+                                    HStack(spacing: 2) {
+                                        Text("\(pullRequest.changesRequestedFrom.count)")
+                                        IconView(image: .fileDiff)
+                                            .frame(width: 12)
+                                            .foregroundColor(.failure)
+                                            .padding(.top, 1)
+                                    }
+                                    .help(usersToString(pullRequest.changesRequestedFrom))
+                                }
                             }
                         }
                     }

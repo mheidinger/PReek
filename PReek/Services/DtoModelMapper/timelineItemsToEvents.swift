@@ -2,10 +2,10 @@ import Foundation
 import MarkdownUI
 
 private let reviewStateMap = [
-    PullRequestDto.TimelineItem.ReviewState.COMMENTED: EventReviewData.State.comment,
-    PullRequestDto.TimelineItem.ReviewState.APPROVED: EventReviewData.State.approve,
-    PullRequestDto.TimelineItem.ReviewState.CHANGES_REQUESTED: EventReviewData.State.changesRequested,
-    PullRequestDto.TimelineItem.ReviewState.DISMISSED: EventReviewData.State.dismissed,
+    PullRequestDto.ReviewState.COMMENTED: EventReviewData.State.comment,
+    PullRequestDto.ReviewState.APPROVED: EventReviewData.State.approve,
+    PullRequestDto.ReviewState.CHANGES_REQUESTED: EventReviewData.State.changesRequested,
+    PullRequestDto.ReviewState.DISMISSED: EventReviewData.State.dismissed,
 ]
 
 private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevEventData: EventData?) -> (EventData?, Bool) {
@@ -95,7 +95,7 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRe
     return mergedDataArray.map { data, timelineItem in
         Event(
             id: timelineItem.id!,
-            user: toUser(user: timelineItem.actor ?? timelineItem.author ?? timelineItem.commit?.author?.user),
+            user: toUser(timelineItem.actor ?? timelineItem.author ?? timelineItem.commit?.author?.user),
             time: timelineItem.createdAt ?? timelineItem.commit?.committedDate ?? Date(),
             data: data,
             pullRequestUrl: pullRequestUrl

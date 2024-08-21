@@ -1,6 +1,6 @@
 import Foundation
 
-func toUser(user: PullRequestDto.User?) -> User {
+func toUser(_ user: PullRequestDto.User?) -> User {
     guard let user = user else {
         return User(login: "Unknown", url: nil)
     }
