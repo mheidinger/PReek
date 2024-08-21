@@ -1,9 +1,12 @@
+import OSLog
 import SwiftUI
 
 class PullRequestsViewModel: ObservableObject {
     @Published var lastUpdated: Date? = nil
     @Published var isRefreshing = false
     @Published var error: Error? = nil
+
+    private let logger = Logger()
 
     @AppStorage("hideClosed") var hideClosed: Bool = true {
         didSet {
@@ -88,7 +91,7 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     private func handleReceivedNotifications(notifications: [Notification]) async throws -> [String] {
-        print("Got \(notifications.count) notifications")
+        logger.info("Got \(notifications.count) notifications")
 
         let repoMap = notifications.reduce([String: [Int]]()) { repoMap, notification in
             var repoMapClone = repoMap
@@ -105,7 +108,7 @@ class PullRequestsViewModel: ObservableObject {
     private func fetchPullRequestMap(repoMap: [String: [Int]]) async throws -> [String] {
         if !repoMap.isEmpty {
             let pullRequests = try await GitHubService.fetchPullRequests(repoMap: repoMap)
-            print("Got \(pullRequests.count) pull requests")
+            logger.info("Got \(pullRequests.count) pull requests")
 
             DispatchQueue.main.async {
                 for pullRequest in pullRequests {
@@ -114,14 +117,14 @@ class PullRequestsViewModel: ObservableObject {
             }
             return pullRequests.map { $0.id }
         } else {
-            print("No new PRs to fetch")
+            logger.info("No new PRs to fetch")
         }
         return []
     }
 
     func updatePullRequests() async {
         do {
-            print("Start fetching notifications")
+            logger.info("Start fetching notifications")
 
             DispatchQueue.main.async {
                 self.isRefreshing = true
@@ -131,7 +134,7 @@ class PullRequestsViewModel: ObservableObject {
             let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: Date())!
             let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: handleReceivedNotifications)
 
-            print("Start fetching not updated pull requests")
+            logger.info("Start fetching not updated pull requests")
             let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
                 !updatedPullRequestIds.contains(pullRequest.id) && pullRequest.status != .merged
             }.reduce([String: [Int]]()) { repoMap, pullRequest in
@@ -152,9 +155,9 @@ class PullRequestsViewModel: ObservableObject {
                 self.isRefreshing = false
                 self.error = nil
             }
-            print("Finished fetching notifications")
+            logger.info("Finished fetching notifications")
         } catch {
-            print("Failed to get pull requests: \(error)")
+            logger.error("Failed to get pull requests: \(error)")
             DispatchQueue.main.async {
                 self.isRefreshing = false
                 self.error = error
@@ -174,8 +177,8 @@ class PullRequestsViewModel: ObservableObject {
         }
 
         if filteredPullRequestMap.count != pullRequestMap.count || filteredPullRequestReadMap.count != pullRequestReadMap.count {
-            print("Removing \(pullRequestMap.count - filteredPullRequestMap.count) pull requests")
-            print("Removing \(pullRequestReadMap.count - filteredPullRequestReadMap.count) pull requests read info")
+            logger.info("Removing \(self.pullRequestMap.count - filteredPullRequestMap.count) pull requests")
+            logger.info("Removing \(self.pullRequestReadMap.count - filteredPullRequestReadMap.count) pull requests read info")
             DispatchQueue.main.async {
                 self.pullRequestMap = filteredPullRequestMap
                 self.pullRequestReadMap = filteredPullRequestReadMap

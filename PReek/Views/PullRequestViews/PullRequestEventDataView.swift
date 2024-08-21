@@ -5,9 +5,9 @@ struct PullRequestEventDataView: View {
 
     var body: some View {
         switch data {
-        case let pushedData as PullRequestEventPushedData:
+        case let pushedData as EventPushedData:
             CommitsView(commits: pushedData.commits)
-        case let reviewData as PullRequestEventReviewData:
+        case let reviewData as EventReviewData:
             if !reviewData.comments.isEmpty {
                 VStack(alignment: .leading, spacing: 5) {
                     ForEach(reviewData.comments) { comment in
@@ -17,9 +17,9 @@ struct PullRequestEventDataView: View {
             } else {
                 EmptyView()
             }
-        case let commentData as PullRequestEventCommentData:
+        case let commentData as EventCommentData:
             CommentView(comment: commentData.comment)
-        case let renamedTitleData as PullRequestEventRenamedTitleData:
+        case let renamedTitleData as EventRenamedTitleData:
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
                     Text("From:")
@@ -38,7 +38,7 @@ struct PullRequestEventDataView: View {
                         .lineLimit(1)
                 }
             }
-        case let reviewRequestedData as PullRequestEventReviewRequestedData:
+        case let reviewRequestedData as EventReviewRequestedData:
             if let requestedReviewer = reviewRequestedData.requestedReviewer {
                 HStack {
                     Text("From:")

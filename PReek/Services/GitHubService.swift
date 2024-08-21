@@ -1,5 +1,6 @@
 import Foundation
 import LinkHeaderParser
+import OSLog
 
 private struct GraphQLQuery: Codable {
     var query: String
@@ -34,6 +35,8 @@ enum GitHubError: LocalizedError {
 }
 
 class GitHubService {
+    private static let logger = Logger()
+
     private static let PUBLIC_GITHUB_BASE_URL = URL(string: "https://api.github.com")!
 
     private static var decoder: JSONDecoder {
@@ -72,7 +75,7 @@ class GitHubService {
 
     // returns IDs of all fetched PRs to update all that did not have new notifications
     static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> [String]) async throws -> [String] {
-        print("Fetching notifications since \(since.formatted())")
+        logger.info("Fetching notifications since \(since.formatted())")
         var url: URL? = try restApiUrl().appending(path: "notifications")
             .appending(queryItems: [
                 URLQueryItem(name: "all", value: "true"),
@@ -99,7 +102,7 @@ class GitHubService {
 
             if nextLink != nil {
                 url = nextLink?.link
-                print("Next page available")
+                logger.debug("Next page available")
             } else {
                 url = nil
             }

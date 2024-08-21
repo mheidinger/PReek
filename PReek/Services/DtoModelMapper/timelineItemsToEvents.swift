@@ -2,60 +2,60 @@ import Foundation
 import MarkdownUI
 
 private let reviewStateMap = [
-    PullRequestDto.TimelineItem.ReviewState.COMMENTED: PullRequestEventReviewData.State.comment,
-    PullRequestDto.TimelineItem.ReviewState.APPROVED: PullRequestEventReviewData.State.approve,
-    PullRequestDto.TimelineItem.ReviewState.CHANGES_REQUESTED: PullRequestEventReviewData.State.changesRequested,
-    PullRequestDto.TimelineItem.ReviewState.DISMISSED: PullRequestEventReviewData.State.dismissed,
+    PullRequestDto.TimelineItem.ReviewState.COMMENTED: EventReviewData.State.comment,
+    PullRequestDto.TimelineItem.ReviewState.APPROVED: EventReviewData.State.approve,
+    PullRequestDto.TimelineItem.ReviewState.CHANGES_REQUESTED: EventReviewData.State.changesRequested,
+    PullRequestDto.TimelineItem.ReviewState.DISMISSED: EventReviewData.State.dismissed,
 ]
 
 private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevEventData: EventData?) -> (EventData?, Bool) {
     switch timelineItem.type {
     case .ClosedEvent:
-        if prevEventData is PullRequestEventMergedData {
+        if prevEventData is EventMergedData {
             return (nil, false)
         }
-        return (PullRequestEventClosedData(url: toOptionalUrl(timelineItem.url)), false)
+        return (EventClosedData(url: toOptionalUrl(timelineItem.url)), false)
     case .HeadRefForcePushedEvent:
-        if let prevCommitEventData = prevEventData as? PullRequestEventPushedData {
-            return (PullRequestEventPushedData(isForcePush: true, commits: prevCommitEventData.commits), true)
+        if let prevCommitEventData = prevEventData as? EventPushedData {
+            return (EventPushedData(isForcePush: true, commits: prevCommitEventData.commits), true)
         }
-        return (PullRequestEventPushedData(isForcePush: true, commits: []), false)
+        return (EventPushedData(isForcePush: true, commits: []), false)
     case .IssueComment:
-        return (PullRequestEventCommentData(url: toOptionalUrl(timelineItem.url), comment: Comment(id: timelineItem.id ?? UUID().uuidString, content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)), false)
+        return (EventCommentData(url: toOptionalUrl(timelineItem.url), comment: Comment(id: timelineItem.id ?? UUID().uuidString, content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)), false)
     case .MergedEvent:
-        return (PullRequestEventMergedData(url: toOptionalUrl(timelineItem.url)), false)
+        return (EventMergedData(url: toOptionalUrl(timelineItem.url)), false)
     case .PullRequestCommit:
         var newCommit: [Commit] = []
         if let commit = timelineItem.commit {
             newCommit.append(Commit(id: commit.oid, messageHeadline: commit.messageHeadline, url: toOptionalUrl(timelineItem.url)))
         }
 
-        if let prevCommitEventData = prevEventData as? PullRequestEventPushedData {
-            return (PullRequestEventPushedData(isForcePush: false, commits: prevCommitEventData.commits + newCommit), true)
+        if let prevCommitEventData = prevEventData as? EventPushedData {
+            return (EventPushedData(isForcePush: false, commits: prevCommitEventData.commits + newCommit), true)
         }
-        return (PullRequestEventPushedData(isForcePush: false, commits: newCommit), false)
+        return (EventPushedData(isForcePush: false, commits: newCommit), false)
     case .PullRequestReview:
         if timelineItem.state == .PENDING {
             return (nil, false)
         }
-        return (PullRequestEventReviewData(
+        return (EventReviewData(
             url: toOptionalUrl(timelineItem.url),
             state: (timelineItem.state != nil) ? reviewStateMap[timelineItem.state!] ?? .dismissed : .dismissed,
             comments: timelineItem.comments?.nodes?.map(toComment) ?? []
         ), false)
     case .ReadyForReviewEvent:
-        return (PullRequestEventReadyForReviewData(url: toOptionalUrl(timelineItem.url)), false)
+        return (ReadyForReviewData(url: toOptionalUrl(timelineItem.url)), false)
     case .RenamedTitleEvent:
-        return (PullRequestEventRenamedTitleData(
+        return (EventRenamedTitleData(
             currentTitle: timelineItem.currentTitle ?? "Unknown",
             previousTitle: timelineItem.previousTitle ?? "Unknown"
         ), false)
     case .ReopenedEvent:
-        return (PullRequestEventReopenedData(), false)
+        return (EventReopenedData(), false)
     case .ReviewRequestedEvent:
-        return (PullRequestEventReviewRequestedData(requestedReviewer: timelineItem.requestedReviewer?.name ?? timelineItem.requestedReviewer?.login), false)
+        return (EventReviewRequestedData(requestedReviewer: timelineItem.requestedReviewer?.name ?? timelineItem.requestedReviewer?.login), false)
     case .ConvertToDraftEvent:
-        return (PullRequestEventConvertToDraftData(url: toOptionalUrl(timelineItem.url)), false)
+        return (EventConvertToDraftData(url: toOptionalUrl(timelineItem.url)), false)
     default:
         return (nil, false)
     }
