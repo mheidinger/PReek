@@ -177,8 +177,10 @@ class PullRequestsViewModel: ObservableObject {
         }
 
         if filteredPullRequestMap.count != pullRequestMap.count || filteredPullRequestReadMap.count != pullRequestReadMap.count {
+            // swiftformat:disable redundantSelf
             logger.info("Removing \(self.pullRequestMap.count - filteredPullRequestMap.count) pull requests")
             logger.info("Removing \(self.pullRequestReadMap.count - filteredPullRequestReadMap.count) pull requests read info")
+            // swiftformat:enable redundantSelf
             DispatchQueue.main.async {
                 self.pullRequestMap = filteredPullRequestMap
                 self.pullRequestReadMap = filteredPullRequestReadMap
