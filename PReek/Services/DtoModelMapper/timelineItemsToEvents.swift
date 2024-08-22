@@ -8,6 +8,13 @@ private let reviewStateMap = [
     PullRequestDto.ReviewState.DISMISSED: EventReviewData.State.dismissed,
 ]
 
+private func toMainCommentId(_ id: String?) -> String {
+    guard let id = id else {
+        return UUID().uuidString
+    }
+    return id + "-comment"
+}
+
 private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevEventData: EventData?) -> (EventData?, Bool) {
     switch timelineItem.type {
     case .ClosedEvent:
@@ -21,7 +28,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         }
         return (EventPushedData(isForcePush: true, commits: []), false)
     case .IssueComment:
-        return (EventCommentData(url: toOptionalUrl(timelineItem.url), comment: Comment(id: timelineItem.id ?? UUID().uuidString, content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)), false)
+        return (EventCommentData(url: toOptionalUrl(timelineItem.url), comment: Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)), false)
     case .MergedEvent:
         return (EventMergedData(url: toOptionalUrl(timelineItem.url)), false)
     case .PullRequestCommit:
@@ -35,13 +42,26 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevE
         }
         return (EventPushedData(isForcePush: false, commits: newCommit), false)
     case .PullRequestReview:
-        if timelineItem.state == .PENDING {
+        guard timelineItem.state != .PENDING else {
             return (nil, false)
         }
+
+        let state = timelineItem.state.flatMap { reviewStateMap[$0] } ?? .dismissed
+
+        let mainComment = timelineItem.body.map { body in
+            Comment(
+                id: toMainCommentId(timelineItem.id),
+                content: MarkdownContent(body),
+                fileReference: nil,
+                isReply: false
+            )
+        }
+        let allComments = (mainComment.map { [$0] } ?? []) + (timelineItem.comments?.nodes?.map(toComment) ?? [])
+
         return (EventReviewData(
             url: toOptionalUrl(timelineItem.url),
-            state: (timelineItem.state != nil) ? reviewStateMap[timelineItem.state!] ?? .dismissed : .dismissed,
-            comments: timelineItem.comments?.nodes?.map(toComment) ?? []
+            state: state,
+            comments: allComments
         ), false)
     case .ReadyForReviewEvent:
         return (ReadyForReviewData(url: toOptionalUrl(timelineItem.url)), false)
