@@ -100,8 +100,8 @@ class GitHubService {
                 link.rel.first { rel in rel == "next" } != nil
             }
 
-            if nextLink != nil {
-                url = nextLink?.link
+            if let nextLink = nextLink {
+                url = nextLink.link
                 logger.debug("Next page available")
             } else {
                 url = nil

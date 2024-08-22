@@ -114,6 +114,7 @@ class PullRequestsViewModel: ObservableObject {
                 for pullRequest in pullRequests {
                     self.pullRequestMap[pullRequest.id] = pullRequest
                 }
+                self.updateHasUnread()
             }
             return pullRequests.map { $0.id }
         } else {
@@ -150,7 +151,6 @@ class PullRequestsViewModel: ObservableObject {
             cleanupPullRequests()
 
             DispatchQueue.main.async {
-                self.updateHasUnread()
                 self.lastUpdated = newLastUpdated
                 self.isRefreshing = false
                 self.error = nil
