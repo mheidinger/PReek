@@ -18,13 +18,14 @@ struct PullRequestContentView: View {
         Text("No Events")
             .foregroundStyle(.secondary)
     }
-
+    
     var eventsBody: some View {
         VStack {
-            DividedView {
-                ForEach(pullRequest.events[0 ..< eventLimit]) { event in
-                    EventView(event: event)
-                }
+            DividedView(pullRequest.events[0 ..< eventLimit]) { event in
+                EventView(event: event)
+            } shouldHighlight: { event in
+                false // TODO: Base on last read timestamp
+            } additionalContent: {
                 if self.eventLimit < pullRequest.events.count {
                     Button(action: loadMore) {
                         Label("Load More", systemImage: "ellipsis.circle")
@@ -47,4 +48,5 @@ struct PullRequestContentView: View {
 
 #Preview {
     PullRequestContentView(pullRequest: PullRequest.preview())
+        .padding()
 }

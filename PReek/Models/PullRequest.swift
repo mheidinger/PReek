@@ -74,6 +74,9 @@ struct PullRequest: Identifiable {
                 Event.previewMerged,
                 Event.previewReview(),
                 Event.previewComment,
+                Event.previewRenamedTitle,
+                Event.previewReadyForReview,
+                Event.previewConvertToDraft
             ],
             url: URL(string: "https://example.com")!,
             additions: 123_456,
