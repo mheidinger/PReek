@@ -771,12 +771,12 @@
         }
       }
     },
-    "The Personal Access Token (PAT) needs to be of type 'classic' and requires the 'notifications' scope. Notifications are used to get the Pull Requests that are shown yo you. See the GitHub documentation on how to generate a PAT." : {
+    "The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the GitHub documentation on how to generate a PAT." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Personal Access Token (PAT) muss vom Typ 'Classic' sein und benötigt die 'notifications' Berechtigung. Benachrichtigungen werden verwendet, um die für dich relevanten Pull Requests zu identifizieren. Informationen zum Generieren eines PAT findest du in der GitHub Dokumentation."
+            "value" : "Der Personal Access Token (PAT) sollte vom Typ 'Classic' sein und benötigt die 'notifications' Berechtigung. Für Zugang zu privaten repositories ist zusätzlich die 'repo' Berechtigung notwendig. Benachrichtigungen werden verwendet, um die für dich relevanten Pull Requests zu identifizieren. Informationen zum Generieren eines PAT findest du in der GitHub Dokumentation."
           }
         }
       }
