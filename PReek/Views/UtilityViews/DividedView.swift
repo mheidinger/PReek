@@ -14,8 +14,7 @@ struct DividedView<Content: View>: View {
     }
 
     struct DividedLayout: _VariadicView_MultiViewRoot {
-        @ViewBuilder
-        func body(children: _VariadicView.Children) -> some View {
+        @ViewBuilder func body(children: _VariadicView.Children) -> some View {
             let last = children.last?.id
 
             ForEach(children) { child in

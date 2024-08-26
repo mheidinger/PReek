@@ -43,8 +43,7 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
-    var content: some View {
+    @ViewBuilder var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
             PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests, toggleRead: pullRequestsViewModel.toggleRead)
         } else if pullRequestsViewModel.error != nil {
@@ -58,7 +57,6 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
     var mainPage: some View {
         VStack {
             content

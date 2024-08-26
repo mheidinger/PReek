@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PullRequestEventDataView: View {
+struct EventDataView: View {
     var data: any EventData
 
     var body: some View {
@@ -83,7 +83,7 @@ struct PullRequestEventDataView: View {
         VStack(alignment: .leading) {
             DividedView {
                 ForEach(pullRequestEvents) { pullRequestEvent in
-                    PullRequestEventDataView(data: pullRequestEvent.data)
+                    EventDataView(data: pullRequestEvent.data)
                 }
             }
         }
