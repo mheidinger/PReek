@@ -55,7 +55,6 @@ struct EventView: View {
                 .padding(.leading, 30)
                 .padding(.top, 2)
         }
-        .padding(.trailing)
     }
 }
 

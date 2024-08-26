@@ -33,6 +33,7 @@ struct PullRequestContentView: View {
             }
         }
         .padding(.leading, 30)
+        .padding(.trailing)
         .padding(.vertical, 5)
     }
 
