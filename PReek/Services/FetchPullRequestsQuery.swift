@@ -27,8 +27,11 @@ struct FetchPullRequestsResponse: Decodable {
 
             var repos = RepositoryDtoMap()
             for key in container.allKeys {
-                if key.stringValue.starts(with: "repo") {
-                    let repo = try container.decode(PullRequestDtoMap.self, forKey: key)
+                if !key.stringValue.starts(with: "repo") {
+                    continue
+                }
+
+                if let repo = try? container.decode(PullRequestDtoMap.self, forKey: key) {
                     repos[key.stringValue] = repo
                 }
             }
