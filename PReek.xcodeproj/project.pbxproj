@@ -43,8 +43,6 @@
 		6CDC9FA02C752A04005FAFFD /* toOptionalUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDC9F9F2C752A04005FAFFD /* toOptionalUrl.swift */; };
 		6CDC9FA22C752B55005FAFFD /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDC9FA12C752B55005FAFFD /* Comment.swift */; };
 		6CDC9FA42C752E31005FAFFD /* toComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CDC9FA32C752E31005FAFFD /* toComment.swift */; };
-		6CDC9FA72C753610005FAFFD /* CommandLineTool in Frameworks */ = {isa = PBXBuildFile; productRef = 6CDC9FA62C753610005FAFFD /* CommandLineTool */; };
-		6CDC9FA92C753610005FAFFD /* swiftformat in Frameworks */ = {isa = PBXBuildFile; productRef = 6CDC9FA82C753610005FAFFD /* swiftformat */; };
 		6CDC9FAD2C75C8C5005FAFFD /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FAA2C75C8C4005FAFFD /* .gitignore */; };
 		6CDC9FAE2C75C8C5005FAFFD /* .swift-version in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FAB2C75C8C5005FAFFD /* .swift-version */; };
 		6CDC9FAF2C75C8C5005FAFFD /* renovate.json in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FAC2C75C8C5005FAFFD /* renovate.json */; };
@@ -130,11 +128,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				6C232DE72C08C51D00C003B1 /* KeychainAccess in Frameworks */,
-				6CDC9FA92C753610005FAFFD /* swiftformat in Frameworks */,
 				6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */,
 				6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */,
 				6CB7203E2C70ED840067CA1D /* MarkdownUI in Frameworks */,
-				6CDC9FA72C753610005FAFFD /* CommandLineTool in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,8 +298,6 @@
 				6C232DE62C08C51D00C003B1 /* KeychainAccess */,
 				6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */,
 				6CB7203D2C70ED840067CA1D /* MarkdownUI */,
-				6CDC9FA62C753610005FAFFD /* CommandLineTool */,
-				6CDC9FA82C753610005FAFFD /* swiftformat */,
 			);
 			productName = PReek;
 			productReference = 6CB027222BFF817E00C4C3B1 /* PReek.app */;
@@ -339,7 +333,6 @@
 				6C232DE52C08C51D00C003B1 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
 				6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
-				6CDC9FA52C753610005FAFFD /* XCRemoteSwiftPackageReference "SwiftFormat" */,
 			);
 			productRefGroup = 6CB027232BFF817E00C4C3B1 /* Products */;
 			projectDirPath = "";
@@ -661,14 +654,6 @@
 				minimumVersion = 2.4.0;
 			};
 		};
-		6CDC9FA52C753610005FAFFD /* XCRemoteSwiftPackageReference "SwiftFormat" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nicklockwood/SwiftFormat";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.54.3;
-			};
-		};
 		6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/orchetect/MenuBarExtraAccess";
@@ -694,16 +679,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
-		};
-		6CDC9FA62C753610005FAFFD /* CommandLineTool */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6CDC9FA52C753610005FAFFD /* XCRemoteSwiftPackageReference "SwiftFormat" */;
-			productName = CommandLineTool;
-		};
-		6CDC9FA82C753610005FAFFD /* swiftformat */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6CDC9FA52C753610005FAFFD /* XCRemoteSwiftPackageReference "SwiftFormat" */;
-			productName = swiftformat;
 		};
 		6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */ = {
 			isa = XCSwiftPackageProductDependency;

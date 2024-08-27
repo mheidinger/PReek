@@ -1,20 +1,22 @@
 import SwiftUI
 
 struct DividedView<Content: View>: View {
+    typealias ShouldHighlightFunc<T> = ((T) -> String?)?
+
     private let content: Content
-    private let shouldHighlight: ((Int) -> Bool)?
+    private let shouldHighlight: ShouldHighlightFunc<Int>
 
     // Initializer for full content without data
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
         shouldHighlight = nil
     }
-    
+
     // Initializer for data-driven content with optional highlighting, without additional content
     init<T: Identifiable, ItemContent: View, C: Collection>(
         _ data: C,
         @ViewBuilder content: @escaping (T) -> ItemContent,
-        shouldHighlight: ((T) -> Bool)? = nil
+        shouldHighlight: ShouldHighlightFunc<T> = nil
     ) where C.Element == T, Content == TupleView<(ForEach<C, T.ID, ItemContent>, EmptyView)> {
         self.init(
             data,
@@ -23,12 +25,12 @@ struct DividedView<Content: View>: View {
             additionalContent: { EmptyView() }
         )
     }
-    
+
     // Initializer for data-driven content with optional highlighting and additional content
     init<T: Identifiable, ItemContent: View, AdditionalContent: View, C: Collection>(
         _ data: C,
         @ViewBuilder content: @escaping (T) -> ItemContent,
-        shouldHighlight: ((T) -> Bool)? = nil,
+        shouldHighlight: ShouldHighlightFunc<T> = nil,
         @ViewBuilder additionalContent: () -> AdditionalContent
     ) where C.Element == T, Content == TupleView<(ForEach<C, T.ID, ItemContent>, AdditionalContent)> {
         self.content = TupleView((
@@ -39,13 +41,13 @@ struct DividedView<Content: View>: View {
         ))
         self.shouldHighlight = shouldHighlight.map { highlight in
             { index in
-                guard index < data.count else { return false }
+                guard index < data.count else { return nil }
                 let item = data[data.index(data.startIndex, offsetBy: index)]
                 return highlight(item)
             }
         }
     }
-    
+
     var body: some View {
         _VariadicView.Tree(DividedLayout(shouldHighlight: shouldHighlight)) {
             content
@@ -53,7 +55,7 @@ struct DividedView<Content: View>: View {
     }
 
     private struct DividedLayout: _VariadicView_MultiViewRoot {
-        let shouldHighlight: ((Int) -> Bool)?
+        let shouldHighlight: ShouldHighlightFunc<Int>
 
         @ViewBuilder
         func body(children: _VariadicView.Children) -> some View {
@@ -63,8 +65,8 @@ struct DividedView<Content: View>: View {
                 child
 
                 if child.id != last {
-                    if let shouldHighlight = shouldHighlight, shouldHighlight(index) {
-                        HighlightedDivider()
+                    if let shouldHighlight = shouldHighlight, let highlightText = shouldHighlight(index) {
+                        HighlightedDivider(highlightText: highlightText)
                     } else {
                         Divider()
                     }
@@ -75,14 +77,16 @@ struct DividedView<Content: View>: View {
 }
 
 private struct HighlightedDivider: View {
+    var highlightText: String
+
     var body: some View {
         Divider()
             .frame(height: 1)
-            .overlay(.orange)
+            .overlay(.accent)
             .background(alignment: .bottomLeading) {
-                Text("New")
+                Text(highlightText)
                     .font(.footnote)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.accent)
             }
             .padding(.top, 4)
     }
@@ -115,7 +119,7 @@ private struct HighlightedDivider: View {
         DividedView(items) { item in
             Text(item.title)
         } shouldHighlight: { item in
-            item.isNew
+            item.isNew ? "New" : nil
         } additionalContent: {
             Button(action: {}) {
                 Label("Load More", systemImage: "ellipsis.circle")

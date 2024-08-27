@@ -38,6 +38,10 @@ func eventDataToActionLabel(data: any EventData) -> String {
 struct EventView: View {
     var event: Event
 
+    init(_ event: Event) {
+        self.event = event
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
@@ -51,7 +55,7 @@ struct EventView: View {
                     Image(systemName: "square.and.arrow.up")
                 }
             }
-            EventDataView(data: event.data)
+            EventDataView(event.data)
                 .padding(.leading, 30)
                 .padding(.top, 2)
         }
@@ -85,7 +89,7 @@ struct EventView: View {
         VStack {
             DividedView {
                 ForEach(pullRequestEvents) { pullRequestEvent in
-                    EventView(event: pullRequestEvent)
+                    EventView(pullRequestEvent)
                 }
             }
         }

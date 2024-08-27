@@ -5,7 +5,7 @@ struct PullRequestContentView: View {
 
     var pullRequest: PullRequest
 
-    init(pullRequest: PullRequest) {
+    init(_ pullRequest: PullRequest) {
         eventLimit = min(pullRequest.events.count, 5)
         self.pullRequest = pullRequest
     }
@@ -18,13 +18,13 @@ struct PullRequestContentView: View {
         Text("No Events")
             .foregroundStyle(.secondary)
     }
-    
+
     var eventsBody: some View {
         VStack {
             DividedView(pullRequest.events[0 ..< eventLimit]) { event in
-                EventView(event: event)
+                EventView(event)
             } shouldHighlight: { event in
-                false // TODO: Base on last read timestamp
+                event.id == pullRequest.oldestUnreadEvent?.id ? String(localized: "New") : nil
             } additionalContent: {
                 if self.eventLimit < pullRequest.events.count {
                     Button(action: loadMore) {
@@ -47,6 +47,6 @@ struct PullRequestContentView: View {
 }
 
 #Preview {
-    PullRequestContentView(pullRequest: PullRequest.preview())
+    PullRequestContentView(PullRequest.preview())
         .padding()
 }

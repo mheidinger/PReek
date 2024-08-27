@@ -3,6 +3,10 @@ import SwiftUI
 struct EventDataView: View {
     var data: any EventData
 
+    init(_ data: any EventData) {
+        self.data = data
+    }
+
     var body: some View {
         switch data {
         case let pushedData as EventPushedData:
@@ -83,7 +87,7 @@ struct EventDataView: View {
         VStack(alignment: .leading) {
             DividedView {
                 ForEach(pullRequestEvents) { pullRequestEvent in
-                    EventDataView(data: pullRequestEvent.data)
+                    EventDataView(pullRequestEvent.data)
                 }
             }
         }

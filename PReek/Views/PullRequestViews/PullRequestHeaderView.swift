@@ -19,6 +19,11 @@ struct PullRequestHeaderView: View {
 
     @Environment(\.colorScheme) var colorScheme
 
+    init(_ pullRequest: PullRequest, toggleRead: @escaping () -> Void) {
+        self.pullRequest = pullRequest
+        self.toggleRead = toggleRead
+    }
+
     var body: some View {
         HStack(spacing: 10) {
             Image(statusToIcon[pullRequest.status] ?? .prOpen)
@@ -50,7 +55,7 @@ struct PullRequestHeaderView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Image(systemName: pullRequest.markedAsRead ? "circle" : "circle.fill")
+            Image(systemName: pullRequest.unread ? "circle.fill" : "circle")
                 .imageScale(.medium)
                 .foregroundStyle(.blue)
                 .onTapGesture(perform: toggleRead)
@@ -117,6 +122,6 @@ struct PullRequestHeaderView: View {
 }
 
 #Preview {
-    PullRequestHeaderView(pullRequest: PullRequest.preview(), toggleRead: {})
+    PullRequestHeaderView(PullRequest.preview(), toggleRead: {})
         .padding()
 }
