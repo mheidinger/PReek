@@ -57,7 +57,7 @@ struct PullRequestHeaderView: View {
 
             Image(systemName: pullRequest.unread ? "circle.fill" : "circle")
                 .imageScale(.medium)
-                .foregroundStyle(.blue)
+                .foregroundStyle(.accent)
                 .onTapGesture(perform: toggleRead)
         }
         .padding(.leading)
