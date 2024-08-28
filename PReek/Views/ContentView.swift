@@ -43,10 +43,9 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
-    var content: some View {
+    @ViewBuilder var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
-            PullRequestsView(pullRequests: pullRequestsViewModel.pullRequests, toggleRead: pullRequestsViewModel.toggleRead)
+            PullRequestsView(pullRequestsViewModel.pullRequests, toggleRead: pullRequestsViewModel.toggleRead)
         } else if pullRequestsViewModel.error != nil {
             Image(systemName: "icloud.slash")
                 .font(.largeTitle)
@@ -58,7 +57,6 @@ struct ContentView: View {
         }
     }
 
-    @ViewBuilder
     var mainPage: some View {
         VStack {
             content
@@ -68,6 +66,7 @@ struct ContentView: View {
                 pullRequestsViewModel: pullRequestsViewModel,
                 openSettings: { currentScreen = .settings }
             )
+            .background(.background.opacity(0.7))
         }
         .environment(\.modifierLinkAction, modifierLinkAction)
         .background(.background.opacity(0.5))

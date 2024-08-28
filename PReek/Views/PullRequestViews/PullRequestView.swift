@@ -1,173 +1,23 @@
 import SwiftUI
 
-private let statusToIcon: [PullRequest.Status: ImageResource] = [
-    PullRequest.Status.draft: .prDraft,
-    PullRequest.Status.open: .prOpen,
-    PullRequest.Status.merged: .prMerged,
-    PullRequest.Status.closed: .prClosed,
-]
-
-private func usersToString(_ users: [User]) -> String {
-    return users.map {
-        $0.displayName
-    }.joined(separator: "\n")
-}
-
-struct PullRequestHeaderView: View {
-    var pullRequest: PullRequest
-    var toggleRead: () -> Void
-
-    @Environment(\.colorScheme) var colorScheme
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Image(statusToIcon[pullRequest.status] ?? .prOpen)
-                .foregroundStyle(.primary)
-                .imageScale(.large)
-
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack {
-                        ModifierLink(destination: pullRequest.repository.url) {
-                            Text(pullRequest.repository.name)
-                        }
-                        ModifierLink(destination: pullRequest.url) {
-                            Text(pullRequest.numberFormatted)
-                        }
-                        .foregroundColor(.secondary)
-                    }
-                    HStack {
-                        ModifierLink(destination: pullRequest.url) {
-                            Text(pullRequest.title)
-                                .multilineTextAlignment(.leading)
-                                .lineLimit(2)
-                        }
-                        .font(.headline)
-                    }
-                    HStack(spacing: 5) {
-                        if let authorUrl = pullRequest.author.url {
-                            ModifierLink(destination: authorUrl) {
-                                Text("by \(pullRequest.author.displayName)")
-                            }
-                        } else {
-                            Text("by \(pullRequest.author.displayName)")
-                        }
-
-                        Text("·")
-
-                        Text("\(pullRequest.lastUpdatedFormatted)")
-
-                        Text("·")
-
-                        ModifierLink(destination: pullRequest.filesUrl) {
-                            HStack(spacing: 2) {
-                                Text(pullRequest.additionsFormatted)
-                                    .foregroundStyle(.success)
-                                Text(pullRequest.deletionsFormatted)
-                                    .foregroundStyle(.failure)
-                            }
-                        }
-
-                        if !pullRequest.approvalFrom.isEmpty || !pullRequest.changesRequestedFrom.isEmpty {
-                            Text("·")
-
-                            HStack(spacing: 5) {
-                                if !pullRequest.approvalFrom.isEmpty {
-                                    HStack(spacing: 1) {
-                                        Text("\(pullRequest.approvalFrom.count)")
-                                        IconView(image: .check)
-                                            .frame(width: 13)
-                                            .foregroundColor(.success)
-                                    }
-                                    .help(usersToString(pullRequest.approvalFrom))
-                                }
-                                if !pullRequest.changesRequestedFrom.isEmpty {
-                                    HStack(spacing: 2) {
-                                        Text("\(pullRequest.changesRequestedFrom.count)")
-                                        IconView(image: .fileDiff)
-                                            .frame(width: 12)
-                                            .foregroundColor(.failure)
-                                            .padding(.top, 1)
-                                    }
-                                    .help(usersToString(pullRequest.changesRequestedFrom))
-                                }
-                            }
-                        }
-                    }
-                    .foregroundStyle(.secondary)
-                    .textScale(.secondary)
-                    .padding(.top, -3)
-                }
-                Spacer()
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Image(systemName: pullRequest.markedAsRead ? "circle" : "circle.fill")
-                .imageScale(.medium)
-                .foregroundStyle(.blue)
-                .onTapGesture(perform: toggleRead)
-        }
-        .padding(.leading)
-        .frame(maxWidth: .infinity)
-    }
-}
-
-struct PullRequestContentView: View {
-    @State var eventLimit = 0
-
-    var pullRequest: PullRequest
-
-    init(pullRequest: PullRequest) {
-        eventLimit = min(pullRequest.events.count, 5)
-        self.pullRequest = pullRequest
-    }
-
-    func loadMore() {
-        eventLimit = min(pullRequest.events.count, eventLimit + 5)
-    }
-
-    @ViewBuilder var noEventsBody: some View {
-        Text("No Events")
-            .foregroundStyle(.secondary)
-    }
-
-    @ViewBuilder var eventsBody: some View {
-        VStack {
-            DividedView {
-                ForEach(pullRequest.events[0 ..< eventLimit]) { event in
-                    PullRequestEventView(pullRequestEvent: event)
-                }
-                if self.eventLimit < pullRequest.events.count {
-                    Button(action: loadMore) {
-                        Label("Load More", systemImage: "ellipsis.circle")
-                    }
-                }
-            }
-        }
-        .padding(.leading, 30)
-        .padding(.vertical, 5)
-    }
-
-    var body: some View {
-        if pullRequest.events.isEmpty {
-            noEventsBody
-        }
-        eventsBody
-    }
-}
-
 struct PullRequestView: View {
     var pullRequest: PullRequest
     var toggleRead: () -> Void
 
-    @State var sectionExpanded: Bool = false
+    @State var sectionExpanded: Bool
+
+    init(_ pullRequest: PullRequest, toggleRead: @escaping () -> Void, sectionExpanded: Bool = false) {
+        self.pullRequest = pullRequest
+        self.toggleRead = toggleRead
+        self.sectionExpanded = sectionExpanded
+    }
 
     var body: some View {
         VStack {
             DisclosureGroup(isExpanded: $sectionExpanded) {
-                PullRequestContentView(pullRequest: pullRequest)
+                PullRequestContentView(pullRequest)
             } label: {
-                PullRequestHeaderView(pullRequest: pullRequest, toggleRead: toggleRead)
+                PullRequestHeaderView(pullRequest, toggleRead: toggleRead)
             }
         }
         .onDisappear {
@@ -179,7 +29,7 @@ struct PullRequestView: View {
 #Preview {
     ScrollView {
         PullRequestView(
-            pullRequest: PullRequest.preview(),
+            PullRequest.preview(),
             toggleRead: {},
             sectionExpanded: true
         )

@@ -24,18 +24,18 @@ struct Event: Identifiable {
         return URL(string: dataUrl.path, relativeTo: pullRequestUrl) ?? pullRequestUrl
     }
 
-    static let previewClosed = Event(id: UUID().uuidString, user: User.preview(login: "person-1"), time: Date(), data: EventClosedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
-    static let previewForcePushed = Event(id: UUID().uuidString, user: User.preview(login: "person-with-long-name-2"), time: Date(), data: EventPushedData(isForcePush: true, commits: []), pullRequestUrl: URL(string: "https://example.com")!)
-    static let previewMerged = Event(id: UUID().uuidString, user: User.preview(login: "per3"), time: Date(), data: EventMergedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewClosed = Event(id: UUID().uuidString, user: User.preview(login: "person-1"), time: Date().addingTimeInterval(-10), data: EventClosedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewForcePushed = Event(id: UUID().uuidString, user: User.preview(login: "person-with-long-name-2"), time: Date().addingTimeInterval(-20), data: EventPushedData(isForcePush: true, commits: []), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewMerged = Event(id: UUID().uuidString, user: User.preview(login: "per3"), time: Date().addingTimeInterval(-30), data: EventMergedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
     static func previewCommit(commits: [Commit] = []) -> Event {
-        Event(id: UUID().uuidString, user: User.preview(login: "person-4"), time: Date(), data: EventPushedData(isForcePush: false, commits: commits), pullRequestUrl: URL(string: "https://example.com")!)
+        Event(id: UUID().uuidString, user: User.preview(login: "person-4"), time: Date().addingTimeInterval(-40), data: EventPushedData(isForcePush: false, commits: commits), pullRequestUrl: URL(string: "https://example.com")!)
     }
 
     static func previewReview(comments: [Comment]? = nil) -> Event {
         Event(
             id: UUID().uuidString,
             user: User.preview(login: "person-5"),
-            time: Date(),
+            time: Date().addingTimeInterval(-50),
             data: EventReviewData(
                 url: nil,
                 state: .changesRequested,
@@ -59,15 +59,15 @@ struct Event: Identifiable {
     static let previewComment = Event(
         id: UUID().uuidString,
         user: User.preview(login: "person-6"),
-        time: Date(),
+        time: Date().addingTimeInterval(-60),
         data: EventCommentData(url: nil, comment: Comment(id: UUID().uuidString, content: MarkdownContent("Hello World, this is some really long comment which basically has no content but it has to be long"), fileReference: nil, isReply: false)),
         pullRequestUrl: URL(string: "https://example.com")!
     )
-    static let previewReadyForReview = Event(id: UUID().uuidString, user: User.preview(login: "person-7"), time: Date(), data: ReadyForReviewData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
-    static let previewRenamedTitle = Event(id: UUID().uuidString, user: User.preview(login: "person-8"), time: Date(), data: EventRenamedTitleData(currentTitle: "current title", previousTitle: "previous title"), pullRequestUrl: URL(string: "https://example.com")!)
-    static let previewReopened = Event(id: UUID().uuidString, user: User.preview(login: "person-9"), time: Date(), data: EventReopenedData(), pullRequestUrl: URL(string: "https://example.com")!)
-    static let previewReviewRequested = Event(id: UUID().uuidString, user: User.preview(login: "person-10"), time: Date(), data: EventReviewRequestedData(requestedReviewer: "me"), pullRequestUrl: URL(string: "https://example.com")!)
-    static let previewConvertToDraft = Event(id: UUID().uuidString, user: User.preview(login: "person-11"), time: Date(), data: EventConvertToDraftData(url: URL(string: "https://example.com")!), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewReadyForReview = Event(id: UUID().uuidString, user: User.preview(login: "person-7"), time: Date().addingTimeInterval(-70), data: ReadyForReviewData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewRenamedTitle = Event(id: UUID().uuidString, user: User.preview(login: "person-8"), time: Date().addingTimeInterval(-80), data: EventRenamedTitleData(currentTitle: "current title", previousTitle: "previous title"), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewReopened = Event(id: UUID().uuidString, user: User.preview(login: "person-9"), time: Date().addingTimeInterval(-90), data: EventReopenedData(), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewReviewRequested = Event(id: UUID().uuidString, user: User.preview(login: "person-10"), time: Date().addingTimeInterval(-100), data: EventReviewRequestedData(requestedReviewer: "me"), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewConvertToDraft = Event(id: UUID().uuidString, user: User.preview(login: "person-11"), time: Date().addingTimeInterval(-110), data: EventConvertToDraftData(url: URL(string: "https://example.com")!), pullRequestUrl: URL(string: "https://example.com")!)
 }
 
 struct EventClosedData: EventData {

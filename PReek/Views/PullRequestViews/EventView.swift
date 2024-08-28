@@ -35,27 +35,30 @@ func eventDataToActionLabel(data: any EventData) -> String {
     }
 }
 
-struct PullRequestEventView: View {
-    var pullRequestEvent: Event
+struct EventView: View {
+    var event: Event
+
+    init(_ event: Event) {
+        self.event = event
+    }
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(pullRequestEvent.user.displayName).frame(width: 200, alignment: .leading)
+                Text(event.user.displayName).frame(width: 200, alignment: .leading)
                 Spacer()
-                Text(eventDataToActionLabel(data: pullRequestEvent.data)).frame(width: 150, alignment: .trailing)
+                Text(eventDataToActionLabel(data: event.data)).frame(width: 150, alignment: .trailing)
                 Spacer()
-                Text(pullRequestEvent.time.formatted(date: .numeric, time: .shortened))
+                Text(event.time.formatted(date: .numeric, time: .shortened))
                     .foregroundStyle(.secondary)
-                ModifierLink(destination: pullRequestEvent.url) {
+                ModifierLink(destination: event.url) {
                     Image(systemName: "square.and.arrow.up")
                 }
             }
-            PullRequestEventDataView(data: pullRequestEvent.data)
+            EventDataView(event.data)
                 .padding(.leading, 30)
                 .padding(.top, 2)
         }
-        .padding(.trailing)
     }
 }
 
@@ -86,7 +89,7 @@ struct PullRequestEventView: View {
         VStack {
             DividedView {
                 ForEach(pullRequestEvents) { pullRequestEvent in
-                    PullRequestEventView(pullRequestEvent: pullRequestEvent)
+                    EventView(pullRequestEvent)
                 }
             }
         }

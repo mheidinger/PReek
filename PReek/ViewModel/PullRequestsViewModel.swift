@@ -25,9 +25,9 @@ class PullRequestsViewModel: ObservableObject {
 
     @Published private var pullRequestMap: [String: PullRequest] = [:]
     var pullRequests: [PullRequest] {
-        return pullRequestMap.map { entry in
+        pullRequestMap.map { entry in
             var pullRequest = entry.value
-            pullRequest.markedAsRead = isRead(pullRequest)
+            pullRequest.lastMarkedAsRead = pullRequestReadMap[pullRequest.id]
             return pullRequest
         }.filter { pullRequest in
             let containsNonExcludedUser = pullRequest.events.contains { event in
@@ -35,7 +35,7 @@ class PullRequestsViewModel: ObservableObject {
             }
 
             let passesClosedFilter = !hideClosed || !pullRequest.isClosed
-            let passesReadFilter = !hideRead || !pullRequest.markedAsRead
+            let passesReadFilter = !hideRead || pullRequest.unread
 
             return containsNonExcludedUser && passesClosedFilter && passesReadFilter
         }.sorted {
@@ -61,10 +61,10 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     func toggleRead(_ pullRequest: PullRequest) {
-        if isRead(pullRequest) {
-            pullRequestReadMap.removeValue(forKey: pullRequest.id)
-        } else {
+        if pullRequest.unread {
             pullRequestReadMap[pullRequest.id] = Date()
+        } else {
+            pullRequestReadMap.removeValue(forKey: pullRequest.id)
         }
         updateHasUnread()
         objectWillChange.send()
@@ -79,15 +79,8 @@ class PullRequestsViewModel: ObservableObject {
         objectWillChange.send()
     }
 
-    private func isRead(_ pullRequest: PullRequest) -> Bool {
-        guard let markedRead = pullRequestReadMap[pullRequest.id] else {
-            return false
-        }
-        return markedRead > pullRequest.lastNonViewerUpdated
-    }
-
     private func updateHasUnread() {
-        hasUnread = pullRequests.first { pullRequest in !pullRequest.markedAsRead } != nil
+        hasUnread = pullRequests.first { pullRequest in pullRequest.unread } != nil
     }
 
     private func handleReceivedNotifications(notifications: [Notification]) async throws -> [String] {

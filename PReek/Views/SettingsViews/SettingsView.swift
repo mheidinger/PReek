@@ -55,7 +55,6 @@ struct SettingsView: View {
 
     @State private var count: Int = 0
 
-    @ViewBuilder
     var content: some View {
         VStack(alignment: .leading) {
             HStack(spacing: 15) {

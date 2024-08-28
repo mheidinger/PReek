@@ -22,7 +22,22 @@ struct PullRequest: Identifiable {
     let deletions: Int
     var approvalFrom: [User]
     var changesRequestedFrom: [User]
-    var markedAsRead: Bool = false
+
+    var lastMarkedAsRead: Date? = nil
+    var unread: Bool {
+        guard let lastMarkedAsRead = lastMarkedAsRead else {
+            return true
+        }
+        return lastMarkedAsRead < lastNonViewerUpdated
+    }
+
+    var oldestUnreadEvent: Event? {
+        lastMarkedAsRead.map { lastMarkedAsRead in
+            events.reversed().first { event in
+                event.time > lastMarkedAsRead
+            }
+        } ?? nil
+    }
 
     var isClosed: Bool {
         return status == .closed || status == .merged
@@ -63,15 +78,18 @@ struct PullRequest: Identifiable {
     static func preview(title: String? = nil, status: Status? = nil, events: [Event]? = nil, lastUpdated: Date? = nil) -> PullRequest {
         PullRequest(
             id: UUID().uuidString,
-            repository: Repository(name: "t2/t2-graphql", url: URL(string: "https://example.com")!),
+            repository: Repository(name: "max-heidinger/PReek", url: URL(string: "https://example.com")!),
             author: User(login: "max-heidinger", url: URL(string: "https://example.com")!),
-            title: title ?? "[TRIP-23251] Fix some things but the title is pretty long",
+            title: title ?? "[TICKET-23251] Fix some things but the title is pretty long",
             number: 5312,
             status: status ?? .open,
             lastUpdated: lastUpdated ?? Date(),
             lastNonViewerUpdated: Date(),
             events: events ?? [
+                Event.previewClosed,
+                Event.previewForcePushed,
                 Event.previewMerged,
+                Event.previewCommit(),
                 Event.previewReview(),
                 Event.previewComment,
             ],
@@ -79,7 +97,8 @@ struct PullRequest: Identifiable {
             additions: 123_456,
             deletions: 654_321,
             approvalFrom: [User(login: "user-1"), User(login: "user-2")],
-            changesRequestedFrom: [User(login: "user-3")]
+            changesRequestedFrom: [User(login: "user-3")],
+            lastMarkedAsRead: Date().addingTimeInterval(-35)
         )
     }
 }
