@@ -66,6 +66,7 @@ struct ContentView: View {
                 pullRequestsViewModel: pullRequestsViewModel,
                 openSettings: { currentScreen = .settings }
             )
+            .background(.background.opacity(0.7))
         }
         .environment(\.modifierLinkAction, modifierLinkAction)
         .background(.background.opacity(0.5))

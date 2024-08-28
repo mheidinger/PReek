@@ -82,11 +82,11 @@ private struct HighlightedDivider: View {
     var body: some View {
         Divider()
             .frame(height: 1)
-            .overlay(.accent)
+            .overlay(.highlight)
             .background(alignment: .bottomLeading) {
                 Text(highlightText)
                     .font(.footnote)
-                    .foregroundStyle(.accent)
+                    .foregroundStyle(.highlight)
             }
             .padding(.top, 4)
     }
