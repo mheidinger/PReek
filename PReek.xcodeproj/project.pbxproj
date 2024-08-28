@@ -47,7 +47,7 @@
 		6CDC9FAE2C75C8C5005FAFFD /* .swift-version in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FAB2C75C8C5005FAFFD /* .swift-version */; };
 		6CDC9FAF2C75C8C5005FAFFD /* renovate.json in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FAC2C75C8C5005FAFFD /* renovate.json */; };
 		6CDC9FB12C75C8FB005FAFFD /* .swiftformat in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FB02C75C8FB005FAFFD /* .swiftformat */; };
-		6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */; };
+		6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; platformFilters = (macos, ); productRef = 6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */; };
 		6CE0CE6E2C410D0B00ECF4FA /* ModifierLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE0CE6D2C410D0B00ECF4FA /* ModifierLink.swift */; };
 		6CE563F72BFFAD3E008E9A4B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE563F62BFFAD3E008E9A4B /* ContentView.swift */; };
 		6CE563F92BFFDC8F008E9A4B /* PullRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE563F82BFFDC8F008E9A4B /* PullRequestView.swift */; };
@@ -152,6 +152,14 @@
 			path = DtoModelMapper;
 			sourceTree = "<group>";
 		};
+		6C5D5AB12C7FB41E000C8A35 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				6C232DEC2C08CB9600C003B1 /* KeychainStorage.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
 		6C5FBDEE2C6B3C5800620B7A /* PullRequestViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -215,15 +223,15 @@
 		6CB027242BFF817E00C4C3B1 /* PReek */ = {
 			isa = PBXGroup;
 			children = (
+				6CE563FC2C008D78008E9A4B /* Models */,
 				6CE564182C013519008E9A4B /* ViewModel */,
 				6CE564172C013117008E9A4B /* Views */,
 				6CE5640E2C00FD01008E9A4B /* Services */,
-				6CE563FC2C008D78008E9A4B /* Models */,
+				6C5D5AB12C7FB41E000C8A35 /* Utility */,
 				6CB027252BFF817E00C4C3B1 /* PReekApp.swift */,
+				6C7C4CA22C087A9900B9B4DA /* extensions.swift */,
 				6CB027292BFF818000C4C3B1 /* Assets.xcassets */,
 				6CB0272E2BFF818000C4C3B1 /* PReek.entitlements */,
-				6C7C4CA22C087A9900B9B4DA /* extensions.swift */,
-				6C232DEC2C08CB9600C003B1 /* KeychainStorage.swift */,
 			);
 			path = PReek;
 			sourceTree = "<group>";
@@ -568,8 +576,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "macosx xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
 			};
 			name = Debug;
 		};
@@ -601,8 +612,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "macosx xros xrsimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
 			};
 			name = Release;
 		};

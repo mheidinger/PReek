@@ -1,17 +1,19 @@
 import SwiftUI
 
-private func convertToNSEventModifierFlags(_ modifiers: EventModifiers) -> NSEvent.ModifierFlags {
-    var flags = NSEvent.ModifierFlags()
+#if os(macOS)
+    private func convertToNSEventModifierFlags(_ modifiers: EventModifiers) -> NSEvent.ModifierFlags {
+        var flags = NSEvent.ModifierFlags()
 
-    if modifiers.contains(.shift) { flags.insert(.shift) }
-    if modifiers.contains(.control) { flags.insert(.control) }
-    if modifiers.contains(.option) { flags.insert(.option) }
-    if modifiers.contains(.command) { flags.insert(.command) }
-    if modifiers.contains(.capsLock) { flags.insert(.capsLock) }
-    if modifiers.contains(.numericPad) { flags.insert(.numericPad) }
+        if modifiers.contains(.shift) { flags.insert(.shift) }
+        if modifiers.contains(.control) { flags.insert(.control) }
+        if modifiers.contains(.option) { flags.insert(.option) }
+        if modifiers.contains(.command) { flags.insert(.command) }
+        if modifiers.contains(.capsLock) { flags.insert(.capsLock) }
+        if modifiers.contains(.numericPad) { flags.insert(.numericPad) }
 
-    return flags
-}
+        return flags
+    }
+#endif
 
 struct ModifierLink<Label: View>: View {
     typealias AdditionalActionProcessor = (_ modifierPressed: Bool) -> Void
@@ -29,18 +31,22 @@ struct ModifierLink<Label: View>: View {
     }
 
     var body: some View {
-        Button(action: {
-            openURL(destination)
-            additionalAction(NSEvent.modifierFlags.contains(convertToNSEventModifierFlags(modifiers)))
-        }, label: label)
-            .buttonStyle(PlainButtonStyle())
-            .onHover { inside in
-                if inside {
-                    NSCursor.pointingHand.set()
-                } else {
-                    NSCursor.arrow.set()
+        #if os(macOS)
+            Button(action: {
+                openURL(destination)
+                additionalAction(NSEvent.modifierFlags.contains(convertToNSEventModifierFlags(modifiers)))
+            }, label: label)
+                .buttonStyle(PlainButtonStyle())
+                .onHover { inside in
+                    if inside {
+                        NSCursor.pointingHand.set()
+                    } else {
+                        NSCursor.arrow.set()
+                    }
                 }
-            }
+        #else
+            Link(destination: destination, label: label)
+        #endif
     }
 }
 

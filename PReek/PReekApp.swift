@@ -1,4 +1,6 @@
-import MenuBarExtraAccess
+#if os(macOS)
+    import MenuBarExtraAccess
+#endif
 import SwiftUI
 
 @main
@@ -26,18 +28,24 @@ struct PReekApp: App {
     }
 
     var body: some Scene {
-        MenuBarExtra("PReek", image: pullRequestsViewModel.hasUnread ? "MenuBarIconUnread" : "MenuBarIcon") {
-            ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: { isMenuPresented = false })
-                .frame(width: 600, height: 400)
-                .focused($isContentFocused)
-        }
-        .menuBarExtraStyle(.window)
-        .defaultSize(width: 600, height: 400)
-        .menuBarExtraAccess(isPresented: $isMenuPresented)
-        .onChange(of: isMenuPresented) {
-            if isMenuPresented {
-                isContentFocused = true
+        #if os(macOS)
+            MenuBarExtra("PReek", image: pullRequestsViewModel.hasUnread ? "MenuBarIconUnread" : "MenuBarIcon") {
+                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: { isMenuPresented = false })
+                    .frame(width: 600, height: 400)
+                    .focused($isContentFocused)
             }
-        }
+            .menuBarExtraStyle(.window)
+            .defaultSize(width: 600, height: 400)
+            .menuBarExtraAccess(isPresented: $isMenuPresented)
+            .onChange(of: isMenuPresented) {
+                if isMenuPresented {
+                    isContentFocused = true
+                }
+            }
+        #elseif os(visionOS)
+            WindowGroup {
+                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: {})
+            }
+        #endif
     }
 }

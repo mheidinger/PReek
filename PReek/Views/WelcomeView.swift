@@ -40,13 +40,10 @@ struct WelcomeView: View {
                     Text("Save")
                 }
 
-                if let error = error {
-                    Text("Error: \(error.localizedDescription)")
-                        .foregroundStyle(.red)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                }
+                Text(error != nil ? String(localized: "Error: \(error!.localizedDescription)") : "")
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity, minHeight: 25, alignment: .center)
             }
-            .frame(height: 150, alignment: .top)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottom) {
@@ -62,5 +59,9 @@ struct WelcomeView: View {
 
 #Preview {
     WelcomeView(configViewModel: ConfigViewModel(), testConnection: { GitHubError.forbidden }, dismissWelcomeView: {})
+    #if os(macOS)
         .frame(width: 600, height: 400)
+    #elseif os(visionOS)
+        .glassBackgroundEffect()
+    #endif
 }

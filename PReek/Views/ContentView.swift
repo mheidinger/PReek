@@ -14,10 +14,10 @@ struct ContentView: View {
 
     @State var currentScreen: Screen
 
-    init(pullRequestsViewModel: PullRequestsViewModel, configViewModel: ConfigViewModel, closeWindow: @escaping () -> Void) {
+    init(pullRequestsViewModel: PullRequestsViewModel, configViewModel: ConfigViewModel, closeWindow: (() -> Void)? = nil) {
         self.pullRequestsViewModel = pullRequestsViewModel
         self.configViewModel = configViewModel
-        self.closeWindow = closeWindow
+        self.closeWindow = closeWindow ?? {}
         currentScreen = configViewModel.token.isEmpty ? .welcome : .main
     }
 

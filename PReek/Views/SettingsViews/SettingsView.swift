@@ -33,14 +33,18 @@ struct SettingsView: View {
             .padding(.trailing, 10)
 
             HStack {
-                Button("Quit App", action: { NSApplication.shared.terminate(nil) })
+                #if os(macOS)
+                    Button("Quit App", action: { NSApplication.shared.terminate(nil) })
+                #endif
                 Spacer()
                 Button("Save Settings", action: saveSettings)
             }
             .padding(.horizontal)
             .padding(.bottom)
         }
+        #if os(macOS)
         .background(.windowBackground)
+        #endif
     }
 
     func addExcludedUserEntry() {

@@ -14,9 +14,11 @@ struct ConnectionSettingsView: View {
                 .frame(width: 300)
             }
             Toggle(isOn: $configViewModel.useGitHubEnterprise) {
-                // Make this have the widest label to avoid a layout shift when URL field is shown
                 Text("Use GitHub Enterprise")
+                #if os(macOS)
+                    // Make this have the widest label to avoid a layout shift when URL field is shown
                     .frame(width: 170, alignment: .trailing)
+                #endif
             }
             .toggleStyle(.switch)
             if configViewModel.useGitHubEnterprise {
