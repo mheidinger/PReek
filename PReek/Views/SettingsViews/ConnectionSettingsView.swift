@@ -2,9 +2,10 @@ import SwiftUI
 
 struct ConnectionSettingsView: View {
     @ObservedObject var configViewModel: ConfigViewModel
+    var headerLabel: LocalizedStringKey
 
     var body: some View {
-        Form {
+        Section(headerLabel) {
             HelpTextField(type: .secureField, text: $configViewModel.token, label: "GitHub PAT") {
                 VStack(alignment: .leading) {
                     Text("The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the GitHub documentation on how to generate a PAT.")
@@ -14,9 +15,7 @@ struct ConnectionSettingsView: View {
                 .frame(width: 300)
             }
             Toggle(isOn: $configViewModel.useGitHubEnterprise) {
-                // Make this have the widest label to avoid a layout shift when URL field is shown
                 Text("Use GitHub Enterprise")
-                    .frame(width: 170, alignment: .trailing)
             }
             .toggleStyle(.switch)
             if configViewModel.useGitHubEnterprise {
@@ -34,6 +33,9 @@ struct ConnectionSettingsView: View {
 }
 
 #Preview {
-    ConnectionSettingsView(configViewModel: ConfigViewModel())
-        .padding()
+    Form {
+        ConnectionSettingsView(configViewModel: ConfigViewModel(), headerLabel: "GitHub Connection")
+    }
+    .formStyle(.grouped)
+    .background(.windowBackground)
 }

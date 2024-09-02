@@ -55,10 +55,12 @@ struct PullRequestHeaderView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Image(systemName: pullRequest.unread ? "circle.fill" : "circle")
-                .imageScale(.medium)
-                .foregroundStyle(pullRequest.unread ? .accent : .gray)
-                .onTapGesture(perform: toggleRead)
+            Button(action: toggleRead) {
+                Image(systemName: pullRequest.unread ? "circle.fill" : "circle")
+                    .imageScale(.medium)
+                    .foregroundStyle(pullRequest.unread ? .accent : .gray)
+            }
+            .buttonStyle(.borderless)
         }
         .padding(.leading)
         .frame(maxWidth: .infinity)

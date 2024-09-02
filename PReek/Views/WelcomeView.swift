@@ -19,44 +19,69 @@ struct WelcomeView: View {
     }
 
     var body: some View {
-        VStack(spacing: 50) {
-            HStack(spacing: 30) {
-                Image(.icon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60)
-                VStack {
-                    Text("Welcome to PReek")
-                        .font(.largeTitle)
-                    Text("Let's get you started!")
-                        .font(.title)
-                }
-            }
+        VStack(spacing: 15) {
+            headerView
 
-            VStack(alignment: .trailing) {
-                ConnectionSettingsView(configViewModel: configViewModel)
+            formView
 
-                Button(action: doSave) {
-                    Text("Save")
-                }
+            errorAndContinue
 
-                if let error = error {
-                    Text("Error: \(error.localizedDescription)")
-                        .foregroundStyle(.red)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                }
-            }
-            .frame(height: 150, alignment: .top)
+            Spacer(minLength: 0)
+
+            footerView
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .bottom) {
-            ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek")!) {
-                Text("Made by Max Heidinger")
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+        .background(.windowBackground)
+    }
+
+    private var headerView: some View {
+        HStack(spacing: 30) {
+            Image(.icon)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 60)
+            VStack {
+                Text("Welcome to PReek")
+                    .font(.largeTitle)
+                Text("Let's get you started!")
+                    .font(.title)
             }
         }
-        .padding()
+        .padding(.top, 50)
+    }
+
+    private var formView: some View {
+        Form {
+            ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "Required Settings")
+        }
+        .formStyle(.grouped)
+        .frame(maxHeight: 180)
+    }
+
+    private var errorAndContinue: some View {
+        HStack(alignment: .top) {
+            if let error = error {
+                Text("Error: \(error.localizedDescription)")
+                    .foregroundStyle(.red)
+            }
+
+            Spacer()
+
+            Button(action: doSave) {
+                Text("Continue")
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .padding(.top, -15)
+        .padding(.horizontal, 20)
+    }
+
+    private var footerView: some View {
+        ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek")!) {
+            Text("Made by Max Heidinger")
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+        }
+        .padding(.bottom)
     }
 }
 
