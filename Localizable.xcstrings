@@ -91,12 +91,12 @@
         }
       }
     },
-    "Add Entry" : {
+    "Add Username" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eintrag hinzufügen"
+            "value" : "Nutzername hinzufügen"
           }
         }
       }
@@ -211,6 +211,16 @@
         }
       }
     },
+    "Continue" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        }
+      }
+    },
     "converted to draft" : {
       "localizations" : {
         "de" : {
@@ -241,6 +251,26 @@
         }
       }
     },
+    "Data Fetching and Cleanup" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daten Abfrage und Löschung"
+          }
+        }
+      }
+    },
+    "Don't show PRs that only have been contributed to by these users" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRs nicht anzeigen, zu denen nur von folgenden Nutzern beigetragen wurde"
+          }
+        }
+      }
+    },
     "Error: %@" : {
       "localizations" : {
         "de" : {
@@ -251,12 +281,12 @@
         }
       }
     },
-    "Excluded User #%lld" : {
+    "Excluded Users" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ignorierter User #%lld"
+            "value" : "Ignorierte Nutzer"
           }
         }
       }
@@ -331,12 +361,12 @@
         }
       }
     },
-    "GitHub Connection:" : {
+    "GitHub Connection" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GitHub Verbindung:"
+            "value" : "GitHub Verbindung"
           }
         }
       }
@@ -397,16 +427,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gelesene Ausblenden"
-          }
-        }
-      }
-    },
-    "Ignore PRs with only the following contributors:" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ignoriere PRs, die nur folgende Teilnehmer haben:"
           }
         }
       }
@@ -691,6 +711,16 @@
         }
       }
     },
+    "Required Settings" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benötigte Einstellungen"
+          }
+        }
+      }
+    },
     "reviewed" : {
       "localizations" : {
         "de" : {
@@ -707,16 +737,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "hat reviewed (verworfen)"
-          }
-        }
-      }
-    },
-    "Save" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speichern"
           }
         }
       }
@@ -863,6 +883,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Verwende GitHub Enterprise"
+          }
+        }
+      }
+    },
+    "Username" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benutzername"
           }
         }
       }

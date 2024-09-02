@@ -18,6 +18,14 @@ class ConfigViewModel: ObservableObject {
 
     @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { username in ExcludedUser(username: username) }
 
+    func addExcludedUser(username: String) {
+        excludedUsers.append(ConfigViewModel.ExcludedUser(username: username))
+    }
+
+    func removeExcludedUser(_ excludedUser: ExcludedUser) {
+        excludedUsers.removeAll { $0.id == excludedUser.id }
+    }
+
     func saveSettings() {
         if useGitHubEnterprise {
             ConfigService.gitHubEnterpriseUrl = gitHubEnterpriseUrl
