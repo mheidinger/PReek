@@ -17,13 +17,13 @@ struct FetchPullRequestsResponse: Decodable {
     typealias RepositoryDtoMap = [String: PullRequestDtoMap]
 
     struct Data: Decodable {
-        let viewer: PullRequestDto.User
+        let viewer: PullRequestDto.Actor
         let repoMap: RepositoryDtoMap
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
 
-            viewer = try container.decode(PullRequestDto.User.self, forKey: DynamicCodingKeys(stringValue: "viewer")!)
+            viewer = try container.decode(PullRequestDto.Actor.self, forKey: DynamicCodingKeys(stringValue: "viewer")!)
 
             var repos = RepositoryDtoMap()
             for key in container.allKeys {
@@ -38,12 +38,22 @@ struct FetchPullRequestsResponse: Decodable {
             repoMap = repos
         }
     }
+    
+    struct Error: Decodable {
+        enum ErrorType: String, CaseIterableDefaultsLast {
+            case INSUFFICIENT_SCOPES
+            case Unknown
+        }
+        
+        let type: ErrorType
+    }
 
-    let data: Data
+    let data: Data?
+    let errors: [Error]?
 }
 
 enum FetchPullRequestsQueryBuilder {
-    static func fetchPullRequestQuery(repoMap: [String: [Int]]) -> String {
+    static func fetchPullRequestQuery(repoMap: [String: [Int]], fetchRequestedTeamReview: Bool) -> String {
         var repoCount = 0
         let queryContent = repoMap.reduce("") { query, repo in
             let repoQuery = repo.value.reduce("") { repoQuery, prNumber in
@@ -66,7 +76,7 @@ enum FetchPullRequestsQueryBuilder {
         }
 
         return """
-        \(pullRequestFragment)
+        \(pullRequestFragment(fetchRequestedTeamReview: fetchRequestedTeamReview))
 
         query pullRequests {
           viewer {
@@ -78,169 +88,172 @@ enum FetchPullRequestsQueryBuilder {
         """
     }
 
-    private static let pullRequestFragment = """
-    fragment ActorFragment on Actor {
-      login
-      url
-      ... on User {
-        name
-      }
-    }
-
-    fragment CommentFragment on PullRequestReviewComment {
-      id
-      author {
-        ...ActorFragment
-      }
-      body
-      createdAt
-      path
-      replyTo {
-        id
-      }
-      url
-    }
-
-    fragment PullRequestReviewFragment on PullRequestReview {
-      author {
-        ...ActorFragment
-      }
-      body
-      state
-      createdAt
-      url
-      comments(last: 30) {
-        nodes {
-          ...CommentFragment
+    private static func pullRequestFragment(fetchRequestedTeamReview: Bool) -> String {
+        """
+        fragment ActorFragment on Actor {
+          login
+          url
+          ... on User {
+            name
+          }
         }
-      }
-    }
 
-    fragment PullRequestFragment on PullRequest {
-      id
-      state
-      title
-      number
-      updatedAt
-      author {
-        ...ActorFragment
-      }
-      repository {
-        nameWithOwner
-        url
-      }
-      isDraft
-      url
-      additions
-      deletions
-      latestOpinionatedReviews(last: 30) {
-        nodes {
-          state
+        fragment CommentFragment on PullRequestReviewComment {
+          id
           author {
             ...ActorFragment
           }
+          body
+          createdAt
+          path
+          replyTo {
+            id
+          }
+          url
         }
-      }
-      reviewThreads(last: 30) {
-        nodes {
+
+        fragment PullRequestReviewFragment on PullRequestReview {
+          author {
+            ...ActorFragment
+          }
+          body
+          state
+          createdAt
+          url
           comments(last: 30) {
             nodes {
               ...CommentFragment
             }
           }
         }
-      }
-      timelineItems(last: 30, itemTypes: [PULL_REQUEST_COMMIT, PULL_REQUEST_REVIEW, HEAD_REF_FORCE_PUSHED_EVENT, MERGED_EVENT, REVIEW_REQUESTED_EVENT, READY_FOR_REVIEW_EVENT, CONVERT_TO_DRAFT_EVENT, ISSUE_COMMENT, CLOSED_EVENT, RENAMED_TITLE_EVENT, REOPENED_EVENT]) {
-        nodes {
-          type: __typename
-          ... on Node {
-            id
+
+        fragment PullRequestFragment on PullRequest {
+          id
+          state
+          title
+          number
+          updatedAt
+          author {
+            ...ActorFragment
           }
-          ... on ClosedEvent {
-            actor {
-              ...ActorFragment
-            }
-            createdAt
+          repository {
+            nameWithOwner
             url
           }
-          ... on HeadRefForcePushedEvent {
-            actor {
-              ...ActorFragment
-            }
-            createdAt
-          }
-          ... on IssueComment {
-            author {
-              ...ActorFragment
-            }
-            body
-            createdAt
-            url
-          }
-          ... on MergedEvent {
-            actor {
-              ...ActorFragment
-            }
-            createdAt
-            url
-          }
-          ... on PullRequestCommit {
-            commit {
+          isDraft
+          url
+          additions
+          deletions
+          latestOpinionatedReviews(last: 30) {
+            nodes {
+              state
               author {
-                user {
-                  ...ActorFragment
-                }
-              }
-              committedDate
-              messageHeadline
-              oid
-            }
-            url
-          }
-          ... on PullRequestReview {
-            ...PullRequestReviewFragment
-          }
-          ... on ReadyForReviewEvent {
-            actor {
-              ...ActorFragment
-            }
-            createdAt
-            url
-          }
-          ... on RenamedTitleEvent {
-            actor {
-              ...ActorFragment
-            }
-            createdAt
-            currentTitle
-            previousTitle
-          }
-          ... on ReopenedEvent {
-            actor {
-              ...ActorFragment
-            }
-            createdAt
-          }
-          ... on ReviewRequestedEvent {
-            actor {
-              ...ActorFragment
-            }
-            createdAt
-            requestedReviewer {
-              ... on Actor {
                 ...ActorFragment
               }
             }
           }
-          ... on ConvertToDraftEvent {
-            actor {
-              ...ActorFragment
+          reviewThreads(last: 30) {
+            nodes {
+              comments(last: 30) {
+                nodes {
+                  ...CommentFragment
+                }
+              }
             }
-            createdAt
-            url
+          }
+          timelineItems(last: 30, itemTypes: [PULL_REQUEST_COMMIT, PULL_REQUEST_REVIEW, HEAD_REF_FORCE_PUSHED_EVENT, MERGED_EVENT, REVIEW_REQUESTED_EVENT, READY_FOR_REVIEW_EVENT, CONVERT_TO_DRAFT_EVENT, ISSUE_COMMENT, CLOSED_EVENT, RENAMED_TITLE_EVENT, REOPENED_EVENT]) {
+            nodes {
+              type: __typename
+              ... on Node {
+                id
+              }
+              ... on ClosedEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+                url
+              }
+              ... on HeadRefForcePushedEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+              }
+              ... on IssueComment {
+                author {
+                  ...ActorFragment
+                }
+                body
+                createdAt
+                url
+              }
+              ... on MergedEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+                url
+              }
+              ... on PullRequestCommit {
+                commit {
+                  author {
+                    user {
+                      ...ActorFragment
+                    }
+                  }
+                  committedDate
+                  messageHeadline
+                  oid
+                }
+                url
+              }
+              ... on PullRequestReview {
+                ...PullRequestReviewFragment
+              }
+              ... on ReadyForReviewEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+                url
+              }
+              ... on RenamedTitleEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+                currentTitle
+                previousTitle
+              }
+              ... on ReopenedEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+              }
+              ... on ReviewRequestedEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+                requestedReviewer {
+                  ... on Actor {
+                    ...ActorFragment
+                  }
+                  \(if: fetchRequestedTeamReview, "... on Team { name url }")
+                }
+              }
+              ... on ConvertToDraftEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+                url
+              }
+            }
           }
         }
-      }
+        """
     }
-    """
 }

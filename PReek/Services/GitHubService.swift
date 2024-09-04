@@ -14,6 +14,8 @@ enum GitHubError: LocalizedError {
     case networkError
     case unauthorized
     case forbidden
+    case apiError
+    case insufficientScopes
     case unknown
 
     var errorDescription: String? {
@@ -28,6 +30,10 @@ enum GitHubError: LocalizedError {
             return String(localized: "PAT is invalid")
         case .forbidden:
             return String(localized: "PAT is missing permissions, does it have the 'notifications' scope?")
+        case .apiError:
+            return String(localized: "Unknown error happened when calling the GitHub API")
+        case .insufficientScopes:
+            return String(localized: "PAT is missing required scopes")
         case .unknown:
             return String(localized: "Unknown error happened")
         }
@@ -112,15 +118,24 @@ class GitHubService {
     }
 
     static func fetchPullRequests(repoMap: [String: [Int]]) async throws -> [PullRequest] {
-        let query = GraphQLQuery(query: FetchPullRequestsQueryBuilder.fetchPullRequestQuery(repoMap: repoMap))
+        let query = GraphQLQuery(query: FetchPullRequestsQueryBuilder.fetchPullRequestQuery(repoMap: repoMap, fetchRequestedTeamReview: ConfigService.fetchRequestedTeamReview))
         var request = try URLRequest(url: graphUrl())
         request.httpMethod = "POST"
-        request.httpBody = try! encoder.encode(query)
+        request.httpBody = try encoder.encode(query)
 
         let (data, _) = try await sendRequest(request: request)
-        let parsedData = try decoder.decode(FetchPullRequestsResponse.self, from: data)
-        let dtos = parsedData.data.repoMap.flatMap { $0.value.compactMap { $0.value } }
-        return toPullRequests(dtos: dtos, viewer: parsedData.data.viewer)
+        let parsedResponse = try decoder.decode(FetchPullRequestsResponse.self, from: data)
+        guard let data = parsedResponse.data else {
+            switch parsedResponse.errors?.first?.type {
+            case .INSUFFICIENT_SCOPES:
+                throw GitHubError.insufficientScopes
+            default:
+                throw GitHubError.apiError
+            }
+        }
+        
+        let dtos = data.repoMap.flatMap { $0.value.compactMap { $0.value } }
+        return toPullRequests(dtos: dtos, viewer: data.viewer)
     }
 
     private static func sendRequest(request: URLRequest) async throws -> (Data, HTTPURLResponse) {

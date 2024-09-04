@@ -4,7 +4,6 @@ class ConfigService {
     @OptionalKeychainStorage("gitHubEnterpriseUrl") static var gitHubEnterpriseUrl: String? = nil
     @OptionalKeychainStorage("token") static var token: String? = nil
 
-    @AppStorage("closeWindowOnLinkClick") static var closeWindowOnLinkClick: Bool = true
     @AppStorage("onStartFetchWeeks") static var onStartFetchWeeks: Int = 1
     @AppStorage("deleteAfterWeeks") static var deleteAfterWeeks: Int = 1
     @AppStorage("deleteOnlyClosed") static var deleteOnlyClosed: Bool = true
@@ -14,4 +13,7 @@ class ConfigService {
         set { excludedUsersStr = newValue.joined(separator: "|") }
         get { return excludedUsersStr.split(separator: "|").map { subString in String(subString) } }
     }
+
+    @AppStorage("closeWindowOnLinkClick") static var closeWindowOnLinkClick: Bool = true
+    @AppStorage("fetchRequestedTeamReview") static var fetchRequestedTeamReview: Bool = false
 }

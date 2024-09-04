@@ -15,10 +15,19 @@ struct PullRequestDto: Decodable {
         case DISMISSED
     }
 
-    struct User: Decodable {
+    struct Actor: Decodable {
         var login: String
         var url: String
         var name: String?
+    }
+
+    // This is an empty object if we don't fetch teams but have permission for it
+    struct ActorOrTeam: Decodable {
+        /// only on Actor
+        var login: String?
+        /// required on Team, optional on Actor
+        var name: String?
+        var url: String?
     }
 
     struct Repository: Decodable {
@@ -52,13 +61,13 @@ struct PullRequestDto: Decodable {
         /// all except PullRequestCommit (commit.committedDate)
         var createdAt: Date?
         /// all except PullRequestReview (author.user), PullRequestCommit (commit.author.user)
-        var actor: User?
+        var actor: Actor?
         /// all except HeadRefForcePushedEvent, RenamedTitleEvent, ReopenedEvent, ReviewRequestedEvent
         var url: String?
         /// PullRequestCommit
         var commit: Commit?
         /// PullRequestReview and IssueComment
-        var author: User?
+        var author: Actor?
         var body: String?
         /// PullRequestReview
         var state: ReviewState?
@@ -67,7 +76,7 @@ struct PullRequestDto: Decodable {
         var currentTitle: String?
         var previousTitle: String?
         /// ReviewRequestedEvent
-        var requestedReviewer: User?
+        var requestedReviewer: ActorOrTeam?
     }
 
     struct Commit: Decodable {
@@ -78,7 +87,7 @@ struct PullRequestDto: Decodable {
     }
 
     struct CommitAuthor: Decodable {
-        var user: User?
+        var user: Actor?
     }
 
     struct ReviewComments: Decodable {
@@ -87,7 +96,7 @@ struct PullRequestDto: Decodable {
 
     struct ReviewComment: Decodable {
         var id: String
-        var author: User?
+        var author: Actor?
         var body: String
         var createdAt: Date
         var path: String
@@ -113,7 +122,7 @@ struct PullRequestDto: Decodable {
 
     struct LatestOpinionatedReview: Decodable {
         var state: ReviewState
-        var author: User
+        var author: Actor
     }
 
     var id: String
@@ -122,7 +131,7 @@ struct PullRequestDto: Decodable {
     var title: String
     var number: Int
     var updatedAt: Date
-    var author: User?
+    var author: Actor?
     var repository: Repository
     var latestOpinionatedReviews: LatestOpinionatedReviews?
     var reviewThreads: ReviewThreads
