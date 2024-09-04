@@ -321,16 +321,6 @@
         }
       }
     },
-    "Fetch team name if review is requested from a team. Requires the 'read:org' PAT scope." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Team Name abfragen, falls eine Review von einem Team angefragt wurde. Benötigt die 'read:org' PAT Berechtigung."
-          }
-        }
-      }
-    },
     "Filters" : {
       "localizations" : {
         "de" : {
@@ -577,6 +567,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PAT fehlen Berechtigungen, ist die 'notifications' Berechtigung zugewiesen?"
+          }
+        }
+      }
+    },
+    "PAT is missing required scope: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PAT fehlt folgende Berechtigung: %@"
           }
         }
       }

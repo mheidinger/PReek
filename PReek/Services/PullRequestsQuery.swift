@@ -1,58 +1,14 @@
 import Foundation
 
-private struct DynamicCodingKeys: CodingKey {
-    var stringValue: String
-    init?(stringValue: String) {
-        self.stringValue = stringValue
-    }
-
-    var intValue: Int?
-    init?(intValue _: Int) {
-        return nil
-    }
-}
-
-struct FetchPullRequestsResponse: Decodable {
+struct PullRequestsResponse: Decodable {
     typealias PullRequestDtoMap = [String: PullRequestDto]
     typealias RepositoryDtoMap = [String: PullRequestDtoMap]
 
-    struct Data: Decodable {
-        let viewer: PullRequestDto.Actor
-        let repoMap: RepositoryDtoMap
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: DynamicCodingKeys.self)
-
-            viewer = try container.decode(PullRequestDto.Actor.self, forKey: DynamicCodingKeys(stringValue: "viewer")!)
-
-            var repos = RepositoryDtoMap()
-            for key in container.allKeys {
-                if !key.stringValue.starts(with: "repo") {
-                    continue
-                }
-
-                if let repo = try? container.decode(PullRequestDtoMap.self, forKey: key) {
-                    repos[key.stringValue] = repo
-                }
-            }
-            repoMap = repos
-        }
-    }
-    
-    struct Error: Decodable {
-        enum ErrorType: String, CaseIterableDefaultsLast {
-            case INSUFFICIENT_SCOPES
-            case Unknown
-        }
-        
-        let type: ErrorType
-    }
-
-    let data: Data?
-    let errors: [Error]?
+    let data: RepositoryDtoMap?
+    let errors: [GitHubGraphQLError]?
 }
 
-enum FetchPullRequestsQueryBuilder {
+enum PullRequestsQueryBuilder {
     static func fetchPullRequestQuery(repoMap: [String: [Int]], fetchRequestedTeamReview: Bool) -> String {
         var repoCount = 0
         let queryContent = repoMap.reduce("") { query, repo in
@@ -79,10 +35,6 @@ enum FetchPullRequestsQueryBuilder {
         \(pullRequestFragment(fetchRequestedTeamReview: fetchRequestedTeamReview))
 
         query pullRequests {
-          viewer {
-            ...ActorFragment
-          }
-
           \(queryContent)
         }
         """

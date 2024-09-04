@@ -69,9 +69,6 @@ struct SettingsView: View {
                     Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
                         Text("Close window when opening a link, press CMD on click to get opposite behaviour")
                     }
-                    Toggle(isOn: $configViewModel.fetchRequestedTeamReview) {
-                        Text("Fetch team name if review is requested from a team. Requires the 'read:org' PAT scope.")
-                    }
                 }
             }
             .formStyle(.grouped)

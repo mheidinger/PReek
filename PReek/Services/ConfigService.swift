@@ -15,5 +15,4 @@ class ConfigService {
     }
 
     @AppStorage("closeWindowOnLinkClick") static var closeWindowOnLinkClick: Bool = true
-    @AppStorage("fetchRequestedTeamReview") static var fetchRequestedTeamReview: Bool = false
 }
