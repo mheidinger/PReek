@@ -18,10 +18,7 @@ struct CommitsView: View {
     }
 
     private func commitBulletPoint(_ commit: Commit) -> some View {
-        HStack {
-            Text("•")
-            Text(commit.messageHeadline)
-        }
+        Text("• \(commit.messageHeadline)")
     }
 }
 

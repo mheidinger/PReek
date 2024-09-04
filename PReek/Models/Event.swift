@@ -66,7 +66,7 @@ struct Event: Identifiable {
     static let previewReadyForReview = Event(id: UUID().uuidString, user: User.preview(login: "person-7"), time: Date().addingTimeInterval(-70), data: ReadyForReviewData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewRenamedTitle = Event(id: UUID().uuidString, user: User.preview(login: "person-8"), time: Date().addingTimeInterval(-80), data: EventRenamedTitleData(currentTitle: "current title", previousTitle: "previous title"), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewReopened = Event(id: UUID().uuidString, user: User.preview(login: "person-9"), time: Date().addingTimeInterval(-90), data: EventReopenedData(), pullRequestUrl: URL(string: "https://example.com")!)
-    static let previewReviewRequested = Event(id: UUID().uuidString, user: User.preview(login: "person-10"), time: Date().addingTimeInterval(-100), data: EventReviewRequestedData(requestedReviewer: "me"), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewReviewRequested = Event(id: UUID().uuidString, user: User.preview(login: "person-10"), time: Date().addingTimeInterval(-100), data: EventReviewRequestedData(requestedReviewers: ["me", "you"]), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewConvertToDraft = Event(id: UUID().uuidString, user: User.preview(login: "person-11"), time: Date().addingTimeInterval(-110), data: EventConvertToDraftData(url: URL(string: "https://example.com")!), pullRequestUrl: URL(string: "https://example.com")!)
 }
 
@@ -128,7 +128,7 @@ struct EventReopenedData: EventData {
 
 struct EventReviewRequestedData: EventData {
     let url: URL? = nil
-    let requestedReviewer: String?
+    let requestedReviewers: [String]
 }
 
 struct EventConvertToDraftData: EventData {

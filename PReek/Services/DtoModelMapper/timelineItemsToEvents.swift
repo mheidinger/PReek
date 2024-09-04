@@ -24,17 +24,17 @@ private func canMergeTimelineItems(_ firstItem: PullRequestDto.TimelineItem, _ s
     guard let secondItem = secondItem else {
         return false
     }
-    
+
     let sameAuthor = firstItem.resolvedActor?.login == secondItem.resolvedActor?.login
     // Check if times are within 5 minutes of each other
     let closeInTime = abs(firstItem.resolvedTime.timeIntervalSince(secondItem.resolvedTime)) < 5 * 60
-    
+
     return sameAuthor && closeInTime
 }
 
 private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevPair: TimelineItemEventDataPair?) -> (EventData?, Bool) {
     let canMerge = canMergeTimelineItems(timelineItem, prevPair?.timelineItem)
-    
+
     switch timelineItem.type {
     case .ClosedEvent:
         // If the last event before closing a PR has been a merge, omit the close event
@@ -93,7 +93,12 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
     case .ReopenedEvent:
         return (EventReopenedData(), false)
     case .ReviewRequestedEvent:
-        return (EventReviewRequestedData(requestedReviewer: timelineItem.requestedReviewer?.name ?? timelineItem.requestedReviewer?.login), false)
+        let newRequestedReviewers = timelineItem.requestedReviewer?.resolvedName.map { [$0] } ?? []
+        if let prevReviewReqeuestedEventData = prevPair?.eventData as? EventReviewRequestedData, canMerge {
+            let combinedRequestedReviewers = prevReviewReqeuestedEventData.requestedReviewers + newRequestedReviewers
+            return (EventReviewRequestedData(requestedReviewers: combinedRequestedReviewers), true)
+        }
+        return (EventReviewRequestedData(requestedReviewers: newRequestedReviewers), false)
     case .ConvertToDraftEvent:
         return (EventConvertToDraftData(url: toOptionalUrl(timelineItem.url)), false)
     default:
@@ -112,7 +117,7 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRe
         guard let data, let _ = timelineItem.id else {
             return
         }
-        
+
         let pair = TimelineItemEventDataPair(timelineItem: timelineItem, eventData: data)
         result.append((pair, merge))
     }

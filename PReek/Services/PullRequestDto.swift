@@ -28,6 +28,10 @@ struct PullRequestDto: Decodable {
         /// required on Team, optional on Actor
         let name: String?
         let url: String?
+
+        var resolvedName: String? {
+            name ?? login
+        }
     }
 
     struct Repository: Decodable {
@@ -77,11 +81,11 @@ struct PullRequestDto: Decodable {
         let previousTitle: String?
         /// ReviewRequestedEvent
         let requestedReviewer: ActorOrTeam?
-        
+
         var resolvedActor: Actor? {
             actor ?? author ?? commit?.author?.user
         }
-        
+
         var resolvedTime: Date {
             createdAt ?? commit?.committedDate ?? Date()
         }

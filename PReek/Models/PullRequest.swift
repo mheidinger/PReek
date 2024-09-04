@@ -92,6 +92,7 @@ struct PullRequest: Identifiable {
                 Event.previewCommit(),
                 Event.previewReview(),
                 Event.previewComment,
+                Event.previewReviewRequested,
             ],
             url: URL(string: "https://example.com")!,
             additions: 123_456,
