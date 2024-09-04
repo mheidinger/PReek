@@ -27,10 +27,10 @@ Depending on the success of the project I'll decide whether it is worth the effo
 
 ## FAQ
 
-### Why is the notification scope required for the GitHub PAT?
+### Why is the `notification` scope required for the GitHub PAT?
 
 PReek shows Pull Requests for which you got notifications for.
-To be able to fetch your notifications, the notifications scope is required.
+To be able to fetch your notifications, the `notifications` scope is required.
 
 ### Why is a given Pull Request not shown?
 
@@ -38,5 +38,9 @@ As PReek shows Pull Requests for which you got notifications for, please check w
 If you did not get a notification, verify that you have not disabled them for a given repository.
 See the [GitHub documentation](https://docs.github.com/en/account-and-profile/managing-subscriptions-and-notifications-on-github/setting-up-notifications/configuring-notifications) for more information.
 
-Additionally check if the repository it private / internal and if yes, whether you granted the repo scope to the GitHub PAT.
+Additionally check if the repository it private / internal and if yes, whether you granted the `repo` scope to the GitHub PAT.
 This scope is required to be able to access private repositories.
+
+### Why is no team name shown if a review has been requested by a team?
+
+An additional PAT scope `read:org` is required to access the name of a team.

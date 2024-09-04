@@ -8,29 +8,12 @@ private struct GraphQLQuery: Codable {
     var variables: [String: String]?
 }
 
-enum GitHubError: LocalizedError {
-    case parseGheUrlFailure
-    case noTokenAvailable
-    case networkError
-    case unauthorized
-    case forbidden
-    case unknown
-
-    var errorDescription: String? {
-        switch self {
-        case .parseGheUrlFailure:
-            return String(localized: "Could not parse GitHub Enterprise URL")
-        case .noTokenAvailable:
-            return String(localized: "No token provided")
-        case .networkError:
-            return String(localized: "Failed to send request to GitHub")
-        case .unauthorized:
-            return String(localized: "PAT is invalid")
-        case .forbidden:
-            return String(localized: "PAT is missing permissions, does it have the 'notifications' scope?")
-        case .unknown:
-            return String(localized: "Unknown error happened")
-        }
+func graphQLErrorToError(errors: [GitHubGraphQLError]?) -> AppError {
+    switch errors?.first?.type {
+    case .INSUFFICIENT_SCOPES:
+        return AppError.insufficientScopes(missingScope: nil)
+    default:
+        return AppError.apiError
     }
 }
 
@@ -54,7 +37,7 @@ class GitHubService {
     private static func restApiUrl() throws -> URL {
         if let gitHubEnterpriseUrl = ConfigService.gitHubEnterpriseUrl {
             guard let baseUrl = URL(string: gitHubEnterpriseUrl) else {
-                throw GitHubError.parseGheUrlFailure
+                throw AppError.parseGheUrlFailure
             }
             return baseUrl.appending(path: "api").appending(path: "v3")
         }
@@ -65,12 +48,28 @@ class GitHubService {
     private static func graphUrl() throws -> URL {
         if let gitHubEnterpriseUrl = ConfigService.gitHubEnterpriseUrl {
             guard let baseUrl = URL(string: gitHubEnterpriseUrl) else {
-                throw GitHubError.parseGheUrlFailure
+                throw AppError.parseGheUrlFailure
             }
             return baseUrl.appending(path: "api").appending(path: "graphql")
         }
 
         return PUBLIC_GITHUB_BASE_URL.appending(path: "graphql")
+    }
+
+    static func fetchViewer() async throws -> Viewer {
+        let query = GraphQLQuery(query: ViewerQuery)
+        var request = try URLRequest(url: graphUrl())
+        request.httpMethod = "POST"
+        request.httpBody = try encoder.encode(query)
+
+        let (data, response) = try await sendRequest(request: request)
+        let parsedData = try decoder.decode(ViewerResponse.self, from: data)
+        guard let data = parsedData.data else {
+            throw graphQLErrorToError(errors: parsedData.errors)
+        }
+        let scopesHeader = response.value(forHTTPHeaderField: "x-oauth-scopes")
+
+        return toViewer(data.viewer, scopesHeader: scopesHeader)
     }
 
     // returns IDs of all fetched PRs to update all that did not have new notifications
@@ -111,21 +110,27 @@ class GitHubService {
         return updatedPullRequestIds
     }
 
-    static func fetchPullRequests(repoMap: [String: [Int]]) async throws -> [PullRequest] {
-        let query = GraphQLQuery(query: FetchPullRequestsQueryBuilder.fetchPullRequestQuery(repoMap: repoMap))
+    static func fetchPullRequests(repoMap: [String: [Int]], viewer: Viewer) async throws -> [PullRequest] {
+        let fetchRequestedTeamReview = viewer.scopes?.contains(.readOrg) ?? false
+
+        let query = GraphQLQuery(query: PullRequestsQueryBuilder.fetchPullRequestQuery(repoMap: repoMap, fetchRequestedTeamReview: fetchRequestedTeamReview))
         var request = try URLRequest(url: graphUrl())
         request.httpMethod = "POST"
-        request.httpBody = try! encoder.encode(query)
+        request.httpBody = try encoder.encode(query)
 
         let (data, _) = try await sendRequest(request: request)
-        let parsedData = try decoder.decode(FetchPullRequestsResponse.self, from: data)
-        let dtos = parsedData.data.repoMap.flatMap { $0.value.compactMap { $0.value } }
-        return toPullRequests(dtos: dtos, viewer: parsedData.data.viewer)
+        let parsedData = try decoder.decode(PullRequestsResponse.self, from: data)
+        guard let data = parsedData.data else {
+            throw graphQLErrorToError(errors: parsedData.errors)
+        }
+
+        let dtos = data.flatMap { $0.value.compactMap { $0.value } }
+        return toPullRequests(dtos: dtos, viewer: viewer)
     }
 
     private static func sendRequest(request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         guard let jwt = ConfigService.token else {
-            throw GitHubError.noTokenAvailable
+            throw AppError.noTokenAvailable
         }
 
         var intRequest = request
@@ -135,21 +140,21 @@ class GitHubService {
         do {
             let (data, response) = try await URLSession.shared.data(for: intRequest)
             guard let httpResponse = response as? HTTPURLResponse else {
-                throw GitHubError.unknown
+                throw AppError.unknown
             }
 
             if httpResponse.statusCode == 401 {
-                throw GitHubError.unauthorized
+                throw AppError.unauthorized
             }
             if httpResponse.statusCode == 403 {
-                throw GitHubError.forbidden
+                throw AppError.forbidden
             }
 
             return (data, httpResponse)
-        } catch let error as GitHubError {
+        } catch let error as AppError {
             throw error
         } catch {
-            throw GitHubError.networkError
+            throw AppError.networkError
         }
     }
 }

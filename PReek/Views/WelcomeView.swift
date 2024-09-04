@@ -86,6 +86,6 @@ struct WelcomeView: View {
 }
 
 #Preview {
-    WelcomeView(configViewModel: ConfigViewModel(), testConnection: { GitHubError.forbidden }, dismissWelcomeView: {})
+    WelcomeView(configViewModel: ConfigViewModel(), testConnection: { AppError.forbidden }, dismissWelcomeView: {})
         .frame(width: 600, height: 400)
 }

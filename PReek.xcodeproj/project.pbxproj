@@ -28,6 +28,12 @@
 		6C5FBDED2C6AA3E200620B7A /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5FBDEC2C6AA3E200620B7A /* WelcomeView.swift */; };
 		6C5FBDF12C6B3C9D00620B7A /* HelpTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5FBDF02C6B3C9D00620B7A /* HelpTextField.swift */; };
 		6C5FBDF42C6B41C100620B7A /* ConnectionSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5FBDF32C6B41C100620B7A /* ConnectionSettingsView.swift */; };
+		6C66CF3B2C88455B0060F290 /* ViewerQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C66CF3A2C88455B0060F290 /* ViewerQuery.swift */; };
+		6C66CF3D2C8845A00060F290 /* GitHubGraphQLError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C66CF3C2C8845A00060F290 /* GitHubGraphQLError.swift */; };
+		6C66CF3F2C889AFC0060F290 /* Viewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C66CF3E2C889AFC0060F290 /* Viewer.swift */; };
+		6C66CF412C889B810060F290 /* Scope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C66CF402C889B810060F290 /* Scope.swift */; };
+		6C66CF432C889B980060F290 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C66CF422C889B980060F290 /* AppError.swift */; };
+		6C66CF452C889C1F0060F290 /* toViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C66CF442C889C1F0060F290 /* toViewer.swift */; };
 		6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6C7C4CA02C071A0400B9B4DA /* LinkHeaderParser */; };
 		6C7C4CA32C087A9900B9B4DA /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C7C4CA22C087A9900B9B4DA /* extensions.swift */; };
 		6CB027262BFF817E00C4C3B1 /* PReekApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB027252BFF817E00C4C3B1 /* PReekApp.swift */; };
@@ -57,7 +63,7 @@
 		6CE564002C008DDC008E9A4B /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE563FF2C008DDC008E9A4B /* Event.swift */; };
 		6CE564022C0090BD008E9A4B /* EventView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE564012C0090BD008E9A4B /* EventView.swift */; };
 		6CE564102C00FD22008E9A4B /* GitHubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE5640F2C00FD22008E9A4B /* GitHubService.swift */; };
-		6CE564122C01068A008E9A4B /* FetchPullRequestsQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE564112C01068A008E9A4B /* FetchPullRequestsQuery.swift */; };
+		6CE564122C01068A008E9A4B /* PullRequestsQuery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE564112C01068A008E9A4B /* PullRequestsQuery.swift */; };
 		6CE564142C0119CF008E9A4B /* PullRequestDto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE564132C0119CF008E9A4B /* PullRequestDto.swift */; };
 		6CE564162C011BAE008E9A4B /* toPullRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE564152C011BAE008E9A4B /* toPullRequests.swift */; };
 		6CE5641A2C013529008E9A4B /* PullRequestsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE564192C013529008E9A4B /* PullRequestsViewModel.swift */; };
@@ -87,6 +93,12 @@
 		6C5FBDEC2C6AA3E200620B7A /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		6C5FBDF02C6B3C9D00620B7A /* HelpTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpTextField.swift; sourceTree = "<group>"; };
 		6C5FBDF32C6B41C100620B7A /* ConnectionSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionSettingsView.swift; sourceTree = "<group>"; };
+		6C66CF3A2C88455B0060F290 /* ViewerQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewerQuery.swift; sourceTree = "<group>"; };
+		6C66CF3C2C8845A00060F290 /* GitHubGraphQLError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubGraphQLError.swift; sourceTree = "<group>"; };
+		6C66CF3E2C889AFC0060F290 /* Viewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Viewer.swift; sourceTree = "<group>"; };
+		6C66CF402C889B810060F290 /* Scope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scope.swift; sourceTree = "<group>"; };
+		6C66CF422C889B980060F290 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
+		6C66CF442C889C1F0060F290 /* toViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toViewer.swift; sourceTree = "<group>"; };
 		6C7C4CA22C087A9900B9B4DA /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		6CB027222BFF817E00C4C3B1 /* PReek.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PReek.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB027252BFF817E00C4C3B1 /* PReekApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PReekApp.swift; sourceTree = "<group>"; };
@@ -115,7 +127,7 @@
 		6CE563FF2C008DDC008E9A4B /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		6CE564012C0090BD008E9A4B /* EventView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventView.swift; sourceTree = "<group>"; };
 		6CE5640F2C00FD22008E9A4B /* GitHubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubService.swift; sourceTree = "<group>"; };
-		6CE564112C01068A008E9A4B /* FetchPullRequestsQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchPullRequestsQuery.swift; sourceTree = "<group>"; };
+		6CE564112C01068A008E9A4B /* PullRequestsQuery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullRequestsQuery.swift; sourceTree = "<group>"; };
 		6CE564132C0119CF008E9A4B /* PullRequestDto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullRequestDto.swift; sourceTree = "<group>"; };
 		6CE564152C011BAE008E9A4B /* toPullRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toPullRequests.swift; sourceTree = "<group>"; };
 		6CE564192C013529008E9A4B /* PullRequestsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullRequestsViewModel.swift; sourceTree = "<group>"; };
@@ -150,6 +162,7 @@
 				6CDC9F9D2C75278A005FAFFD /* reviewThreadsCommentsToEvents.swift */,
 				6CDC9F9F2C752A04005FAFFD /* toOptionalUrl.swift */,
 				6CDC9FA32C752E31005FAFFD /* toComment.swift */,
+				6C66CF442C889C1F0060F290 /* toViewer.swift */,
 			);
 			path = DtoModelMapper;
 			sourceTree = "<group>";
@@ -249,6 +262,9 @@
 				6C232DF62C3F1ACA00C003B1 /* Repository.swift */,
 				6CB720382C7091D00067CA1D /* Commit.swift */,
 				6CDC9FA12C752B55005FAFFD /* Comment.swift */,
+				6C66CF3E2C889AFC0060F290 /* Viewer.swift */,
+				6C66CF402C889B810060F290 /* Scope.swift */,
+				6C66CF422C889B980060F290 /* AppError.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -258,10 +274,12 @@
 			children = (
 				6C3605B92C751BA400664E66 /* DtoModelMapper */,
 				6CE5640F2C00FD22008E9A4B /* GitHubService.swift */,
-				6CE564112C01068A008E9A4B /* FetchPullRequestsQuery.swift */,
+				6CE564112C01068A008E9A4B /* PullRequestsQuery.swift */,
 				6CE564132C0119CF008E9A4B /* PullRequestDto.swift */,
 				6C50F4352C0486BA008F5B66 /* NotificationDto.swift */,
 				6C232DEE2C08F6C600C003B1 /* ConfigService.swift */,
+				6C66CF3A2C88455B0060F290 /* ViewerQuery.swift */,
+				6C66CF3C2C8845A00060F290 /* GitHubGraphQLError.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -378,13 +396,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C66CF3F2C889AFC0060F290 /* Viewer.swift in Sources */,
 				6CDC9FA42C752E31005FAFFD /* toComment.swift in Sources */,
 				6CF15A542C03909900A7CE3E /* SettingsView.swift in Sources */,
 				6CE564102C00FD22008E9A4B /* GitHubService.swift in Sources */,
 				6CF15A522C038F9400A7CE3E /* PullRequestsView.swift in Sources */,
 				6C50F43A2C04C830008F5B66 /* toNotifications.swift in Sources */,
 				6C5FBDED2C6AA3E200620B7A /* WelcomeView.swift in Sources */,
-				6CE564122C01068A008E9A4B /* FetchPullRequestsQuery.swift in Sources */,
+				6CE564122C01068A008E9A4B /* PullRequestsQuery.swift in Sources */,
+				6C66CF452C889C1F0060F290 /* toViewer.swift in Sources */,
+				6C66CF3D2C8845A00060F290 /* GitHubGraphQLError.swift in Sources */,
 				6CE563FB2C00862E008E9A4B /* DividedView.swift in Sources */,
 				6C232DEB2C08C95E00C003B1 /* ConfigViewModel.swift in Sources */,
 				6C45077D2C7686C3008EA76D /* IconView.swift in Sources */,
@@ -392,10 +413,12 @@
 				6C7C4CA32C087A9900B9B4DA /* extensions.swift in Sources */,
 				6CB720442C7239FF0067CA1D /* CommentView.swift in Sources */,
 				6CE564162C011BAE008E9A4B /* toPullRequests.swift in Sources */,
+				6C66CF412C889B810060F290 /* Scope.swift in Sources */,
 				6CE564002C008DDC008E9A4B /* Event.swift in Sources */,
 				6C5DB5402C7D0EB6004654E4 /* PullRequestHeaderView.swift in Sources */,
 				6CB720392C7091D00067CA1D /* Commit.swift in Sources */,
 				6CDC9F9E2C75278A005FAFFD /* reviewThreadsCommentsToEvents.swift in Sources */,
+				6C66CF3B2C88455B0060F290 /* ViewerQuery.swift in Sources */,
 				6CE5641C2C037996008E9A4B /* StatusBarView.swift in Sources */,
 				6CB7203B2C7096520067CA1D /* CommitsView.swift in Sources */,
 				6C232DF72C3F1ACA00C003B1 /* Repository.swift in Sources */,
@@ -421,6 +444,7 @@
 				6C50F4382C04C590008F5B66 /* Notification.swift in Sources */,
 				6C232DF52C3F174A00C003B1 /* User.swift in Sources */,
 				6C3605B62C751B4C00664E66 /* toUser.swift in Sources */,
+				6C66CF432C889B980060F290 /* AppError.swift in Sources */,
 				6C5DB5442C7D12F1004654E4 /* PullRequestContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -576,7 +600,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 0.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -609,7 +633,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.0;
+				MARKETING_VERSION = 0.4.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

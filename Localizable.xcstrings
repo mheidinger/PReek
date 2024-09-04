@@ -566,7 +566,27 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "PAT hat nicht genügend Rechte, ist die 'notifications' Berechtigung zugewiesen?"
+            "value" : "PAT fehlen Berechtigungen, ist die 'notifications' Berechtigung zugewiesen?"
+          }
+        }
+      }
+    },
+    "PAT is missing required scope: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PAT fehlt folgende Berechtigung: %@"
+          }
+        }
+      }
+    },
+    "PAT is missing required scopes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PAT fehlen Berechtigungen"
           }
         }
       }
@@ -837,6 +857,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ein unbekannter Fehler ist aufgetreten"
+          }
+        }
+      }
+    },
+    "Unknown error happened when calling the GitHub API" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbekannter Fehler ist aufgetreten beim Aufruf der GitHub API"
           }
         }
       }

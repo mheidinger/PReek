@@ -36,7 +36,7 @@ private func extractReviewCount(opinionatedReviews: [PullRequestDto.LatestOpinio
     return (approvalFrom, changesRequestedFrom)
 }
 
-private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> PullRequest {
+private func toPullRequest(dto: PullRequestDto, viewer: Viewer) -> PullRequest {
     let pullRequestUrl = URL(string: dto.url) ?? URL(string: "https://invalid.data")!
 
     let timelineEvents = timelineItemsToEvents(timelineItems: dto.timelineItems.nodes, pullRequestUrl: pullRequestUrl)
@@ -71,6 +71,6 @@ private func toPullRequest(dto: PullRequestDto, viewer: PullRequestDto.User) -> 
     )
 }
 
-func toPullRequests(dtos: [PullRequestDto], viewer: PullRequestDto.User) -> [PullRequest] {
+func toPullRequests(dtos: [PullRequestDto], viewer: Viewer) -> [PullRequest] {
     return dtos.map { toPullRequest(dto: $0, viewer: viewer) }
 }

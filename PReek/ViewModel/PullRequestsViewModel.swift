@@ -83,7 +83,7 @@ class PullRequestsViewModel: ObservableObject {
         hasUnread = pullRequests.first { pullRequest in pullRequest.unread } != nil
     }
 
-    private func handleReceivedNotifications(notifications: [Notification]) async throws -> [String] {
+    private func handleReceivedNotifications(notifications: [Notification], viewer: Viewer) async throws -> [String] {
         logger.info("Got \(notifications.count) notifications")
 
         let repoMap = notifications.reduce([String: [Int]]()) { repoMap, notification in
@@ -95,12 +95,12 @@ class PullRequestsViewModel: ObservableObject {
             return repoMapClone
         }
 
-        return try await fetchPullRequestMap(repoMap: repoMap)
+        return try await fetchPullRequestMap(repoMap: repoMap, viewer: viewer)
     }
 
-    private func fetchPullRequestMap(repoMap: [String: [Int]]) async throws -> [String] {
+    private func fetchPullRequestMap(repoMap: [String: [Int]], viewer: Viewer) async throws -> [String] {
         if !repoMap.isEmpty {
-            let pullRequests = try await GitHubService.fetchPullRequests(repoMap: repoMap)
+            let pullRequests = try await GitHubService.fetchPullRequests(repoMap: repoMap, viewer: viewer)
             logger.info("Got \(pullRequests.count) pull requests")
 
             DispatchQueue.main.async {
@@ -118,15 +118,17 @@ class PullRequestsViewModel: ObservableObject {
 
     func updatePullRequests() async {
         do {
-            logger.info("Start fetching notifications")
-
             DispatchQueue.main.async {
                 self.isRefreshing = true
             }
 
+            logger.info("Get current user")
+            let viewer = try await GitHubService.fetchViewer()
+
+            logger.info("Start fetching notifications")
             let newLastUpdated = Date()
             let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: Date())!
-            let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: handleReceivedNotifications)
+            let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: { try await handleReceivedNotifications(notifications: $0, viewer: viewer) })
 
             logger.info("Start fetching not updated pull requests")
             let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
@@ -139,7 +141,7 @@ class PullRequestsViewModel: ObservableObject {
 
                 return repoMapClone
             }
-            _ = try await fetchPullRequestMap(repoMap: notUpdatedRepoMap)
+            _ = try await fetchPullRequestMap(repoMap: notUpdatedRepoMap, viewer: viewer)
 
             cleanupPullRequests()
 
@@ -159,7 +161,8 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     private func cleanupPullRequests() {
-        let deleteFrom = Calendar.current.date(byAdding: .day, value: ConfigService.deleteAfterWeeks * 7 * -1, to: Date())!
+        let daysToDeduct = (ConfigService.deleteAfterWeeks * 7) + 1
+        let deleteFrom = Calendar.current.date(byAdding: .day, value: daysToDeduct * -1, to: Date())!
 
         let filteredPullRequestMap = pullRequestMap.filter { _, pullRequest in
             pullRequest.lastUpdated > deleteFrom || (ConfigService.deleteOnlyClosed && !pullRequest.isClosed)
