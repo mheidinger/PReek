@@ -98,7 +98,7 @@ struct PullRequestHeaderView: View {
                     if !pullRequest.approvalFrom.isEmpty {
                         HStack(spacing: 1) {
                             Text("\(pullRequest.approvalFrom.count)")
-                            IconView(image: .check)
+                            ResourceIcon(image: .check)
                                 .frame(width: 13)
                                 .foregroundColor(.success)
                         }
@@ -107,7 +107,7 @@ struct PullRequestHeaderView: View {
                     if !pullRequest.changesRequestedFrom.isEmpty {
                         HStack(spacing: 2) {
                             Text("\(pullRequest.changesRequestedFrom.count)")
-                            IconView(image: .fileDiff)
+                            ResourceIcon(image: .fileDiff)
                                 .frame(width: 12)
                                 .foregroundColor(.failure)
                                 .padding(.top, 1)

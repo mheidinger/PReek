@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct IconView: View {
+struct ResourceIcon: View {
     let image: ImageResource
 
     var body: some View {
@@ -12,7 +12,7 @@ struct IconView: View {
 }
 
 #Preview {
-    IconView(image: .fileDiff)
+    ResourceIcon(image: .fileDiff)
         .frame(width: 50)
         .padding()
 }

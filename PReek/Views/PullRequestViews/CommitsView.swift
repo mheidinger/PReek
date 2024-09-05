@@ -8,10 +8,10 @@ struct CommitsView: View {
             ForEach(commits) { commit in
                 if let url = commit.url {
                     ModifierLink(destination: url) {
-                        BulletPointView(commit.messageHeadline)
+                        BulletPoint(commit.messageHeadline)
                     }
                 } else {
-                    BulletPointView(commit.messageHeadline)
+                    BulletPoint(commit.messageHeadline)
                 }
             }
         }
