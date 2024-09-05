@@ -130,7 +130,7 @@ struct SettingsView: View {
                 }
             }
 
-            ExcludedUsersTableView(configViewModel: configViewModel)
+            ExcludedUsersTable(configViewModel: configViewModel)
         }
     }
 }

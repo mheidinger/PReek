@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ExcludedUsersTableView: View {
+struct ExcludedUsersTable: View {
     @ObservedObject var configViewModel: ConfigViewModel
 
     @State private var newExcludedUserName: String = ""
@@ -60,7 +60,7 @@ struct ExcludedUsersTableView: View {
 #Preview {
     Form {
         Section {
-            ExcludedUsersTableView(configViewModel: ConfigViewModel())
+            ExcludedUsersTable(configViewModel: ConfigViewModel())
         }
     }
     .formStyle(.grouped)

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BulletPointView: View {
+struct BulletPoint: View {
     let text: String
 
     init(_ text: String) {
@@ -17,8 +17,8 @@ struct BulletPointView: View {
 
 #Preview {
     VStack(alignment: .leading) {
-        BulletPointView("short")
-        BulletPointView("long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long ")
+        BulletPoint("short")
+        BulletPoint("long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long ")
     }
     .frame(width: 400)
     .padding()
