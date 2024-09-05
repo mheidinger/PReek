@@ -16,27 +16,31 @@ struct PullRequestDto: Decodable {
     }
 
     struct Actor: Decodable {
-        var login: String
-        var url: String
-        var name: String?
+        let login: String
+        let url: String
+        let name: String?
     }
 
     // This is an empty object if we don't fetch teams but have permission for it
     struct ActorOrTeam: Decodable {
         /// only on Actor
-        var login: String?
+        let login: String?
         /// required on Team, optional on Actor
-        var name: String?
-        var url: String?
+        let name: String?
+        let url: String?
+
+        var resolvedName: String? {
+            name ?? login
+        }
     }
 
     struct Repository: Decodable {
-        var nameWithOwner: String
-        var url: String
+        let nameWithOwner: String
+        let url: String
     }
 
     struct TimelineItems: Decodable {
-        var nodes: [TimelineItem]?
+        let nodes: [TimelineItem]?
     }
 
     struct TimelineItem: Decodable {
@@ -55,88 +59,96 @@ struct PullRequestDto: Decodable {
             case Unknown
         }
 
-        var id: String?
-        var type: ItemType
+        let id: String?
+        let type: ItemType
 
         /// all except PullRequestCommit (commit.committedDate)
-        var createdAt: Date?
+        let createdAt: Date?
         /// all except PullRequestReview (author.user), PullRequestCommit (commit.author.user)
-        var actor: Actor?
+        let actor: Actor?
         /// all except HeadRefForcePushedEvent, RenamedTitleEvent, ReopenedEvent, ReviewRequestedEvent
-        var url: String?
+        let url: String?
         /// PullRequestCommit
-        var commit: Commit?
+        let commit: Commit?
         /// PullRequestReview and IssueComment
-        var author: Actor?
-        var body: String?
+        let author: Actor?
+        let body: String?
         /// PullRequestReview
-        var state: ReviewState?
-        var comments: ReviewComments?
+        let state: ReviewState?
+        let comments: ReviewComments?
         /// RenamedTitleEvent
-        var currentTitle: String?
-        var previousTitle: String?
+        let currentTitle: String?
+        let previousTitle: String?
         /// ReviewRequestedEvent
-        var requestedReviewer: ActorOrTeam?
+        let requestedReviewer: ActorOrTeam?
+
+        var resolvedActor: Actor? {
+            actor ?? author ?? commit?.author?.user
+        }
+
+        var resolvedTime: Date {
+            createdAt ?? commit?.committedDate ?? Date()
+        }
     }
 
     struct Commit: Decodable {
-        var author: CommitAuthor?
-        var committedDate: Date
-        var messageHeadline: String
-        var oid: String
+        let author: CommitAuthor?
+        let committedDate: Date
+        let messageHeadline: String
+        let oid: String
     }
 
     struct CommitAuthor: Decodable {
-        var user: Actor?
+        let user: Actor?
     }
 
     struct ReviewComments: Decodable {
-        var nodes: [ReviewComment]?
+        let nodes: [ReviewComment]?
     }
 
     struct ReviewComment: Decodable {
-        var id: String
-        var author: Actor?
-        var body: String
-        var createdAt: Date
-        var path: String
-        var replyTo: ReviewCommentReplyTo?
-        var url: String
+        let id: String
+        let author: Actor?
+        let body: String
+        let createdAt: Date
+        let path: String
+        let replyTo: ReviewCommentReplyTo?
+        let url: String
     }
 
     struct ReviewCommentReplyTo: Decodable {
-        var id: String
+        let id: String
     }
 
     struct ReviewThreads: Decodable {
-        var nodes: [ReviewThread]?
+        let nodes: [ReviewThread]?
     }
 
     struct ReviewThread: Decodable {
-        var comments: ReviewComments
+        let comments: ReviewComments
     }
 
     struct LatestOpinionatedReviews: Decodable {
-        var nodes: [LatestOpinionatedReview]?
+        let nodes: [LatestOpinionatedReview]?
     }
 
     struct LatestOpinionatedReview: Decodable {
-        var state: ReviewState
-        var author: Actor
+        let state: ReviewState
+        let author: Actor
     }
 
-    var id: String
-    var state: State
-    var isDraft: Bool
-    var title: String
-    var number: Int
-    var updatedAt: Date
-    var author: Actor?
-    var repository: Repository
-    var latestOpinionatedReviews: LatestOpinionatedReviews?
-    var reviewThreads: ReviewThreads
-    var timelineItems: TimelineItems
-    var url: String
-    var additions: Int
-    var deletions: Int
+    let id: String
+    let state: State
+    let isDraft: Bool
+    let title: String
+    let number: Int
+    let updatedAt: Date
+    let author: Actor?
+    let repository: Repository
+    let latestOpinionatedReviews: LatestOpinionatedReviews?
+    let reviewThreads: ReviewThreads
+    let timelineItems: TimelineItems
+    let url: String
+    let additions: Int
+    let deletions: Int
 }

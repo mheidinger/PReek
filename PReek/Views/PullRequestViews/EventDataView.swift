@@ -43,14 +43,20 @@ struct EventDataView: View {
                 }
             }
         case let reviewRequestedData as EventReviewRequestedData:
-            if let requestedReviewer = reviewRequestedData.requestedReviewer {
-                HStack {
+            if !reviewRequestedData.requestedReviewers.isEmpty {
+                HStack(alignment: .top) {
                     Text("From:")
                         .frame(width: 50, alignment: .leading)
                         .foregroundStyle(.secondary)
-                    Text(requestedReviewer)
-                        .frame(width: 400, alignment: .leading)
-                        .lineLimit(1)
+                    if reviewRequestedData.requestedReviewers.count == 1 {
+                        Text(reviewRequestedData.requestedReviewers[0])
+                    } else {
+                        VStack(alignment: .leading) {
+                            ForEach(reviewRequestedData.requestedReviewers, id: \.self) { reviewer in
+                                BulletPointView(reviewer)
+                            }
+                        }
+                    }
                 }
             } else {
                 EmptyView()
@@ -63,24 +69,15 @@ struct EventDataView: View {
 
 #Preview {
     let pullRequestEvents: [Event] = [
-        Event.previewClosed,
-        Event.previewCommit(),
-        Event.previewCommit(commits: [
-            Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
-        ]),
         Event.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
             Commit(id: "2", messageHeadline: "my second commit!", url: URL(string: "https://example.com")!),
             Commit(id: "3", messageHeadline: "my third commit!", url: URL(string: "https://example.com")!),
         ]),
-        Event.previewMerged,
         Event.previewReview(),
         Event.previewComment,
-        Event.previewReopened,
-        Event.previewForcePushed,
         Event.previewRenamedTitle,
         Event.previewReviewRequested,
-        Event.previewReadyForReview,
     ]
 
     return ScrollView {

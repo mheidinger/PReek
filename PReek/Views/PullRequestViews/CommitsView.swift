@@ -8,19 +8,12 @@ struct CommitsView: View {
             ForEach(commits) { commit in
                 if let url = commit.url {
                     ModifierLink(destination: url) {
-                        commitBulletPoint(commit)
+                        BulletPointView(commit.messageHeadline)
                     }
                 } else {
-                    commitBulletPoint(commit)
+                    BulletPointView(commit.messageHeadline)
                 }
             }
-        }
-    }
-
-    private func commitBulletPoint(_ commit: Commit) -> some View {
-        HStack {
-            Text("•")
-            Text(commit.messageHeadline)
         }
     }
 }
