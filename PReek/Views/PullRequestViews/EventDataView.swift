@@ -53,7 +53,7 @@ struct EventDataView: View {
                     } else {
                         VStack(alignment: .leading) {
                             ForEach(reviewRequestedData.requestedReviewers, id: \.self) { reviewer in
-                                Text("• \(reviewer)")
+                                BulletPointView(reviewer)
                             }
                         }
                     }
