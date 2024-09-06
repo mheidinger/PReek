@@ -1,6 +1,11 @@
 import Foundation
 
 struct PullRequestDto: Decodable {
+    protocol MergeableDto {
+        var resolvedActor: Actor? { get }
+        var resolvedTime: Date { get }
+    }
+
     enum State: String, Decodable {
         case OPEN
         case CLOSED
@@ -43,7 +48,7 @@ struct PullRequestDto: Decodable {
         let nodes: [TimelineItem]?
     }
 
-    struct TimelineItem: Decodable {
+    struct TimelineItem: Decodable, MergeableDto {
         enum ItemType: String, CaseIterableDefaultsLast {
             case ClosedEvent
             case HeadRefForcePushedEvent
@@ -106,7 +111,7 @@ struct PullRequestDto: Decodable {
         let nodes: [ReviewComment]?
     }
 
-    struct ReviewComment: Decodable {
+    struct ReviewComment: Decodable, MergeableDto {
         let id: String
         let author: Actor?
         let body: String
@@ -114,6 +119,14 @@ struct PullRequestDto: Decodable {
         let path: String
         let replyTo: ReviewCommentReplyTo?
         let url: String
+
+        var resolvedActor: Actor? {
+            author
+        }
+
+        var resolvedTime: Date {
+            createdAt
+        }
     }
 
     struct ReviewCommentReplyTo: Decodable {

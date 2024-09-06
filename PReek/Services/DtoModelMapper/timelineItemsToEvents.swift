@@ -12,7 +12,7 @@ private func toMainCommentId(_ id: String?) -> String {
     guard let id = id else {
         return UUID().uuidString
     }
-    return id + "-comment"
+    return id + "-event"
 }
 
 private struct TimelineItemEventDataPair {
@@ -20,20 +20,8 @@ private struct TimelineItemEventDataPair {
     let eventData: EventData
 }
 
-private func canMergeTimelineItems(_ firstItem: PullRequestDto.TimelineItem, _ secondItem: PullRequestDto.TimelineItem?) -> Bool {
-    guard let secondItem = secondItem else {
-        return false
-    }
-
-    let sameAuthor = firstItem.resolvedActor?.login == secondItem.resolvedActor?.login
-    // Check if times are within 5 minutes of each other
-    let closeInTime = abs(firstItem.resolvedTime.timeIntervalSince(secondItem.resolvedTime)) < 5 * 60
-
-    return sameAuthor && closeInTime
-}
-
 private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevPair: TimelineItemEventDataPair?) -> (EventData?, Bool) {
-    let canMerge = canMergeTimelineItems(timelineItem, prevPair?.timelineItem)
+    let canMerge = canMergeEvents(timelineItem, prevPair?.timelineItem)
 
     switch timelineItem.type {
     case .ClosedEvent:
@@ -48,7 +36,8 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
         }
         return (EventPushedData(isForcePush: true, commits: []), false)
     case .IssueComment:
-        return (EventCommentData(url: toOptionalUrl(timelineItem.url), comment: Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)), false)
+        // Don't merge here as these are top-level comments on the PR
+        return (EventCommentData(url: toOptionalUrl(timelineItem.url), comments: [Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)]), false)
     case .MergedEvent:
         return (EventMergedData(url: toOptionalUrl(timelineItem.url)), false)
     case .PullRequestCommit:
@@ -123,19 +112,9 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRe
     }
 
     // Step 2: Merge items if necessary
-    let mergedPairs = pairsWithMerge.reduce([TimelineItemEventDataPair]()) { dataArray, element in
-        let (pair, merge) = element
+    let mergedPairs = mergeArray(pairsWithMerge)
 
-        var newDataArray = dataArray
-        if !dataArray.isEmpty, merge {
-            newDataArray[newDataArray.endIndex - 1] = pair
-        } else {
-            newDataArray.append(pair)
-        }
-        return newDataArray
-    }
-
-    // Step 3: Convert to PullRequestEvent objects
+    // Step 3: Convert to Event objects
     return mergedPairs.map { pair in
         let timelineItem = pair.timelineItem
         let data = pair.eventData
