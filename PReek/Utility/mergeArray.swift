@@ -1,14 +1,14 @@
 import Foundation
 
-func mergeArray<T>(_ array: [(T, Bool)]) -> [T] {
+func mergeArray<T, I>(_ array: [T], indicator: KeyPath<T, I?>) -> [T] {
     return array.reduce([T]()) { dataArray, element in
-        let (data, merge) = element
+        let merge = element[keyPath: indicator] != nil
 
         var newDataArray = dataArray
         if !dataArray.isEmpty, merge {
-            newDataArray[newDataArray.endIndex - 1] = data
+            newDataArray[newDataArray.endIndex - 1] = element
         } else {
-            newDataArray.append(data)
+            newDataArray.append(element)
         }
         return newDataArray
     }
