@@ -44,7 +44,7 @@ struct EventView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 Text(event.user.displayName).frame(width: 200, alignment: .leading)
                 Spacer()
                 Text(eventDataToActionLabel(data: event.data)).frame(width: 150, alignment: .trailing)

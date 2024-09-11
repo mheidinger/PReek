@@ -1,0 +1,35 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build:
+    name: Build and analyse
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Select XCode Version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "16.0-beta"
+      - name: Build
+        run: xcodebuild clean build analyze -scheme "PReek" -project "PReek.xcodeproj" -destination "generic/platform=macOS" CODE_SIGNING_ALLOWED=NO | xcpretty && exit ${PIPESTATUS[0]}
+
+  test:
+    name: Test
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Select XCode Version
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "16.0-beta"
+      - name: Test
+        run: xcodebuild test -scheme "PReek" -project "PReek.xcodeproj" -destination "platform=macOS,arch=arm64" CODE_SIGNING_ALLOWED=NO | xcpretty && exit ${PIPESTATUS[0]}

@@ -12,45 +12,44 @@ private func toMainCommentId(_ id: String?) -> String {
     guard let id = id else {
         return UUID().uuidString
     }
-    return id + "-comment"
+    return id + "-event"
 }
 
 private struct TimelineItemEventDataPair {
     let timelineItem: PullRequestDto.TimelineItem
     let eventData: EventData
-}
+    let mergedFromOldest: PullRequestDto.TimelineItem?
 
-private func canMergeTimelineItems(_ firstItem: PullRequestDto.TimelineItem, _ secondItem: PullRequestDto.TimelineItem?) -> Bool {
-    guard let secondItem = secondItem else {
-        return false
+    var baseTimelineItem: PullRequestDto.TimelineItem {
+        mergedFromOldest ?? timelineItem
     }
-
-    let sameAuthor = firstItem.resolvedActor?.login == secondItem.resolvedActor?.login
-    // Check if times are within 5 minutes of each other
-    let closeInTime = abs(firstItem.resolvedTime.timeIntervalSince(secondItem.resolvedTime)) < 5 * 60
-
-    return sameAuthor && closeInTime
 }
 
-private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevPair: TimelineItemEventDataPair?) -> (EventData?, Bool) {
-    let canMerge = canMergeTimelineItems(timelineItem, prevPair?.timelineItem)
+private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevPair: TimelineItemEventDataPair?) -> TimelineItemEventDataPair? {
+    let canMerge = canMergeEvents(timelineItem, prevPair?.baseTimelineItem)
+
+    var data: EventData?
+    var merge = false
 
     switch timelineItem.type {
     case .ClosedEvent:
         // If the last event before closing a PR has been a merge, omit the close event
         if prevPair?.eventData is EventMergedData {
-            return (nil, false)
+            break
         }
-        return (EventClosedData(url: toOptionalUrl(timelineItem.url)), false)
+        data = EventClosedData(url: toOptionalUrl(timelineItem.url))
     case .HeadRefForcePushedEvent:
         if let prevCommitEventData = prevPair?.eventData as? EventPushedData, canMerge {
-            return (EventPushedData(isForcePush: true, commits: prevCommitEventData.commits), true)
+            data = EventPushedData(isForcePush: true, commits: prevCommitEventData.commits)
+            merge = true
+            break
         }
-        return (EventPushedData(isForcePush: true, commits: []), false)
+        data = EventPushedData(isForcePush: true, commits: [])
     case .IssueComment:
-        return (EventCommentData(url: toOptionalUrl(timelineItem.url), comment: Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)), false)
+        // Don't merge here as these are top-level comments on the PR
+        data = EventCommentData(url: toOptionalUrl(timelineItem.url), comments: [Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)])
     case .MergedEvent:
-        return (EventMergedData(url: toOptionalUrl(timelineItem.url)), false)
+        data = EventMergedData(url: toOptionalUrl(timelineItem.url))
     case .PullRequestCommit:
         var newCommit: [Commit] = []
         if let commit = timelineItem.commit {
@@ -58,12 +57,14 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
         }
 
         if let prevCommitEventData = prevPair?.eventData as? EventPushedData, canMerge {
-            return (EventPushedData(isForcePush: prevCommitEventData.isForcePush, commits: prevCommitEventData.commits + newCommit), true)
+            data = EventPushedData(isForcePush: prevCommitEventData.isForcePush, commits: prevCommitEventData.commits + newCommit)
+            merge = true
+            break
         }
-        return (EventPushedData(isForcePush: false, commits: newCommit), false)
+        data = EventPushedData(isForcePush: false, commits: newCommit)
     case .PullRequestReview:
         guard timelineItem.state != .PENDING else {
-            return (nil, false)
+            break
         }
 
         let state = timelineItem.state.flatMap { reviewStateMap[$0] } ?? .dismissed
@@ -78,32 +79,40 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
         }
         let allComments = (mainComment.map { [$0] } ?? []) + (timelineItem.comments?.nodes?.map(toComment) ?? [])
 
-        return (EventReviewData(
+        data = EventReviewData(
             url: toOptionalUrl(timelineItem.url),
             state: state,
             comments: allComments
-        ), false)
+        )
     case .ReadyForReviewEvent:
-        return (ReadyForReviewData(url: toOptionalUrl(timelineItem.url)), false)
+        data = ReadyForReviewData(url: toOptionalUrl(timelineItem.url))
     case .RenamedTitleEvent:
-        return (EventRenamedTitleData(
+        data = EventRenamedTitleData(
             currentTitle: timelineItem.currentTitle ?? "Unknown",
             previousTitle: timelineItem.previousTitle ?? "Unknown"
-        ), false)
+        )
     case .ReopenedEvent:
-        return (EventReopenedData(), false)
+        data = EventReopenedData()
     case .ReviewRequestedEvent:
         let newRequestedReviewers = timelineItem.requestedReviewer?.resolvedName.map { [$0] } ?? []
         if let prevReviewReqeuestedEventData = prevPair?.eventData as? EventReviewRequestedData, canMerge {
             let combinedRequestedReviewers = prevReviewReqeuestedEventData.requestedReviewers + newRequestedReviewers
-            return (EventReviewRequestedData(requestedReviewers: combinedRequestedReviewers), true)
+            data = EventReviewRequestedData(requestedReviewers: combinedRequestedReviewers)
+            merge = true
+            break
         }
-        return (EventReviewRequestedData(requestedReviewers: newRequestedReviewers), false)
+        data = EventReviewRequestedData(requestedReviewers: newRequestedReviewers)
     case .ConvertToDraftEvent:
-        return (EventConvertToDraftData(url: toOptionalUrl(timelineItem.url)), false)
+        data = EventConvertToDraftData(url: toOptionalUrl(timelineItem.url))
     default:
-        return (nil, false)
+        break
     }
+
+    guard let data else {
+        return nil
+    }
+
+    return TimelineItemEventDataPair(timelineItem: timelineItem, eventData: data, mergedFromOldest: merge ? prevPair?.baseTimelineItem : nil)
 }
 
 func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRequestUrl: URL) -> [Event] {
@@ -112,37 +121,30 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRe
     }
 
     // Step 1: Convert timeline items to data and merge information
-    let pairsWithMerge = timelineItems.reduce(into: [(TimelineItemEventDataPair, Bool)]()) { result, timelineItem in
-        let (data, merge) = timelineItemToData(timelineItem: timelineItem, prevPair: result.last?.0)
-        guard let data, let _ = timelineItem.id else {
+    let pairs = timelineItems.reduce(into: [TimelineItemEventDataPair]()) { result, timelineItem in
+        guard let _ = timelineItem.id else {
             return
         }
 
-        let pair = TimelineItemEventDataPair(timelineItem: timelineItem, eventData: data)
-        result.append((pair, merge))
+        let pair = timelineItemToData(timelineItem: timelineItem, prevPair: result.last)
+        guard let pair else {
+            return
+        }
+        result.append(pair)
     }
 
     // Step 2: Merge items if necessary
-    let mergedPairs = pairsWithMerge.reduce([TimelineItemEventDataPair]()) { dataArray, element in
-        let (pair, merge) = element
+    let mergedPairs = mergeArray(pairs, indicator: \.mergedFromOldest)
 
-        var newDataArray = dataArray
-        if !dataArray.isEmpty, merge {
-            newDataArray[newDataArray.endIndex - 1] = pair
-        } else {
-            newDataArray.append(pair)
-        }
-        return newDataArray
-    }
-
-    // Step 3: Convert to PullRequestEvent objects
+    // Step 3: Convert to Event objects
     return mergedPairs.map { pair in
         let timelineItem = pair.timelineItem
+        let baseTimelineItem = pair.baseTimelineItem
         let data = pair.eventData
         return Event(
-            id: timelineItem.id!,
-            user: toUser(timelineItem.resolvedActor),
-            time: timelineItem.resolvedTime,
+            id: baseTimelineItem.id!, // ID of oldest item
+            user: toUser(baseTimelineItem.resolvedActor),
+            time: timelineItem.resolvedTime, // Time of newest item
             data: data,
             pullRequestUrl: pullRequestUrl
         )

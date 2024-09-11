@@ -12,17 +12,9 @@ struct EventDataView: View {
         case let pushedData as EventPushedData:
             CommitsView(commits: pushedData.commits)
         case let reviewData as EventReviewData:
-            if !reviewData.comments.isEmpty {
-                VStack(alignment: .leading, spacing: 5) {
-                    ForEach(reviewData.comments) { comment in
-                        CommentView(comment: comment)
-                    }
-                }
-            } else {
-                EmptyView()
-            }
+            CommentsView(comments: reviewData.comments)
         case let commentData as EventCommentData:
-            CommentView(comment: commentData.comment)
+            CommentsView(comments: commentData.comments)
         case let renamedTitleData as EventRenamedTitleData:
             VStack(alignment: .leading, spacing: 5) {
                 HStack {

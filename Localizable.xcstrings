@@ -111,32 +111,12 @@
         }
       }
     },
-    "Alpha" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
     "approved" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "hat genehmigt"
-          }
-        }
-      }
-    },
-    "Beta" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -157,16 +137,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "von Max Heidinger"
-          }
-        }
-      }
-    },
-    "Click Me!" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -347,16 +317,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Von:"
-          }
-        }
-      }
-    },
-    "Gamma" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }
@@ -777,46 +737,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einstellungen"
-          }
-        }
-      }
-    },
-    "Some helpful help" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "Some helpful secure help" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "Some secure value" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
-          }
-        }
-      }
-    },
-    "Some value" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : ""
           }
         }
       }

@@ -60,7 +60,7 @@ struct Event: Identifiable {
         id: UUID().uuidString,
         user: User.preview(login: "person-6"),
         time: Date().addingTimeInterval(-60),
-        data: EventCommentData(url: nil, comment: Comment(id: UUID().uuidString, content: MarkdownContent("Hello World, this is some really long comment which basically has no content but it has to be long"), fileReference: nil, isReply: false)),
+        data: EventCommentData(url: nil, comments: [Comment(id: UUID().uuidString, content: MarkdownContent("Hello World, this is some really long comment which basically has no content but it has to be long"), fileReference: nil, isReply: false)]),
         pullRequestUrl: URL(string: "https://example.com")!
     )
     static let previewReadyForReview = Event(id: UUID().uuidString, user: User.preview(login: "person-7"), time: Date().addingTimeInterval(-70), data: ReadyForReviewData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
@@ -109,7 +109,7 @@ struct EventReviewData: EventData {
 
 struct EventCommentData: EventData {
     let url: URL?
-    let comment: Comment
+    let comments: [Comment]
 }
 
 struct ReadyForReviewData: EventData {
