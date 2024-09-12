@@ -28,13 +28,13 @@ let actor3 = PullRequestDto.Actor(login: "user-3", url: urlString, name: nil)
 
 struct ReviewThreadsCommentsToEventsTests {
     @Test func mapSeparateReviewThreadsComments() async throws {
-        let firstThreadCommentDtos: [PullRequestDto.ReviewComment] = [
+        let firstThreadCommentDtos = [
             createComment(id: "comment-2", author: actor2, body: "comment-2", minute: 5),
         ]
-        let secondThreadCommentDtos: [PullRequestDto.ReviewComment] = [
+        let secondThreadCommentDtos = [
             createComment(id: "comment-1", author: actor1, body: "comment-1", minute: 0),
         ]
-        let reviewThreadDtos: [PullRequestDto.ReviewThread] = [
+        let reviewThreadDtos = [
             PullRequestDto.ReviewThread(comments: PullRequestDto.ReviewComments(nodes: firstThreadCommentDtos)),
             PullRequestDto.ReviewThread(comments: PullRequestDto.ReviewComments(nodes: secondThreadCommentDtos)),
         ]
@@ -60,14 +60,14 @@ struct ReviewThreadsCommentsToEventsTests {
     }
 
     @Test func mergeReviewThreadsComments() async throws {
-        let firstThreadCommentDtos: [PullRequestDto.ReviewComment] = [
+        let firstThreadCommentDtos = [
             createComment(id: "comment-1", author: actor1, body: "comment-1", minute: 0),
         ]
-        let secondThreadCommentDtos: [PullRequestDto.ReviewComment] = [
+        let secondThreadCommentDtos = [
             createComment(id: "comment-2", author: actor1, body: "comment-2", minute: 1),
             createComment(id: "comment-3", author: actor2, body: "comment-3", minute: 2),
         ]
-        let reviewThreadDtos: [PullRequestDto.ReviewThread] = [
+        let reviewThreadDtos = [
             PullRequestDto.ReviewThread(comments: PullRequestDto.ReviewComments(nodes: firstThreadCommentDtos)),
             PullRequestDto.ReviewThread(comments: PullRequestDto.ReviewComments(nodes: secondThreadCommentDtos)),
         ]
@@ -93,11 +93,11 @@ struct ReviewThreadsCommentsToEventsTests {
     }
 
     @Test func excludeReviewThreadsCommentsFromReviews() async throws {
-        let firstThreadCommentDtos: [PullRequestDto.ReviewComment] = [
+        let firstThreadCommentDtos = [
             createComment(id: "comment-1", author: actor1, body: "comment-1", minute: 0),
             createComment(id: "comment-2", author: actor1, body: "comment-2", minute: 1),
         ]
-        let reviewThreadDtos: [PullRequestDto.ReviewThread] = [
+        let reviewThreadDtos = [
             PullRequestDto.ReviewThread(comments: PullRequestDto.ReviewComments(nodes: firstThreadCommentDtos)),
         ]
 

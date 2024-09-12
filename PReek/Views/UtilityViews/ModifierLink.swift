@@ -33,7 +33,7 @@ struct ModifierLink<Label: View>: View {
             openURL(destination)
             additionalAction(NSEvent.modifierFlags.contains(convertToNSEventModifierFlags(modifiers)))
         }, label: label)
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .onHover { inside in
                 if inside {
                     NSCursor.pointingHand.set()

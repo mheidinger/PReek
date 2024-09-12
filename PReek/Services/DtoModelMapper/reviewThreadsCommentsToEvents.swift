@@ -13,14 +13,17 @@ private struct CommentEventDataPair {
 
 private func commentToEventDataPair(commentDto: PullRequestDto.ReviewComment, prevPair: CommentEventDataPair?) -> CommentEventDataPair {
     let canMerge = canMergeEvents(commentDto, prevPair?.baseComment)
+
+    let newComments = [toComment(commentDto: commentDto)].compactMap { $0 }
+
     if let prevCommentEventData = prevPair?.eventData as? EventCommentData, canMerge {
         // take latest url to link to earliest comment, prepend comments to have order: old to new
-        let data = EventCommentData(url: toOptionalUrl(commentDto.url), comments: prevCommentEventData.comments + [toComment(commentDto: commentDto)])
+        let data = EventCommentData(url: toOptionalUrl(commentDto.url), comments: prevCommentEventData.comments + newComments)
         // comments are ordered new to old, return last comments createdAt as newest
         return CommentEventDataPair(comment: commentDto, eventData: data, mergedFromOldest: prevPair?.baseComment)
     }
 
-    let data = EventCommentData(url: toOptionalUrl(commentDto.url), comments: [toComment(commentDto: commentDto)])
+    let data = EventCommentData(url: toOptionalUrl(commentDto.url), comments: newComments)
     return CommentEventDataPair(comment: commentDto, eventData: data, mergedFromOldest: nil)
 }
 

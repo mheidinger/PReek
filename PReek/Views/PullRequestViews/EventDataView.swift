@@ -60,7 +60,7 @@ struct EventDataView: View {
 }
 
 #Preview {
-    let pullRequestEvents: [Event] = [
+    let pullRequestEvents = [
         Event.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!),
             Commit(id: "2", messageHeadline: "my second commit!", url: URL(string: "https://example.com")!),

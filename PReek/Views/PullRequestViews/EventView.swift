@@ -63,7 +63,7 @@ struct EventView: View {
 }
 
 #Preview {
-    let pullRequestEvents: [Event] = [
+    let pullRequestEvents = [
         Event.previewClosed,
         Event.previewCommit(),
         Event.previewCommit(commits: [

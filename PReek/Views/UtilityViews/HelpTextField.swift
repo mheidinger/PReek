@@ -3,6 +3,7 @@ import SwiftUI
 struct HelpTextField<HelpContent: View>: View {
     enum FieldType {
         case secureField
+        case revealSecureField
         case textField
     }
 
@@ -17,6 +18,8 @@ struct HelpTextField<HelpContent: View>: View {
         switch type {
         case .secureField:
             secureField
+        case .revealSecureField:
+            revealSecureField
         case .textField:
             textField
         }
@@ -24,6 +27,12 @@ struct HelpTextField<HelpContent: View>: View {
 
     var secureField: some View {
         SecureField(text: $text) {
+            labelContent
+        }
+    }
+
+    var revealSecureField: some View {
+        RevealSecureField(text: $text) {
             labelContent
         }
     }
@@ -49,6 +58,10 @@ struct HelpTextField<HelpContent: View>: View {
 #Preview {
     Form {
         HelpTextField(type: .secureField, text: .constant("My entered secure value"), label: "Some secure value") {
+            Text("Some helpful secure help")
+                .padding()
+        }
+        HelpTextField(type: .revealSecureField, text: .constant("My entered secure value"), label: "Some secure value") {
             Text("Some helpful secure help")
                 .padding()
         }
