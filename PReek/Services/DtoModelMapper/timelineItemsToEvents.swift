@@ -47,7 +47,11 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
         data = EventPushedData(isForcePush: true, commits: [])
     case .IssueComment:
         // Don't merge here as these are top-level comments on the PR
-        data = EventCommentData(url: toOptionalUrl(timelineItem.url), comments: [Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(timelineItem.body ?? ""), fileReference: nil, isReply: false)])
+        var comments: [Comment] = []
+        if let body = timelineItem.body, !body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            comments.append(Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(body), fileReference: nil, isReply: false))
+        }
+        data = EventCommentData(url: toOptionalUrl(timelineItem.url), comments: comments)
     case .MergedEvent:
         data = EventMergedData(url: toOptionalUrl(timelineItem.url))
     case .PullRequestCommit:
@@ -69,20 +73,16 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
 
         let state = timelineItem.state.flatMap { reviewStateMap[$0] } ?? .dismissed
 
-        let mainComment = timelineItem.body.map { body in
-            Comment(
-                id: toMainCommentId(timelineItem.id),
-                content: MarkdownContent(body),
-                fileReference: nil,
-                isReply: false
-            )
+        var comments: [Comment] = []
+        if let mainCommentBody = timelineItem.body, !mainCommentBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            comments.append(Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(mainCommentBody), fileReference: nil, isReply: false))
         }
-        let allComments = (mainComment.map { [$0] } ?? []) + (timelineItem.comments?.nodes?.map(toComment) ?? [])
+        comments += (timelineItem.comments?.nodes?.compactMap(toComment) ?? [])
 
         data = EventReviewData(
             url: toOptionalUrl(timelineItem.url),
             state: state,
-            comments: allComments
+            comments: comments
         )
     case .ReadyForReviewEvent:
         data = ReadyForReviewData(url: toOptionalUrl(timelineItem.url))
