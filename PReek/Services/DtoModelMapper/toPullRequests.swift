@@ -36,6 +36,16 @@ private func extractReviewCount(opinionatedReviews: [PullRequestDto.LatestOpinio
     return (approvalFrom, changesRequestedFrom)
 }
 
+private func toStatus(dto: PullRequestDto) -> PullRequest.Status {
+    var status = pullRequestStatusMap[dto.state] ?? PullRequest.Status.open
+
+    if status != .closed && dto.isDraft {
+        status = .draft
+    }
+
+    return status
+}
+
 private func toPullRequest(dto: PullRequestDto, viewer: Viewer) -> PullRequest {
     let pullRequestUrl = URL(string: dto.url) ?? URL(string: "https://invalid.data")!
 
@@ -59,7 +69,7 @@ private func toPullRequest(dto: PullRequestDto, viewer: Viewer) -> PullRequest {
         author: toUser(dto.author),
         title: dto.title,
         number: dto.number,
-        status: dto.isDraft ? PullRequest.Status.draft : (pullRequestStatusMap[dto.state] ?? PullRequest.Status.open),
+        status: toStatus(dto: dto),
         lastUpdated: dto.updatedAt,
         lastNonViewerUpdated: lastNonViewerUpdated?.time ?? dto.updatedAt,
         events: events,
