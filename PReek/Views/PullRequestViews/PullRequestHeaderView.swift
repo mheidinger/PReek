@@ -68,12 +68,17 @@ struct PullRequestHeaderView: View {
 
     var details: some View {
         HStack(spacing: 5) {
-            if let authorUrl = pullRequest.author.url {
-                ModifierLink(destination: authorUrl) {
+            Group {
+                if let authorUrl = pullRequest.author.url {
+                    ModifierLink(destination: authorUrl) {
+                        Text("by \(pullRequest.author.displayName)")
+                    }
+                } else {
                     Text("by \(pullRequest.author.displayName)")
                 }
-            } else {
-                Text("by \(pullRequest.author.displayName)")
+            }
+            .if(pullRequest.author.login != pullRequest.author.displayName) { view in
+                view.help(pullRequest.author.login)
             }
 
             Text("·")

@@ -14,23 +14,6 @@ private struct StatusBarButton: View {
     }
 }
 
-private struct PopoverFilterOption: View {
-    var label: LocalizedStringKey
-    @Binding var isOn: Bool
-
-    var body: some View {
-        HStack {
-            Text(label)
-            Spacer()
-            Toggle(isOn: $isOn) {
-                Text(label)
-            }
-            .labelsHidden()
-            .toggleStyle(.switch)
-        }
-    }
-}
-
 struct StatusBarView: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     let openSettings: () -> Void
@@ -78,10 +61,15 @@ struct StatusBarView: View {
     }
 
     var filterPopover: some View {
-        VStack(alignment: .leading) {
-            PopoverFilterOption(label: "Hide closed", isOn: $pullRequestsViewModel.hideClosed)
-            PopoverFilterOption(label: "Hide read", isOn: $pullRequestsViewModel.hideRead)
+        Form {
+            Toggle(isOn: $pullRequestsViewModel.hideClosed) {
+                Text("Hide closed")
+            }
+            Toggle(isOn: $pullRequestsViewModel.hideRead) {
+                Text("Hide read")
+            }
         }
+        .toggleStyle(.switch)
         .padding()
     }
 }

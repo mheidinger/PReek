@@ -591,6 +591,16 @@
         }
       }
     },
+    "Quick help" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe"
+          }
+        }
+      }
+    },
     "Quit App" : {
       "localizations" : {
         "de" : {
