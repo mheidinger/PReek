@@ -79,7 +79,7 @@ struct PullRequest: Identifiable {
         PullRequest(
             id: UUID().uuidString,
             repository: Repository(name: "max-heidinger/PReek", url: URL(string: "https://example.com")!),
-            author: User(login: "max-heidinger", url: URL(string: "https://example.com")!),
+            author: User(login: "max-heidinger", displayName: "Max Heidinger", url: URL(string: "https://example.com")!),
             title: title ?? "[TICKET-23251] Fix some things but the title is pretty long",
             number: 5312,
             status: status ?? .open,

@@ -51,6 +51,7 @@ struct HelpTextField<HelpContent: View>: View {
                     .popover(isPresented: $showPopover, content: helpContent)
             }
             .buttonStyle(PlainButtonStyle())
+            .accessibilityLabel("Quick help")
         }
     }
 }
