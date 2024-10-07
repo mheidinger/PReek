@@ -1,13 +1,22 @@
 {
-  "originHash" : "d04d5e4e92538d53378d47b0e20f02b2cc0bcbc16b17aa59a461f978764c95e1",
+  "originHash" : "95f3d31680996995bdeddf2a9e408654a63bb4d3eb30463eb7fdc818cfe5a1a8",
   "pins" : [
     {
       "identity" : "keychainaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
       "state" : {
-        "branch" : "master",
-        "revision" : "e0c7eebc5a4465a3c4680764f26b7a61f567cdaf"
+        "revision" : "84e546727d66f1adc5439debad16270d0fdd04e7",
+        "version" : "4.2.2"
+      }
+    },
+    {
+      "identity" : "launchatlogin-modern",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sindresorhus/LaunchAtLogin-Modern",
+      "state" : {
+        "revision" : "a04ec1c363be3627734f6dad757d82f5d4fa8fcc",
+        "version" : "1.1.0"
       }
     },
     {
