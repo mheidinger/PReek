@@ -51,7 +51,7 @@ struct EventView: View {
                 Spacer()
                 Text(event.time.formatted(date: .numeric, time: .shortened))
                     .foregroundStyle(.secondary)
-                ModifierLink(destination: event.url) {
+                HoverableLink(destination: event.url) {
                     Image(systemName: "square.and.arrow.up")
                 }
             }

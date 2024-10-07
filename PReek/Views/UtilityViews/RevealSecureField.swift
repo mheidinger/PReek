@@ -22,7 +22,7 @@ struct RevealSecureField<Label: View>: View {
             }
             .foregroundStyle(.primary)
             .buttonStyle(.borderless)
-            .padding(.trailing)
+            .padding(.leading, 5)
         }
     }
 }
