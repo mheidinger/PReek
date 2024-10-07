@@ -54,6 +54,7 @@
 		6C3605B62C751B4C00664E66 /* toUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3605B52C751B4C00664E66 /* toUser.swift */; };
 		6C3605B82C751B6900664E66 /* toRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3605B72C751B6900664E66 /* toRepository.swift */; };
 		6C3F26B22CB40638007FFB25 /* HoverableLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3F26B12CB40631007FFB25 /* HoverableLink.swift */; };
+		6C3F26B92CB47467007FFB25 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 6C3F26B82CB47467007FFB25 /* LaunchAtLogin */; };
 		6C45077D2C7686C3008EA76D /* ResourceIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C45077C2C7686C3008EA76D /* ResourceIcon.swift */; };
 		6C50F4362C0486BA008F5B66 /* NotificationDto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4352C0486BA008F5B66 /* NotificationDto.swift */; };
 		6C50F4382C04C590008F5B66 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C50F4372C04C590008F5B66 /* Notification.swift */; };
@@ -212,6 +213,7 @@
 				6C232DE72C08C51D00C003B1 /* KeychainAccess in Frameworks */,
 				6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */,
 				6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */,
+				6C3F26B92CB47467007FFB25 /* LaunchAtLogin in Frameworks */,
 				6CB7203E2C70ED840067CA1D /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -428,6 +430,7 @@
 				6C232DE62C08C51D00C003B1 /* KeychainAccess */,
 				6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */,
 				6CB7203D2C70ED840067CA1D /* MarkdownUI */,
+				6C3F26B82CB47467007FFB25 /* LaunchAtLogin */,
 			);
 			productName = PReek;
 			productReference = 6CB027222BFF817E00C4C3B1 /* PReek.app */;
@@ -465,6 +468,7 @@
 				6C232DE52C08C51D00C003B1 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
 				6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
+				6C3F26B72CB47467007FFB25 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6CB027232BFF817E00C4C3B1 /* Products */;
@@ -792,7 +796,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.2;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -825,7 +829,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.4.2;
+				MARKETING_VERSION = 0.5.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -871,8 +875,16 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
 			requirement = {
-				branch = master;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.2.2;
+			};
+		};
+		6C3F26B72CB47467007FFB25 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.0;
 			};
 		};
 		6C7C4C9F2C071A0400B9B4DA /* XCRemoteSwiftPackageReference "LinkHeaderParser" */ = {
@@ -911,6 +923,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6C232DE52C08C51D00C003B1 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		6C3F26B82CB47467007FFB25 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6C3F26B72CB47467007FFB25 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
 		};
 		6C7C4CA02C071A0400B9B4DA /* LinkHeaderParser */ = {
 			isa = XCSwiftPackageProductDependency;

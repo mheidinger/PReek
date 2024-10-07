@@ -1,3 +1,4 @@
+import LaunchAtLogin
 import SwiftUI
 
 struct SettingsView: View {
@@ -67,6 +68,7 @@ struct SettingsView: View {
                 pullRequestSettings
 
                 Section("Additional Settings") {
+                    LaunchAtLogin.Toggle()
                     Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
                         Text("Close window when opening a link, press CMD on click to get opposite behaviour")
                     }
