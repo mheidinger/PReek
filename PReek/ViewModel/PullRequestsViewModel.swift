@@ -62,7 +62,7 @@ class PullRequestsViewModel: ObservableObject {
 
     func toggleRead(_ pullRequest: PullRequest) {
         if pullRequest.unread {
-            pullRequestReadMap[pullRequest.id] = Date()
+            pullRequestReadMap[pullRequest.id] = lastUpdated
         } else {
             pullRequestReadMap.removeValue(forKey: pullRequest.id)
         }
@@ -71,9 +71,8 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     func markAllAsRead() {
-        let now = Date()
         for pullRequest in pullRequests {
-            pullRequestReadMap[pullRequest.id] = now
+            pullRequestReadMap[pullRequest.id] = lastUpdated
         }
         updateHasUnread()
         objectWillChange.send()
@@ -127,7 +126,7 @@ class PullRequestsViewModel: ObservableObject {
 
             logger.info("Start fetching notifications")
             let newLastUpdated = Date()
-            let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: Date())!
+            let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: newLastUpdated)!
             let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: { try await handleReceivedNotifications(notifications: $0, viewer: viewer) })
 
             logger.info("Start fetching not updated pull requests")
