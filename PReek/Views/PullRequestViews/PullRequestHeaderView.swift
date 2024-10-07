@@ -33,21 +33,17 @@ struct PullRequestHeaderView: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
-                        ModifierLink(destination: pullRequest.repository.url) {
-                            Text(pullRequest.repository.name)
-                        }
-                        ModifierLink(destination: pullRequest.url) {
-                            Text(pullRequest.numberFormatted)
-                        }
-                        .foregroundColor(.secondary)
+                        HoverableLink(pullRequest.repository.name, destination: pullRequest.repository.url)
+                            .foregroundStyle(.primary)
+                        HoverableLink(pullRequest.numberFormatted, destination: pullRequest.url)
+                            .foregroundColor(.secondary)
                     }
                     HStack {
-                        ModifierLink(destination: pullRequest.url) {
-                            Text(pullRequest.title)
-                                .multilineTextAlignment(.leading)
-                                .lineLimit(2)
-                        }
-                        .font(.headline)
+                        HoverableLink(pullRequest.title, destination: pullRequest.url)
+                            .multilineTextAlignment(.leading)
+                            .lineLimit(2)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
                     }
                     details
                 }
@@ -70,9 +66,7 @@ struct PullRequestHeaderView: View {
         HStack(spacing: 5) {
             Group {
                 if let authorUrl = pullRequest.author.url {
-                    ModifierLink(destination: authorUrl) {
-                        Text("by \(pullRequest.author.displayName)")
-                    }
+                    HoverableLink("by \(pullRequest.author.displayName)", destination: authorUrl)
                 } else {
                     Text("by \(pullRequest.author.displayName)")
                 }
@@ -87,7 +81,7 @@ struct PullRequestHeaderView: View {
 
             Text("·")
 
-            ModifierLink(destination: pullRequest.filesUrl) {
+            HoverableLink(destination: pullRequest.filesUrl) {
                 HStack(spacing: 2) {
                     Text(pullRequest.additionsFormatted)
                         .foregroundStyle(.success)

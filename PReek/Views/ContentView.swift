@@ -14,6 +14,8 @@ struct ContentView: View {
 
     @State var currentScreen: Screen
 
+    @Environment(\.openURL) private var openURL
+
     init(pullRequestsViewModel: PullRequestsViewModel, configViewModel: ConfigViewModel, closeWindow: @escaping () -> Void) {
         self.pullRequestsViewModel = pullRequestsViewModel
         self.configViewModel = configViewModel
@@ -21,7 +23,7 @@ struct ContentView: View {
         currentScreen = configViewModel.token.isEmpty ? .welcome : .main
     }
 
-    private func modifierLinkAction(modifierPressed: Bool) {
+    private func openURLAdditionalAction(modifierPressed: Bool) {
         if ConfigService.closeWindowOnLinkClick != modifierPressed {
             closeWindow()
         }
@@ -68,8 +70,12 @@ struct ContentView: View {
             )
             .background(.background.opacity(0.7))
         }
-        .environment(\.modifierLinkAction, modifierLinkAction)
         .background(.background.opacity(0.5))
+        .environment(\.openURL, OpenURLAction { destination in
+            openURL(destination)
+            openURLAdditionalAction(modifierPressed: NSEvent.modifierFlags.contains(.command))
+            return .handled
+        })
     }
 }
 

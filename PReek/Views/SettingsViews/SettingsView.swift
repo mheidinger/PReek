@@ -34,6 +34,7 @@ struct SettingsView: View {
                     .font(.title)
             }
             .buttonStyle(.borderless)
+            .accessibilityLabel("Close Settings")
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 5)
@@ -92,18 +93,9 @@ struct SettingsView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 5) {
-                ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek")!) {
-                    Text("GitHub Repository")
-                        .foregroundStyle(.link)
-                }
-                ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek#faq")!) {
-                    Text("FAQ")
-                        .foregroundStyle(.link)
-                }
-                ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek/issues/new")!) {
-                    Text("Create Issue")
-                        .foregroundStyle(.link)
-                }
+                HoverableLink("GitHub Repository", destination: URL(string: "https://github.com/mheidinger/PReek")!)
+                HoverableLink("FAQ", destination: URL(string: "https://github.com/mheidinger/PReek#faq")!)
+                HoverableLink("Create Issue", destination: URL(string: "https://github.com/mheidinger/PReek/issues/new")!)
             }
         }
     }

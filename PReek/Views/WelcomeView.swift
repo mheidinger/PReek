@@ -76,12 +76,10 @@ struct WelcomeView: View {
     }
 
     private var footerView: some View {
-        ModifierLink(destination: URL(string: "https://github.com/mheidinger/PReek")!) {
-            Text("Made by Max Heidinger")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-        }
-        .padding(.bottom)
+        HoverableLink("Made by Max Heidinger", destination: URL(string: "https://github.com/mheidinger/PReek")!)
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .padding(.bottom)
     }
 }
 

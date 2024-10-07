@@ -7,13 +7,14 @@ struct CommitsView: View {
         VStack(alignment: .leading) {
             ForEach(commits) { commit in
                 if let url = commit.url {
-                    ModifierLink(destination: url) {
+                    HoverableLink(destination: url) {
                         BulletPoint(commit.messageHeadline)
                     }
                 } else {
                     BulletPoint(commit.messageHeadline)
                 }
             }
+            .foregroundStyle(.primary)
         }
     }
 }

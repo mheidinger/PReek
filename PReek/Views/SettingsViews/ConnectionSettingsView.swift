@@ -9,7 +9,7 @@ struct ConnectionSettingsView: View {
             HelpTextField(type: .revealSecureField, text: $configViewModel.token, label: "GitHub PAT") {
                 VStack(alignment: .leading) {
                     Text("The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the GitHub documentation on how to generate a PAT.")
-                    Link("GitHub Documentation", destination: URL(string: "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic")!)
+                    HoverableLink("GitHub Documentation", destination: URL(string: "https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic")!)
                 }
                 .padding()
                 .frame(width: 300)
