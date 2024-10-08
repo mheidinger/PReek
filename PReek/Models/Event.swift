@@ -4,9 +4,25 @@ import MarkdownUI
 protocol EventData {
     // Returning nil will default to the PR overview page
     var url: URL? { get }
+    func isEqual(_ other: EventData) -> Bool
 }
 
-struct Event: Identifiable {
+extension EventData where Self: Equatable {
+    func isEqual(_ other: EventData) -> Bool {
+        guard let o = other as? Self else { return false }
+        return self == o
+    }
+}
+
+struct Event: Identifiable, Equatable {
+    static func == (lhs: Event, rhs: Event) -> Bool {
+        lhs.id == rhs.id &&
+            lhs.user == rhs.user &&
+            lhs.time == rhs.time &&
+            lhs.pullRequestUrl == rhs.pullRequestUrl &&
+            lhs.data.isEqual(rhs.data)
+    }
+
     let id: String
     let user: User
     let time: Date
@@ -70,11 +86,11 @@ struct Event: Identifiable {
     static let previewConvertToDraft = Event(id: UUID().uuidString, user: User.preview(login: "person-11"), time: Date().addingTimeInterval(-110), data: EventConvertToDraftData(url: URL(string: "https://example.com")!), pullRequestUrl: URL(string: "https://example.com")!)
 }
 
-struct EventClosedData: EventData {
+struct EventClosedData: EventData, Equatable {
     let url: URL?
 }
 
-struct EventPushedData: EventData {
+struct EventPushedData: EventData, Equatable {
     var url: URL? {
         guard let first = commits.first, let last = commits.last else {
             return URL(string: "files")!
@@ -90,11 +106,11 @@ struct EventPushedData: EventData {
     let commits: [Commit]
 }
 
-struct EventMergedData: EventData {
+struct EventMergedData: EventData, Equatable {
     let url: URL?
 }
 
-struct EventReviewData: EventData {
+struct EventReviewData: EventData, Equatable {
     enum State {
         case comment
         case approve
@@ -107,30 +123,30 @@ struct EventReviewData: EventData {
     let comments: [Comment]
 }
 
-struct EventCommentData: EventData {
+struct EventCommentData: EventData, Equatable {
     let url: URL?
     let comments: [Comment]
 }
 
-struct ReadyForReviewData: EventData {
+struct ReadyForReviewData: EventData, Equatable {
     let url: URL?
 }
 
-struct EventRenamedTitleData: EventData {
+struct EventRenamedTitleData: EventData, Equatable {
     let url: URL? = nil
     let currentTitle: String
     let previousTitle: String
 }
 
-struct EventReopenedData: EventData {
+struct EventReopenedData: EventData, Equatable {
     let url: URL? = nil
 }
 
-struct EventReviewRequestedData: EventData {
+struct EventReviewRequestedData: EventData, Equatable {
     let url: URL? = nil
     let requestedReviewers: [String]
 }
 
-struct EventConvertToDraftData: EventData {
+struct EventConvertToDraftData: EventData, Equatable {
     let url: URL?
 }

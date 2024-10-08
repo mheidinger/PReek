@@ -10,6 +10,8 @@ struct ContentView: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     @ObservedObject var configViewModel: ConfigViewModel
 
+    @StateObject private var keyboardHandler: PullRequestsNavigationShortcutHandler
+
     var closeWindow: () -> Void
 
     @State var currentScreen: Screen
@@ -20,6 +22,8 @@ struct ContentView: View {
         self.pullRequestsViewModel = pullRequestsViewModel
         self.configViewModel = configViewModel
         self.closeWindow = closeWindow
+        _keyboardHandler = StateObject(wrappedValue: PullRequestsNavigationShortcutHandler(viewModel: pullRequestsViewModel))
+
         currentScreen = configViewModel.token.isEmpty ? .welcome : .main
     }
 
@@ -47,7 +51,12 @@ struct ContentView: View {
 
     @ViewBuilder var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
-            PullRequestsView(pullRequestsViewModel.pullRequests, toggleRead: pullRequestsViewModel.toggleRead)
+            PullRequestsView(
+                pullRequestsViewModel.pullRequests,
+                setRead: pullRequestsViewModel.setRead,
+                toBeFocusedPullRequestId: $pullRequestsViewModel.focusedPullRequestId,
+                lastFocusedPullRequestId: $pullRequestsViewModel.lastFocusedPullRequestId
+            )
         } else if pullRequestsViewModel.error != nil {
             Image(systemName: "icloud.slash")
                 .font(.largeTitle)

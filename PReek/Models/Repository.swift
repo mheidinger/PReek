@@ -1,6 +1,6 @@
 import Foundation
 
-struct Repository {
+struct Repository: Equatable {
     let name: String
     let url: URL
 }

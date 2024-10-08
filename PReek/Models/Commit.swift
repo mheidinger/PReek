@@ -1,6 +1,6 @@
 import Foundation
 
-struct Commit: Identifiable {
+struct Commit: Identifiable, Equatable {
     // Hash of the commit
     let id: String
     let messageHeadline: String

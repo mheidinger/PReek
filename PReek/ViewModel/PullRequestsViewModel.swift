@@ -4,6 +4,27 @@ import SwiftUI
 
 class PullRequestsViewModel: ObservableObject {
     private let logger = Logger()
+    private var cancellables = Set<AnyCancellable>()
+    private var timer: Timer?
+
+    enum SetFocusType {
+        case first
+        case last
+        case next
+        case previous
+    }
+
+    init(initialPullRequests: [PullRequest] = []) {
+        pullRequestMap = Dictionary(uniqueKeysWithValues: initialPullRequests.map { ($0.id, $0) })
+
+        // Directly access UserDefaults w/ same keys above for correct initial values in the subject
+        let storedHideClosed = UserDefaults.standard.bool(forKey: "hideClosed")
+        let storedHideRead = UserDefaults.standard.bool(forKey: "hideRead")
+        hideClosedSubject = CurrentValueSubject<Bool, Never>(storedHideClosed)
+        hideReadSubject = CurrentValueSubject<Bool, Never>(storedHideRead)
+        setupPullRequestsMemoization()
+        setupPullRequestFocus()
+    }
 
     @Published private(set) var lastUpdated: Date? = nil
     @Published private(set) var isRefreshing = false
@@ -24,26 +45,18 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
 
+    @Published var lastFocusedPullRequestId: String?
+    @Published var focusedPullRequestId: String?
     var pullRequests: [PullRequest] {
         memoizedPullRequests
-    }
-
-    init(initialPullRequests: [PullRequest] = []) {
-        pullRequestMap = Dictionary(uniqueKeysWithValues: initialPullRequests.map { ($0.id, $0) })
-
-        // Directly access UserDefaults w/ same keys above for correct initial values in the subject
-        let storedHideClosed = UserDefaults.standard.bool(forKey: "hideClosed")
-        let storedHideRead = UserDefaults.standard.bool(forKey: "hideRead")
-        hideClosedSubject = CurrentValueSubject<Bool, Never>(storedHideClosed)
-        hideReadSubject = CurrentValueSubject<Bool, Never>(storedHideRead)
-        setupPullRequestsMemoization()
     }
 
     @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: Date] = [:]
     private var pullRequestMap: [String: PullRequest] = [:]
     @Published private var memoizedPullRequests: [PullRequest] = []
-    private var cancellables = Set<AnyCancellable>()
     private let invalidationTrigger = PassthroughSubject<Void, Never>()
+
+    private let setFocusTrigger = PassthroughSubject<SetFocusType, Never>()
 
     private func setupPullRequestsMemoization() {
         // Combine dependencies that affect the pullRequests computation
@@ -59,8 +72,6 @@ class PullRequestsViewModel: ObservableObject {
         .throttle(for: .milliseconds(100), scheduler: DispatchQueue.main, latest: true)
         .map { [weak self] hideClosed, hideRead, _, _ in
             guard let self = self else { return ([], false) }
-
-            logger.info("Memoize pull requests")
 
             let updatedRead = self.pullRequestMap.map { entry in
                 var pullRequest = entry.value
@@ -92,8 +103,6 @@ class PullRequestsViewModel: ObservableObject {
         .store(in: &cancellables)
     }
 
-    private var timer: Timer?
-
     func triggerUpdatePullRequests() {
         Task {
             await updatePullRequests()
@@ -109,11 +118,11 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
 
-    func toggleRead(_ pullRequest: PullRequest) {
-        if pullRequest.unread {
-            pullRequestReadMap[pullRequest.id] = lastUpdated
+    func setRead(_ id: String, read: Bool) {
+        if read {
+            pullRequestReadMap[id] = lastUpdated
         } else {
-            pullRequestReadMap.removeValue(forKey: pullRequest.id)
+            pullRequestReadMap.removeValue(forKey: id)
         }
         invalidationTrigger.send()
     }
@@ -123,6 +132,49 @@ class PullRequestsViewModel: ObservableObject {
             pullRequestReadMap[pullRequest.id] = lastUpdated
         }
         invalidationTrigger.send()
+    }
+
+    private func setupPullRequestFocus() {
+        setFocusTrigger
+            .throttle(for: .milliseconds(20), scheduler: DispatchQueue.main, latest: true)
+            .map { [weak self] type in
+                guard let self = self else { return nil }
+
+                switch type {
+                case .first:
+                    return self.pullRequests.first?.id
+                case .last:
+                    return self.pullRequests.last?.id
+                case .next:
+                    return self.getNextFocusIdByOffset(by: 1)
+                case .previous:
+                    return self.getNextFocusIdByOffset(by: -1)
+                }
+            }
+            .receive(on: DispatchQueue.main)
+            .assign(to: \.focusedPullRequestId, on: self)
+            .store(in: &cancellables)
+    }
+
+    func setFocus(_ type: SetFocusType) {
+        setFocusTrigger.send(type)
+    }
+
+    private func getNextFocusIdByOffset(by offset: Int) -> String? {
+        if pullRequests.count == 0 {
+            focusedPullRequestId = nil
+            return nil
+        }
+
+        let basePullRequestId = lastFocusedPullRequestId ?? focusedPullRequestId
+
+        // Calculate next PR by current focus
+        let currentIndex = basePullRequestId.flatMap { focusedId in
+            pullRequests.firstIndex { $0.id == focusedId }
+        }
+        let newIndex = ((currentIndex ?? (offset < 0 ? pullRequests.count : -1)) + offset + pullRequests.count) % pullRequests.count
+
+        return pullRequests[safe: newIndex].map { $0.id }
     }
 
     private func handleReceivedNotifications(notifications: [Notification], viewer: Viewer) async throws -> [String] {
