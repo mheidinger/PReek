@@ -2,13 +2,13 @@ import SwiftUI
 
 struct PullRequestView: View {
     var pullRequest: PullRequest
-    var toggleRead: () -> Void
+    var setRead: (String, Bool) -> Void
 
-    @State var sectionExpanded: Bool
+    @State var sectionExpanded: Bool = false
 
-    init(_ pullRequest: PullRequest, toggleRead: @escaping () -> Void, sectionExpanded: Bool = false) {
+    init(_ pullRequest: PullRequest, setRead: @escaping (String, Bool) -> Void, sectionExpanded: Bool = false) {
         self.pullRequest = pullRequest
-        self.toggleRead = toggleRead
+        self.setRead = setRead
         self.sectionExpanded = sectionExpanded
     }
 
@@ -17,13 +17,22 @@ struct PullRequestView: View {
             DisclosureGroup(isExpanded: $sectionExpanded) {
                 PullRequestContentView(pullRequest)
             } label: {
-                PullRequestHeaderView(pullRequest, toggleRead: toggleRead)
+                PullRequestHeaderView(pullRequest, setRead: setRead)
                     .padding(.leading, 10)
+                    .padding(.trailing, 5)
             }
+        }
+        .padding(.leading, 20)
+        .contentShape(Rectangle())
+        .focusable()
+        .onKeyPress(.space) {
+            sectionExpanded = !sectionExpanded
+            return .handled
         }
         .onDisappear {
             sectionExpanded = false
         }
+        .id(pullRequest.id)
     }
 }
 
@@ -31,7 +40,7 @@ struct PullRequestView: View {
     ScrollView {
         PullRequestView(
             PullRequest.preview(title: "long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long lon"),
-            toggleRead: {},
+            setRead: { _, _ in },
             sectionExpanded: true
         )
     }

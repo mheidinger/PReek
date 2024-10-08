@@ -15,13 +15,13 @@ private func usersToString(_ users: [User]) -> String {
 
 struct PullRequestHeaderView: View {
     var pullRequest: PullRequest
-    var toggleRead: () -> Void
+    var setRead: (String, Bool) -> Void
 
     @Environment(\.colorScheme) var colorScheme
 
-    init(_ pullRequest: PullRequest, toggleRead: @escaping () -> Void) {
+    init(_ pullRequest: PullRequest, setRead: @escaping (String, Bool) -> Void) {
         self.pullRequest = pullRequest
-        self.toggleRead = toggleRead
+        self.setRead = setRead
     }
 
     var body: some View {
@@ -38,7 +38,7 @@ struct PullRequestHeaderView: View {
                         HoverableLink(pullRequest.numberFormatted, destination: pullRequest.url)
                             .foregroundColor(.secondary)
                     }
-                    
+
                     HoverableLink(destination: pullRequest.url) {
                         Text(pullRequest.title)
                             .font(.headline)
@@ -46,13 +46,13 @@ struct PullRequestHeaderView: View {
                             .multilineTextAlignment(.leading)
                     }
                     .foregroundStyle(.primary)
-                    
+
                     details
                 }
                 Spacer()
             }
 
-            Button(action: toggleRead) {
+            Button(action: { setRead(pullRequest.id, pullRequest.unread) }) {
                 Image(systemName: pullRequest.unread ? "circle.fill" : "circle")
                     .imageScale(.medium)
                     .foregroundStyle(pullRequest.unread ? .accent : .gray)
@@ -122,6 +122,6 @@ struct PullRequestHeaderView: View {
 }
 
 #Preview {
-    PullRequestHeaderView(PullRequest.preview(title: "long long long long long long long long long long long long long long long long long"), toggleRead: {})
+    PullRequestHeaderView(PullRequest.preview(title: "long long long long long long long long long long long long long long long long long"), setRead: { _, _ in })
         .padding()
 }

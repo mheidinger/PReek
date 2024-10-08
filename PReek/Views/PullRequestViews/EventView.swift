@@ -1,7 +1,7 @@
 import MarkdownUI
 import SwiftUI
 
-func eventDataToActionLabel(data: any EventData) -> String {
+func eventDataToActionLabel(data: EventData) -> String {
     let reviewLabels = [
         EventReviewData.State.approve: String(localized: "approved"),
         EventReviewData.State.changesRequested: String(localized: "requested changes"),

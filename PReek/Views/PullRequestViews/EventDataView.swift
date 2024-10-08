@@ -1,9 +1,9 @@
 import SwiftUI
 
 struct EventDataView: View {
-    var data: any EventData
+    var data: EventData
 
-    init(_ data: any EventData) {
+    init(_ data: EventData) {
         self.data = data
     }
 

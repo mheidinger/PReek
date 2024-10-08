@@ -1,6 +1,6 @@
 import Foundation
 
-struct User {
+struct User: Equatable {
     let login: String
     private let _displayName: String?
     let url: URL?

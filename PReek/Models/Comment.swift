@@ -1,7 +1,7 @@
 import Foundation
 import MarkdownUI
 
-struct Comment: Identifiable {
+struct Comment: Identifiable, Equatable {
     let id: String
     let content: MarkdownContent
     let fileReference: String?
