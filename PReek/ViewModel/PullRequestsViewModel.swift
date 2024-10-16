@@ -7,6 +7,7 @@ class PullRequestsViewModel: ObservableObject {
     @Published var error: Error? = nil
 
     private let logger = Logger()
+    private var timer: Timer?
 
     @AppStorage("hideClosed") var hideClosed: Bool = true {
         didSet {
@@ -24,6 +25,12 @@ class PullRequestsViewModel: ObservableObject {
     @Published var hasUnread: Bool = false
 
     @Published private var pullRequestMap: [String: PullRequest] = [:]
+    @Published var focusedPullRequestId: String?
+
+    init(initialPullRequests: [PullRequest] = []) {
+        pullRequestMap = Dictionary(uniqueKeysWithValues: initialPullRequests.map { ($0.id, $0) })
+    }
+
     var pullRequests: [PullRequest] {
         pullRequestMap.map { entry in
             var pullRequest = entry.value
@@ -42,8 +49,6 @@ class PullRequestsViewModel: ObservableObject {
             $0.lastUpdated > $1.lastUpdated
         }
     }
-
-    private var timer: Timer?
 
     func triggerUpdatePullRequests() {
         Task {
@@ -76,6 +81,25 @@ class PullRequestsViewModel: ObservableObject {
         }
         updateHasUnread()
         objectWillChange.send()
+    }
+
+    func selectFirst() {
+        focusedPullRequestId = pullRequests.first?.id
+    }
+
+    func selectLast() {
+        focusedPullRequestId = pullRequests.last?.id
+    }
+
+    func selectNextByOffset(by offset: Int) {
+        // Calculate next PR by current focus
+        let currentIndex = focusedPullRequestId.flatMap { focusedId in
+            pullRequests.firstIndex { $0.id == focusedId }
+        }
+        let newIndex = ((currentIndex ?? (offset < 0 ? pullRequests.count : -1)) + offset + pullRequests.count) % pullRequests.count
+
+        // Scroll to next PR to make sure it is in view, after scroll focus will be set
+        focusedPullRequestId = pullRequests[safe: newIndex].map { $0.id }
     }
 
     private func updateHasUnread() {

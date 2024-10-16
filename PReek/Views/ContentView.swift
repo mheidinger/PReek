@@ -47,7 +47,7 @@ struct ContentView: View {
 
     @ViewBuilder var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
-            PullRequestsView(pullRequestsViewModel.pullRequests, toggleRead: pullRequestsViewModel.toggleRead)
+            PullRequestsView(viewModel: pullRequestsViewModel)
         } else if pullRequestsViewModel.error != nil {
             Image(systemName: "icloud.slash")
                 .font(.largeTitle)
