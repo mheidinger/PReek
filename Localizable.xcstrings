@@ -241,12 +241,32 @@
         }
       }
     },
+    "disabled auto-merge" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat auto-merge deaktiviert"
+          }
+        }
+      }
+    },
     "Don't show PRs that only have been contributed to by these users" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "PRs nicht anzeigen, zu denen nur von folgenden Nutzern beigetragen wurde"
+          }
+        }
+      }
+    },
+    "enabled auto-merge (%@)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hat auto-merge aktiviert (%@)"
           }
         }
       }

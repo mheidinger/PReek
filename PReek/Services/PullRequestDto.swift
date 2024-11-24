@@ -61,6 +61,10 @@ struct PullRequestDto: Decodable {
             case ReopenedEvent
             case ReviewRequestedEvent
             case ConvertToDraftEvent
+            case AutoMergeEnabledEvent
+            case AutoRebaseEnabledEvent
+            case AutoSquashEnabledEvent
+            case AutoMergeDisabledEvent
             case Unknown
         }
 

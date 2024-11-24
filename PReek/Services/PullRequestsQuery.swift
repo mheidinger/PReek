@@ -113,7 +113,7 @@ enum PullRequestsQueryBuilder {
               }
             }
           }
-          timelineItems(last: 30, itemTypes: [PULL_REQUEST_COMMIT, PULL_REQUEST_REVIEW, HEAD_REF_FORCE_PUSHED_EVENT, MERGED_EVENT, REVIEW_REQUESTED_EVENT, READY_FOR_REVIEW_EVENT, CONVERT_TO_DRAFT_EVENT, ISSUE_COMMENT, CLOSED_EVENT, RENAMED_TITLE_EVENT, REOPENED_EVENT]) {
+          timelineItems(last: 30, itemTypes: [PULL_REQUEST_COMMIT, PULL_REQUEST_REVIEW, HEAD_REF_FORCE_PUSHED_EVENT, MERGED_EVENT, REVIEW_REQUESTED_EVENT, READY_FOR_REVIEW_EVENT, CONVERT_TO_DRAFT_EVENT, ISSUE_COMMENT, CLOSED_EVENT, RENAMED_TITLE_EVENT, REOPENED_EVENT, AUTO_MERGE_ENABLED_EVENT, AUTO_REBASE_ENABLED_EVENT, AUTO_SQUASH_ENABLED_EVENT, AUTO_MERGE_DISABLED_EVENT]) {
             nodes {
               type: __typename
               ... on Node {
@@ -202,6 +202,30 @@ enum PullRequestsQueryBuilder {
                 }
                 createdAt
                 url
+              }
+              ... on AutoMergeEnabledEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+              }
+              ... on AutoRebaseEnabledEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+              }
+              ... on AutoSquashEnabledEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
+              }
+              ... on AutoMergeDisabledEvent {
+                actor {
+                  ...ActorFragment
+                }
+                createdAt
               }
             }
           }
