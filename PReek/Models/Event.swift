@@ -84,6 +84,8 @@ struct Event: Identifiable, Equatable {
     static let previewReopened = Event(id: UUID().uuidString, user: User.preview(login: "person-9"), time: Date().addingTimeInterval(-90), data: EventReopenedData(), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewReviewRequested = Event(id: UUID().uuidString, user: User.preview(login: "person-10"), time: Date().addingTimeInterval(-100), data: EventReviewRequestedData(requestedReviewers: ["me", "you"]), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewConvertToDraft = Event(id: UUID().uuidString, user: User.preview(login: "person-11"), time: Date().addingTimeInterval(-110), data: EventConvertToDraftData(url: URL(string: "https://example.com")!), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewAutoMergeEnabled = Event(id: UUID().uuidString, user: User.preview(login: "person-12"), time: Date().addingTimeInterval(-120), data: EventAutoMergeEnabledData(variant: .rebase), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewAutoMergeDisabled = Event(id: UUID().uuidString, user: User.preview(login: "person-13"), time: Date().addingTimeInterval(-130), data: EventAutoMergeDisabledData(), pullRequestUrl: URL(string: "https://example.com")!)
 }
 
 struct EventClosedData: EventData, Equatable {
@@ -149,4 +151,19 @@ struct EventReviewRequestedData: EventData, Equatable {
 
 struct EventConvertToDraftData: EventData, Equatable {
     let url: URL?
+}
+
+struct EventAutoMergeEnabledData: EventData, Equatable {
+    enum Variant: String {
+        case merge
+        case rebase
+        case squash
+    }
+
+    let url: URL? = nil
+    let variant: Variant
+}
+
+struct EventAutoMergeDisabledData: EventData, Equatable {
+    let url: URL? = nil
 }

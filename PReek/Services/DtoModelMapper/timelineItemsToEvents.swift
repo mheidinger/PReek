@@ -104,6 +104,14 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
         data = EventReviewRequestedData(requestedReviewers: newRequestedReviewers)
     case .ConvertToDraftEvent:
         data = EventConvertToDraftData(url: toOptionalUrl(timelineItem.url))
+    case .AutoMergeEnabledEvent:
+        data = EventAutoMergeEnabledData(variant: .merge)
+    case .AutoRebaseEnabledEvent:
+        data = EventAutoMergeEnabledData(variant: .rebase)
+    case .AutoSquashEnabledEvent:
+        data = EventAutoMergeEnabledData(variant: .squash)
+    case .AutoMergeDisabledEvent:
+        data = EventAutoMergeDisabledData()
     default:
         break
     }

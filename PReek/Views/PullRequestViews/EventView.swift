@@ -1,37 +1,41 @@
 import MarkdownUI
 import SwiftUI
 
-func eventDataToActionLabel(data: EventData) -> String {
+func eventDataToActionLabel(data: EventData) -> LocalizedStringKey {
     let reviewLabels = [
-        EventReviewData.State.approve: String(localized: "approved"),
-        EventReviewData.State.changesRequested: String(localized: "requested changes"),
-        EventReviewData.State.comment: String(localized: "commented"),
-        EventReviewData.State.dismissed: String(localized: "reviewed (dismissed)"),
+        EventReviewData.State.approve: LocalizedStringKey("approved"),
+        EventReviewData.State.changesRequested: LocalizedStringKey("requested changes"),
+        EventReviewData.State.comment: LocalizedStringKey("commented"),
+        EventReviewData.State.dismissed: LocalizedStringKey("reviewed (dismissed)"),
     ]
 
     switch data {
     case is EventClosedData:
-        return String(localized: "closed")
+        return LocalizedStringKey("closed")
     case let pushedData as EventPushedData:
-        return pushedData.isForcePush ? String(localized: "force pushed") : String(localized: "pushed")
+        return pushedData.isForcePush ? LocalizedStringKey("force pushed") : LocalizedStringKey("pushed")
     case is EventMergedData:
-        return String(localized: "merged")
+        return LocalizedStringKey("merged")
     case let reviewData as EventReviewData:
-        return reviewLabels[reviewData.state] ?? String(localized: "reviewed")
+        return reviewLabels[reviewData.state] ?? LocalizedStringKey("reviewed")
     case is EventCommentData:
-        return String(localized: "commented")
+        return LocalizedStringKey("commented")
     case is ReadyForReviewData:
-        return String(localized: "marked ready")
+        return LocalizedStringKey("marked ready")
     case is EventRenamedTitleData:
-        return String(localized: "renamed")
+        return LocalizedStringKey("renamed")
     case is EventReopenedData:
-        return String(localized: "reopened")
+        return LocalizedStringKey("reopened")
     case is EventReviewRequestedData:
-        return String(localized: "requested review")
+        return LocalizedStringKey("requested review")
     case is EventConvertToDraftData:
-        return String(localized: "converted to draft")
+        return LocalizedStringKey("converted to draft")
+    case let autoMergeEnabledData as EventAutoMergeEnabledData:
+        return LocalizedStringKey("enabled auto-merge (\(autoMergeEnabledData.variant.rawValue))")
+    case is EventAutoMergeDisabledData:
+        return LocalizedStringKey("disabled auto-merge")
     default:
-        return String(localized: "unknown")
+        return LocalizedStringKey("unknown")
     }
 }
 
@@ -45,12 +49,12 @@ struct EventView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .firstTextBaseline) {
-                Text(event.user.displayName).frame(width: 200, alignment: .leading)
+                Text(event.user.displayName)
                 Spacer()
-                Text(eventDataToActionLabel(data: event.data)).frame(width: 150, alignment: .trailing)
-                Spacer()
+                Text(eventDataToActionLabel(data: event.data))
                 Text(event.time.formatted(date: .numeric, time: .shortened))
                     .foregroundStyle(.secondary)
+                    .frame(width: 130, alignment: .trailing)
                 HoverableLink(destination: event.url) {
                     Image(systemName: "square.and.arrow.up")
                 }
@@ -83,6 +87,8 @@ struct EventView: View {
         Event.previewReviewRequested,
         Event.previewReadyForReview,
         Event.previewConvertToDraft,
+        Event.previewAutoMergeEnabled,
+        Event.previewAutoMergeDisabled,
     ]
 
     return ScrollView {
