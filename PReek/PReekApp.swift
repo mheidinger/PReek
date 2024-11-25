@@ -26,6 +26,11 @@ struct PReekApp: App {
     }
 
     var body: some Scene {
+        #if os(iOS)
+        WindowGroup {
+            ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: { isMenuPresented = false })
+        }
+        #elseif os(macOS)
         MenuBarExtra("PReek", image: pullRequestsViewModel.hasUnread ? "MenuBarIconUnread" : "MenuBarIcon") {
             ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: { isMenuPresented = false })
                 .frame(width: 600, height: 400)
@@ -39,5 +44,6 @@ struct PReekApp: App {
                 isContentFocused = true
             }
         }
+        #endif
     }
 }

@@ -10,6 +10,7 @@ struct HelpTextField<HelpContent: View>: View {
     let type: FieldType
     @Binding var text: String
     let label: LocalizedStringKey
+    // Only available on macOS
     let helpContent: () -> HelpContent
 
     @State private var showPopover = false
@@ -43,10 +44,11 @@ struct HelpTextField<HelpContent: View>: View {
         }
     }
 
+    #if os(macOS)
     var labelContent: some View {
         HStack(spacing: 3) {
             Text(label)
-            Button(action: { showPopover = true }) {
+            Button(action: { showPopover.toggle() }) {
                 Image(systemName: "questionmark.circle.fill")
                     .popover(isPresented: $showPopover, content: helpContent)
             }
@@ -54,6 +56,11 @@ struct HelpTextField<HelpContent: View>: View {
             .accessibilityLabel("Quick help")
         }
     }
+    #elseif os(iOS)
+    var labelContent: some View {
+        Text(label)
+    }
+    #endif
 }
 
 #Preview {

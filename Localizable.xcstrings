@@ -352,6 +352,7 @@
       }
     },
     "GitHub Documentation" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -582,6 +583,7 @@
       }
     },
     "Provide the base URL without any suffix.\nFor example:" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -590,6 +592,9 @@
           }
         }
       }
+    },
+    "Provide the base URL without any suffix. For example:" : {
+
     },
     "Pull Requests" : {
       "localizations" : {
@@ -771,7 +776,11 @@
         }
       }
     },
+    "The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the [GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) on how to generate a PAT." : {
+
+    },
     "The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the GitHub documentation on how to generate a PAT." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

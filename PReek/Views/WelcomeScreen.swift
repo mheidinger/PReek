@@ -85,5 +85,7 @@ struct WelcomeScreen: View {
 
 #Preview {
     WelcomeScreen(configViewModel: ConfigViewModel(), testConnection: { AppError.forbidden }, dismissWelcomeView: {})
+    #if os(macOS)
         .frame(width: 600, height: 400)
+    #endif
 }

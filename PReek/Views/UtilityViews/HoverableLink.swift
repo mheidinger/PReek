@@ -13,6 +13,7 @@ struct HoverableLink<Label: View>: View {
         Link(destination: destination) {
             label
         }
+        #if os(macOS)
         .onHover { inside in
             if inside {
                 NSCursor.pointingHand.push()
@@ -20,6 +21,7 @@ struct HoverableLink<Label: View>: View {
                 NSCursor.pop()
             }
         }
+        #endif
     }
 }
 

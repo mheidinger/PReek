@@ -44,7 +44,9 @@ struct ExcludedUsersTable: View {
                     .padding(.vertical, 5)
                     .padding(.horizontal, 10)
                 }
+                #if os(macOS)
                 .background(Color(nsColor: .tertiarySystemFill))
+                #endif
             }
         } header: {
             VStack(alignment: .leading) {
