@@ -1,12 +1,10 @@
 import SwiftUI
 
-struct ContentView: View {
-    enum Screen {
-        case settings
-        case welcome
-        case main
-    }
+enum Screen: String, CaseIterable, Hashable {
+    case settings
+}
 
+struct ContentView: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     @ObservedObject var configViewModel: ConfigViewModel
 
@@ -14,8 +12,7 @@ struct ContentView: View {
 
     var closeWindow: () -> Void
 
-    @State var currentScreen: Screen
-
+    @State private var showWelcomeScreen: Bool
     @Environment(\.openURL) private var openURL
 
     init(pullRequestsViewModel: PullRequestsViewModel, configViewModel: ConfigViewModel, closeWindow: @escaping () -> Void) {
@@ -24,7 +21,7 @@ struct ContentView: View {
         self.closeWindow = closeWindow
         _keyboardHandler = StateObject(wrappedValue: PullRequestsNavigationShortcutHandler(viewModel: pullRequestsViewModel))
 
-        currentScreen = configViewModel.token.isEmpty ? .welcome : .main
+        showWelcomeScreen = configViewModel.token.isEmpty
     }
 
     private func openURLAdditionalAction(modifierPressed: Bool) {
@@ -33,62 +30,39 @@ struct ContentView: View {
         }
     }
 
-    private func testConnection() async -> Error? {
-        await pullRequestsViewModel.updatePullRequests()
-        return pullRequestsViewModel.error
-    }
-
     var body: some View {
-        switch currentScreen {
-        case .settings:
-            SettingsView(configViewModel: configViewModel, closeSettings: { currentScreen = .main })
-        case .welcome:
-            WelcomeView(configViewModel: configViewModel, testConnection: testConnection, dismissWelcomeView: { currentScreen = .main })
-        case .main:
-            mainPage
+        NavigationStack {
+            VStack {
+                if showWelcomeScreen {
+                    WelcomeScreen(
+                        configViewModel: configViewModel,
+                        testConnection: pullRequestsViewModel.testConnection,
+                        dismissWelcomeView: {
+                            await MainActor.run {
+                                pullRequestsViewModel.error = nil
+                                showWelcomeScreen = false
+                            }
+                            await pullRequestsViewModel.updatePullRequests()
+                        }
+                    )
+                } else {
+                    MainScreen(
+                        pullRequestsViewModel: pullRequestsViewModel,
+                        configViewModel: configViewModel
+                    )
+                }
+            }
+            .navigationDestination(for: Screen.self) { screen in
+                switch screen {
+                case .settings:
+                    SettingsView(configViewModel: configViewModel)
+                }
+            }
         }
-    }
-
-    @ViewBuilder var content: some View {
-        if !pullRequestsViewModel.pullRequests.isEmpty {
-            PullRequestsView(
-                pullRequestsViewModel.pullRequests,
-                setRead: pullRequestsViewModel.setRead,
-                toBeFocusedPullRequestId: $pullRequestsViewModel.focusedPullRequestId,
-                lastFocusedPullRequestId: $pullRequestsViewModel.lastFocusedPullRequestId
-            )
-        } else if pullRequestsViewModel.error != nil {
-            Image(systemName: "icloud.slash")
-                .font(.largeTitle)
-        } else if pullRequestsViewModel.isRefreshing {
-            ProgressView()
-        } else {
-            Text("You are done for today! 🎉")
-                .font(.title2)
-        }
-    }
-
-    var mainPage: some View {
-        VStack {
-            content
-                .frame(maxHeight: .infinity, alignment: .center)
-
-            StatusBarView(
-                pullRequestsViewModel: pullRequestsViewModel,
-                openSettings: { currentScreen = .settings }
-            )
-            .background(.background.opacity(0.7))
-        }
-        .background(.background.opacity(0.5))
-        .environment(\.openURL, OpenURLAction { destination in
-            openURL(destination)
-            openURLAdditionalAction(modifierPressed: NSEvent.modifierFlags.contains(.command))
-            return .handled
-        })
     }
 }
 
-#Preview(traits: .fixedLayout(width: 600, height: 400)) {
+#Preview {
     @ObservedObject var pullRequestViewModel = PullRequestsViewModel()
     pullRequestViewModel.triggerUpdatePullRequests()
     return ContentView(pullRequestsViewModel: pullRequestViewModel, configViewModel: ConfigViewModel(), closeWindow: {})

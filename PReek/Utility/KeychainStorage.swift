@@ -24,7 +24,7 @@ struct OptionalKeychainStorage: DynamicProperty {
     let key: String
     var wrappedValue: String? {
         didSet {
-            keychainManager[key] = wrappedValue
+            keychainManager[key] = wrappedValue?.isEmpty == true ? nil : wrappedValue
         }
     }
 
