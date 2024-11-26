@@ -7,23 +7,29 @@ class PullRequestsNavigationShortcutHandler: ObservableObject {
         self.viewModel = viewModel
 
         NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
-            self.handleKeyEvent(event)
-            return event
+            if self.handleKeyEvent(event) {
+                return nil
+            } else {
+                return event
+            }
         }
     }
 
-    private func handleKeyEvent(_ event: NSEvent) {
-        guard let characters = event.charactersIgnoringModifiers else { return }
+    private func handleKeyEvent(_ event: NSEvent) -> Bool {
+        guard let characters = event.charactersIgnoringModifiers else { return false }
 
         // No modifier pressed
         if event.modifierFlags.isDisjoint(with: .deviceIndependentFlagsMask) {
             switch characters {
             case "j":
                 viewModel.setFocus(.next)
+                return true
             case "k":
                 viewModel.setFocus(.previous)
+                return true
             case "g":
                 viewModel.setFocus(.first)
+                return true
             default:
                 break
             }
@@ -34,9 +40,12 @@ class PullRequestsNavigationShortcutHandler: ObservableObject {
             switch characters {
             case "G":
                 viewModel.setFocus(.last)
+                return true
             default:
                 break
             }
         }
+
+        return false
     }
 }
