@@ -45,21 +45,21 @@ struct HelpTextField<HelpContent: View>: View {
     }
 
     #if os(macOS)
-    var labelContent: some View {
-        HStack(spacing: 3) {
-            Text(label)
-            Button(action: { showPopover.toggle() }) {
-                Image(systemName: "questionmark.circle.fill")
-                    .popover(isPresented: $showPopover, content: helpContent)
+        var labelContent: some View {
+            HStack(spacing: 3) {
+                Text(label)
+                Button(action: { showPopover.toggle() }) {
+                    Image(systemName: "questionmark.circle.fill")
+                        .popover(isPresented: $showPopover, content: helpContent)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .accessibilityLabel("Quick help")
             }
-            .buttonStyle(PlainButtonStyle())
-            .accessibilityLabel("Quick help")
         }
-    }
-    #elseif os(iOS)
-    var labelContent: some View {
-        Text(label)
-    }
+    #else
+        var labelContent: some View {
+            Text(label)
+        }
     #endif
 }
 

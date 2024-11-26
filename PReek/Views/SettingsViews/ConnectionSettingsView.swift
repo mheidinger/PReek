@@ -1,16 +1,79 @@
 import SwiftUI
 
-struct ConnectionSettingsView: View {
+struct ConnectionSettingsView<AdditionalContent: View>: View {
     @ObservedObject var configViewModel: ConfigViewModel
     var headerLabel: LocalizedStringKey
-    
+    var additionalContent: AdditionalContent?
+
     @State private var showPopover = false
-    
+
+    init(
+        configViewModel: ConfigViewModel,
+        headerLabel: LocalizedStringKey,
+        @ViewBuilder additionalContent: @escaping () -> AdditionalContent
+    ) {
+        self.configViewModel = configViewModel
+        self.headerLabel = headerLabel
+        self.additionalContent = additionalContent()
+    }
+
+    #if os(macOS)
+        var sectionHeader: some View {
+            Text(headerLabel)
+        }
+    #else
+        var sectionHeader: some View {
+            HStack {
+                Text(headerLabel)
+                Button(action: { showPopover.toggle() }) {
+                    Image(systemName: "questionmark.circle.fill")
+                }
+            }
+        }
+    #endif
+
+    // Only relevant for iOS
+    var helpSheet: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text(headerLabel)
+                    .font(.title)
+                Spacer()
+                Button(action: { showPopover.toggle() }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .imageScale(.large)
+                }
+            }
+            .padding(.bottom)
+
+            Spacer()
+
+            VStack(alignment: .leading) {
+                Text("connection-settings.pat.label")
+                    .font(.title3)
+                Text("connection-settings.pat.explanation")
+                    .font(.footnote)
+                    .padding(.bottom)
+
+                Text("connection-settings.enterprise-url.label")
+                    .font(.title3)
+                Group {
+                    Text("connection-settings.enterprise-url.explanation")
+                }
+                .font(.footnote)
+
+                Spacer()
+            }
+        }
+        .padding()
+        .presentationDetents([.medium])
+    }
+
     var body: some View {
         Section {
-            HelpTextField(type: .revealSecureField, text: $configViewModel.token, label: "GitHub PAT") {
+            HelpTextField(type: .revealSecureField, text: $configViewModel.token, label: "connection-settings.pat.label") {
                 VStack(alignment: .leading) {
-                    Text("The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the [GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) on how to generate a PAT.")
+                    Text("connection-settings.pat.explanation")
                 }
                 .padding()
                 .frame(width: 300)
@@ -20,66 +83,37 @@ struct ConnectionSettingsView: View {
             }
             .toggleStyle(.switch)
             if configViewModel.useGitHubEnterprise {
-                HelpTextField(type: .textField, text: $configViewModel.gitHubEnterpriseUrl, label: "GitHub Enterprise URL") {
+                HelpTextField(type: .textField, text: $configViewModel.gitHubEnterpriseUrl, label: "connection-settings.enterprise-url.label") {
                     VStack(alignment: .leading) {
-                        Text("Provide the base URL without any suffix. For example:")
-                        Text(verbatim: "https://github.acme.org")
-                            .monospaced()
+                        Text("connection-settings.enterprise-url.explanation")
                     }
                     .padding()
                 }
             }
+
+            additionalContent
         } header: {
-            HStack {
-                Text(headerLabel)
-                Button(action: { showPopover.toggle() }) {
-                    Image(systemName: "questionmark.circle.fill")
-                }
-            }
+            sectionHeader
         }
         .sheet(isPresented: $showPopover, content: {
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("GitHub Connection")
-                        .font(.title)
-                    Spacer()
-                    Button(action: { showPopover.toggle() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .imageScale(.large)
-                    }
-                }
-                .padding(.bottom)
-                
-                Spacer()
-                
-                VStack(alignment: .leading) {
-                    Text("GitHub PAT")
-                        .font(.title3)
-                    Text("The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the [GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) on how to generate a PAT.")
-                        .font(.footnote)
-                        .padding(.bottom)
-                    
-                    Text("GitHub Enterprise URL")
-                        .font(.title3)
-                    Group {
-                        Text("Provide the base URL without any suffix. For example:")
-                        Text(verbatim: "https://github.acme.org")
-                            .monospaced()
-                    }
-                    .font(.footnote)
-
-                    Spacer()
-                }
-            }
-            .padding()
-            .presentationDetents([.medium])
+            helpSheet
         })
+    }
+}
+
+extension ConnectionSettingsView where AdditionalContent == EmptyView {
+    init(configViewModel: ConfigViewModel, headerLabel: LocalizedStringKey) {
+        self.configViewModel = configViewModel
+        self.headerLabel = headerLabel
     }
 }
 
 #Preview {
     Form {
         ConnectionSettingsView(configViewModel: ConfigViewModel(), headerLabel: "GitHub Connection")
+        ConnectionSettingsView(configViewModel: ConfigViewModel(), headerLabel: "GitHub Connection") {
+            Text("Additional Content")
+        }
     }
     .formStyle(.grouped)
     .background(.windowBackground)

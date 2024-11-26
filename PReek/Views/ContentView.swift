@@ -62,12 +62,11 @@ struct ContentView: View {
         .environment(\.openURL, OpenURLAction { destination in
             openURL(destination)
             #if os(macOS)
-            openURLAdditionalAction(modifierPressed: NSEvent.modifierFlags.contains(.command))
+                openURLAdditionalAction(modifierPressed: NSEvent.modifierFlags.contains(.command))
             #endif
             return .handled
         })
     }
-    
 }
 
 #Preview {

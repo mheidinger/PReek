@@ -19,67 +19,74 @@ struct WelcomeScreen: View {
     }
 
     var body: some View {
-        VStack(spacing: 15) {
+        VStack {
             headerView
 
             formView
-
-            errorAndContinue
-
-            Spacer(minLength: 0)
-
-            footerView
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            HoverableLink("Made by Max Heidinger", destination: URL(string: "https://github.com/mheidinger/PReek")!)
+                .font(.system(size: 12))
+                .foregroundStyle(.secondary)
+                .padding(.bottom)
         }
         .background(.windowBackground)
     }
 
-    private var headerView: some View {
-        HStack(spacing: 30) {
-            Image(.icon)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 60)
-            VStack {
-                Text("Welcome to PReek")
-                    .font(.largeTitle)
-                Text("Let's get you started!")
-                    .font(.title)
+    #if os(macOS)
+        private var headerView: some View {
+            HStack(spacing: 30) {
+                Image(.icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60)
+                VStack {
+                    Text("welcome.title")
+                        .font(.largeTitle)
+                    Text("welcome.subtitle")
+                        .font(.title)
+                }
             }
+            .padding(.top, 25)
         }
-        .padding(.top, 50)
-    }
+    #else
+        private var headerView: some View {
+            VStack {
+                Image(.icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120)
+                VStack {
+                    Text("welcome.title")
+                        .font(.largeTitle)
+                    Text("welcome.subtitle")
+                        .font(.title)
+                }
+            }
+            .padding(.top, 25)
+        }
+    #endif
 
     private var formView: some View {
         Form {
-            ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "Required Settings")
+            ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "Required Settings") {
+                HStack {
+                    Spacer()
+                    Button(action: doSave) {
+                        Text("Continue")
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+            }
+
+            if let error = error {
+                VStack {
+                    Text("Error: \(error.localizedDescription)")
+                        .foregroundStyle(.red)
+                }
+            }
         }
         .formStyle(.grouped)
-        .frame(maxHeight: 180)
-    }
-
-    private var errorAndContinue: some View {
-        HStack(alignment: .top) {
-            if let error = error {
-                Text("Error: \(error.localizedDescription)")
-                    .foregroundStyle(.red)
-            }
-
-            Spacer()
-
-            Button(action: doSave) {
-                Text("Continue")
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .padding(.top, -15)
-        .padding(.horizontal, 20)
-    }
-
-    private var footerView: some View {
-        HoverableLink("Made by Max Heidinger", destination: URL(string: "https://github.com/mheidinger/PReek")!)
-            .font(.system(size: 12))
-            .foregroundStyle(.secondary)
-            .padding(.bottom)
     }
 }
 

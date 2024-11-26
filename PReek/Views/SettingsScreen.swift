@@ -24,7 +24,7 @@ struct SettingsView: View {
     private var bottomBar: some View {
         HStack {
             #if os(macOS)
-            Button("Quit App", action: { NSApplication.shared.terminate(nil) })
+                Button("Quit App", action: { NSApplication.shared.terminate(nil) })
             #endif
             Spacer()
             Button("Save Settings", action: saveSettings)
@@ -50,7 +50,7 @@ struct SettingsView: View {
 
                 Section("Additional Settings") {
                     #if os(macOS)
-                    LaunchAtLogin.Toggle()
+                        LaunchAtLogin.Toggle()
                     #endif
                     Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
                         Text("Close window when opening a link, press CMD on click to get opposite behaviour")
