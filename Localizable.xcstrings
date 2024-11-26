@@ -141,16 +141,6 @@
         }
       }
     },
-    "Close Settings" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einstellungen schließen"
-          }
-        }
-      }
-    },
     "Close window when opening a link, press CMD on click to get opposite behaviour" : {
       "localizations" : {
         "de" : {

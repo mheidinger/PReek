@@ -1,10 +1,10 @@
 import SwiftUI
 
-struct WelcomeView: View {
+struct WelcomeScreen: View {
     @ObservedObject var configViewModel: ConfigViewModel
 
     var testConnection: () async -> Error?
-    var dismissWelcomeView: () -> Void
+    var dismissWelcomeView: () async -> Void
 
     @State private var error: Error?
 
@@ -13,7 +13,7 @@ struct WelcomeView: View {
             configViewModel.saveSettings()
             error = await testConnection()
             if error == nil {
-                dismissWelcomeView()
+                await dismissWelcomeView()
             }
         }
     }
@@ -84,6 +84,6 @@ struct WelcomeView: View {
 }
 
 #Preview {
-    WelcomeView(configViewModel: ConfigViewModel(), testConnection: { AppError.forbidden }, dismissWelcomeView: {})
+    WelcomeScreen(configViewModel: ConfigViewModel(), testConnection: { AppError.forbidden }, dismissWelcomeView: {})
         .frame(width: 600, height: 400)
 }

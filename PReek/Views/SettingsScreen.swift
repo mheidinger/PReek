@@ -3,7 +3,6 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var configViewModel: ConfigViewModel
-    let closeSettings: () -> Void
 
     private func saveSettings() {
         Task {
@@ -15,31 +14,11 @@ struct SettingsView: View {
         ScrollView {
             content
         }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            topBar
-        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             bottomBar
         }
         .background(.windowBackground)
-    }
-
-    private var topBar: some View {
-        HStack {
-            Text("Settings")
-                .font(.title)
-                .bold()
-            Spacer()
-            Button(action: closeSettings) {
-                Image(systemName: "xmark.circle")
-                    .font(.title)
-            }
-            .buttonStyle(.borderless)
-            .accessibilityLabel("Close Settings")
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 5)
-        .background(.windowBackground)
+        .navigationTitle("Settings")
     }
 
     private var bottomBar: some View {
@@ -130,5 +109,5 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView(configViewModel: ConfigViewModel(), closeSettings: {})
+    SettingsView(configViewModel: ConfigViewModel())
 }

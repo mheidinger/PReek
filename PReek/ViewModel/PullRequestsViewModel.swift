@@ -28,7 +28,7 @@ class PullRequestsViewModel: ObservableObject {
 
     @Published private(set) var lastUpdated: Date? = nil
     @Published private(set) var isRefreshing = false
-    @Published private(set) var error: Error? = nil
+    @Published var error: Error? = nil
     @Published private(set) var hasUnread: Bool = false
 
     private var hideClosedSubject: CurrentValueSubject<Bool, Never>
@@ -208,6 +208,17 @@ class PullRequestsViewModel: ObservableObject {
             logger.info("No new PRs to fetch")
         }
         return []
+    }
+
+    func testConnection() async -> Error? {
+        do {
+            _ = try await GitHubService.fetchViewer()
+            logger.info("Connection successful")
+            return nil
+        } catch {
+            logger.info("Connection failed: \(error)")
+            return error
+        }
     }
 
     func updatePullRequests() async {
