@@ -1,10 +1,15 @@
 import Foundation
 
-struct GitHubGraphQLError: Decodable {
-    enum ErrorType: String, CaseIterableDefaultsLast {
-        case INSUFFICIENT_SCOPES
-        case Unknown
-    }
+struct GitHubGraphQLError: Decodable, CustomStringConvertible {
+    let type: String?
+    let path: [String]?
+    let message: String?
 
-    let type: ErrorType
+    var description: String {
+        """
+        type: \(type ?? "nil")
+        path: \(path?.joined(separator: ".") ?? "nil")
+        message: \(message ?? "nil")
+        """
+    }
 }
