@@ -1,8 +1,8 @@
 import Foundation
 
 struct PullRequestsResponse: Decodable {
-    typealias PullRequestDtoMap = [String: PullRequestDto]
-    typealias RepositoryDtoMap = [String: PullRequestDtoMap]
+    typealias PullRequestDtoMap = [String: PullRequestDto?]
+    typealias RepositoryDtoMap = [String: PullRequestDtoMap?]
 
     let data: RepositoryDtoMap?
     let errors: [GitHubGraphQLError]?
