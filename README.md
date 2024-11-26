@@ -44,3 +44,15 @@ This scope is required to be able to access private repositories.
 ### Why is no team name shown if a review has been requested by a team?
 
 An additional PAT scope `read:org` is required to access the name of a team.
+
+### Are there any keyboard shortcuts?
+
+There are basic VIM-like motions build in:
+
+| Key | Action |
+| --- | ------ |
+| j | Move down |
+| k | Move up |
+| g | Jump to top |
+| G | Jump to bottom |
+| \<Space\> | Open / Close focused PR |
