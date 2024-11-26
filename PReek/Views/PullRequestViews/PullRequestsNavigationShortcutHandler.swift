@@ -4,7 +4,6 @@ class PullRequestsNavigationShortcutHandler: ObservableObject {
     var viewModel: PullRequestsViewModel
 
     #if os(macOS)
-
         init(viewModel: PullRequestsViewModel) {
             self.viewModel = viewModel
 
@@ -50,12 +49,9 @@ class PullRequestsNavigationShortcutHandler: ObservableObject {
 
             return false
         }
-
     #else
-
         init(viewModel: PullRequestsViewModel) {
             self.viewModel = viewModel
         }
-
     #endif
 }

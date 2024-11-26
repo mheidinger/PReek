@@ -10,6 +10,12 @@ jobs:
     name: Build and analyse
     runs-on: macos-14
 
+    strategy:
+      matrix:
+        platform:
+          - macOS
+          - iOS
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,7 +24,7 @@ jobs:
         with:
           xcode-version: "16.0"
       - name: Build
-        run: xcodebuild clean build analyze -scheme "PReek" -project "PReek.xcodeproj" -destination "generic/platform=macOS" CODE_SIGNING_ALLOWED=NO | xcpretty && exit ${PIPESTATUS[0]}
+        run: xcodebuild clean build analyze -scheme "PReek" -project "PReek.xcodeproj" -destination "generic/platform=${{ matrix.platform }}" CODE_SIGNING_ALLOWED=NO | xcpretty && exit ${PIPESTATUS[0]}
 
   test:
     name: Test

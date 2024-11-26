@@ -42,7 +42,7 @@ struct PReekApp: App {
             }
         #else
             WindowGroup {
-                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: { isMenuPresented = false })
+                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: {})
             }
         #endif
     }
