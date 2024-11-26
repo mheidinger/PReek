@@ -138,7 +138,11 @@ class GitHubService {
             throw graphQlErrorToError(errors: parsedData.errors)
         }
 
-        let dtos = data.flatMap { $0.value.compactMap { $0.value } }
+        let dtos = data
+            .values // Dictionary<String, PullRequestsResponse.PullRequestDtoMap?>.Values
+            .compactMap { $0 } // [PullRequestsResponse.PullRequestDtoMap]
+            .flatMap { $0 } // [Dictionary<String, PullRequestDto?>.Element]
+            .compactMap { $0.value } // [PullRequestDto]
         return toPullRequests(dtos: dtos, viewer: viewer)
     }
 
