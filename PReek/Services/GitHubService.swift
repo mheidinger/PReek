@@ -8,15 +8,6 @@ private struct GraphQLQuery: Codable {
     var variables: [String: String]?
 }
 
-func graphQLErrorToError(errors: [GitHubGraphQLError]?) -> AppError {
-    switch errors?.first?.type {
-    case .INSUFFICIENT_SCOPES:
-        return AppError.insufficientScopes(missingScope: nil)
-    default:
-        return AppError.apiError
-    }
-}
-
 class GitHubService {
     private static let logger = Logger()
 
@@ -56,6 +47,25 @@ class GitHubService {
         return PUBLIC_GITHUB_BASE_URL.appending(path: "graphql")
     }
 
+    private static func graphQlErrorToError(errors: [GitHubGraphQLError]?) -> AppError {
+        switch errors?.first?.type {
+        case "INSUFFICIENT_SCOPES":
+            return AppError.insufficientScopes(missingScope: nil)
+        default:
+            // If there are errors, then they should already be logged
+            if errors?.first == nil {
+                logger.error("Unknown error happened when calling the GitHub API")
+            }
+            return AppError.apiError
+        }
+    }
+
+    private static func logGraphQlErrors(errors: [GitHubGraphQLError]?) {
+        errors?.forEach { error in
+            logger.error("Received error from GitHub API: \(error)")
+        }
+    }
+
     static func fetchViewer() async throws -> Viewer {
         let query = GraphQLQuery(query: ViewerQuery)
         var request = try URLRequest(url: graphUrl())
@@ -64,8 +74,10 @@ class GitHubService {
 
         let (data, response) = try await sendRequest(request: request)
         let parsedData = try decoder.decode(ViewerResponse.self, from: data)
+
+        logGraphQlErrors(errors: parsedData.errors)
         guard let data = parsedData.data else {
-            throw graphQLErrorToError(errors: parsedData.errors)
+            throw graphQlErrorToError(errors: parsedData.errors)
         }
         let scopesHeader = response.value(forHTTPHeaderField: "x-oauth-scopes")
 
@@ -120,8 +132,10 @@ class GitHubService {
 
         let (data, _) = try await sendRequest(request: request)
         let parsedData = try decoder.decode(PullRequestsResponse.self, from: data)
+
+        logGraphQlErrors(errors: parsedData.errors)
         guard let data = parsedData.data else {
-            throw graphQLErrorToError(errors: parsedData.errors)
+            throw graphQlErrorToError(errors: parsedData.errors)
         }
 
         let dtos = data.flatMap { $0.value.compactMap { $0.value } }
@@ -154,6 +168,7 @@ class GitHubService {
         } catch let error as AppError {
             throw error
         } catch {
+            logger.error("Failed to send request to GitHub, remapping to network error: \(error)")
             throw AppError.networkError
         }
     }
