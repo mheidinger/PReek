@@ -445,22 +445,22 @@
         }
       }
     },
+    "GitHub" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub"
+          }
+        }
+      }
+    },
     "GitHub Connection" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "GitHub Verbindung"
-          }
-        }
-      }
-    },
-    "GitHub Repository" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "GitHub Repository"
           }
         }
       }
@@ -811,16 +811,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "hat reviewed (verworfen)"
-          }
-        }
-      }
-    },
-    "Save Settings" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Einstellungen Speichern"
           }
         }
       }

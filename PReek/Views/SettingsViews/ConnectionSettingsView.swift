@@ -89,6 +89,10 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
                     }
                     .padding()
                 }
+                #if os(iOS)
+                .textInputAutocapitalization(.never)
+                #endif
+                .disableAutocorrection(true)
             }
 
             additionalContent
