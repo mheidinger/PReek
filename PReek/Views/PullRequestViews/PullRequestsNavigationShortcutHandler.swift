@@ -2,12 +2,19 @@ import SwiftUI
 
 class PullRequestsNavigationShortcutHandler: ObservableObject {
     var viewModel: PullRequestsViewModel
+    @Published var disabled: Bool = true
 
     #if os(macOS)
         init(viewModel: PullRequestsViewModel) {
             self.viewModel = viewModel
 
-            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+                guard let self else { return event }
+
+                if self.disabled {
+                    return event
+                }
+
                 if self.handleKeyEvent(event) {
                     return nil
                 } else {
