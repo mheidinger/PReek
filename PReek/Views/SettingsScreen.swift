@@ -4,21 +4,14 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var configViewModel: ConfigViewModel
 
-    private func saveSettings() {
-        Task {
-            configViewModel.saveSettings()
-        }
-    }
-
     var body: some View {
-        ScrollView {
-            content
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            bottomBar
-        }
-        .background(.windowBackground)
-        .navigationTitle("Settings")
+        content
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                bottomBar
+                    .background(.windowBackground)
+            }
+            .background(.windowBackground)
+            .navigationTitle("Settings")
     }
 
     private var bottomBar: some View {
@@ -27,38 +20,34 @@ struct SettingsView: View {
                 Button("Quit App", action: { NSApplication.shared.terminate(nil) })
             #endif
             Spacer()
-            Button("Save Settings", action: saveSettings)
-                .buttonStyle(.borderedProminent)
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 10)
-        .background(.windowBackground)
     }
 
     private var content: some View {
         VStack(alignment: .leading, spacing: 0) {
-            info
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-
-            Divider()
-
             Form {
+                Section {
+                    info
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
+
                 ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "GitHub Connection")
 
                 pullRequestSettings
 
-                Section("Additional Settings") {
-                    #if os(macOS)
+                #if os(macOS)
+                    Section("Additional Settings") {
                         LaunchAtLogin.Toggle()
-                    #endif
-                    Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
-                        Text("Close window when opening a link, press CMD on click to get opposite behaviour")
+                        Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
+                            Text("Close window when opening a link, press CMD on click to get opposite behaviour")
+                        }
                     }
-                }
+                #endif
             }
             .formStyle(.grouped)
-            .background(.windowBackground)
         }
     }
 
@@ -78,7 +67,7 @@ struct SettingsView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 5) {
-                HoverableLink("GitHub Repository", destination: URL(string: "https://github.com/mheidinger/PReek")!)
+                HoverableLink("GitHub", destination: URL(string: "https://github.com/mheidinger/PReek")!)
                 HoverableLink("FAQ", destination: URL(string: "https://github.com/mheidinger/PReek#faq")!)
                 HoverableLink("Create Issue", destination: URL(string: "https://github.com/mheidinger/PReek/issues/new")!)
             }
