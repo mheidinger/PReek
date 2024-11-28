@@ -141,6 +141,7 @@
 		6C2942B92C89A67B00E7D0EF /* BulletPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulletPoint.swift; sourceTree = "<group>"; };
 		6C2942BB2C8AF35700E7D0EF /* canMergeEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = canMergeEvents.swift; sourceTree = "<group>"; };
 		6C2942BD2C8AF98B00E7D0EF /* mergeArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mergeArray.swift; sourceTree = "<group>"; };
+		6C35D5302CF7CB11002C5BE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6C3605B32C751AD300664E66 /* timelineItemsToEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = timelineItemsToEvents.swift; sourceTree = "<group>"; };
 		6C3605B52C751B4C00664E66 /* toUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toUser.swift; sourceTree = "<group>"; };
 		6C3605B72C751B6900664E66 /* toRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toRepository.swift; sourceTree = "<group>"; };
@@ -324,6 +325,7 @@
 				6CB027252BFF817E00C4C3B1 /* PReekApp.swift */,
 				6CB027292BFF818000C4C3B1 /* Assets.xcassets */,
 				6CB0272E2BFF818000C4C3B1 /* PReek.entitlements */,
+				6C35D5302CF7CB11002C5BE4 /* Info.plist */,
 			);
 			path = PReek;
 			sourceTree = "<group>";
@@ -808,6 +810,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PReek/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PReek;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -820,6 +823,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -844,6 +848,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PReek/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PReek;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_LSUIElement = YES;
@@ -856,6 +861,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "de.max-heidinger.PReek";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
