@@ -50,12 +50,21 @@ struct ContentView: View {
                         pullRequestsViewModel: pullRequestsViewModel,
                         configViewModel: configViewModel
                     )
+                    .onAppear {
+                        keyboardHandler.disabled = false
+                    }
                 }
             }
             .navigationDestination(for: Screen.self) { screen in
                 switch screen {
                 case .settings:
                     SettingsView(configViewModel: configViewModel)
+                        .onAppear {
+                            keyboardHandler.disabled = true
+                        }
+                        .onDisappear {
+                            keyboardHandler.disabled = false
+                        }
                 }
             }
         }
