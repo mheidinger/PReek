@@ -101,10 +101,19 @@ struct PullRequestDto: Decodable {
     }
 
     struct Commit: Decodable {
+        struct ParentCommit: Decodable {
+            let oid: String
+        }
+
+        struct ParentCommits: Decodable {
+            let nodes: [ParentCommit]
+        }
+
         let author: CommitAuthor?
         let committedDate: Date
         let messageHeadline: String
         let oid: String
+        let parents: ParentCommits
     }
 
     struct CommitAuthor: Decodable {

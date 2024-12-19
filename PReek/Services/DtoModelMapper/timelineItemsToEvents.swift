@@ -57,7 +57,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
     case .PullRequestCommit:
         var newCommit: [Commit] = []
         if let commit = timelineItem.commit {
-            newCommit.append(Commit(id: commit.oid, messageHeadline: commit.messageHeadline, url: toOptionalUrl(timelineItem.url)))
+            newCommit.append(Commit(id: commit.oid, messageHeadline: commit.messageHeadline, url: toOptionalUrl(timelineItem.url), parentId: commit.parents.nodes.first?.oid))
         }
 
         if let prevCommitEventData = prevPair?.eventData as? EventPushedData, canMerge {
