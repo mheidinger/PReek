@@ -157,6 +157,11 @@ enum PullRequestsQueryBuilder {
                   committedDate
                   messageHeadline
                   oid
+                  parents(first: 1) {
+                    nodes {
+                      oid
+                    }
+                  }
                 }
                 url
               }

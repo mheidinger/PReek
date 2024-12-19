@@ -19,7 +19,7 @@ struct Event: Identifiable, Equatable {
         lhs.id == rhs.id &&
             lhs.user == rhs.user &&
             lhs.time == rhs.time &&
-            lhs.pullRequestUrl == rhs.pullRequestUrl &&
+            lhs.url == rhs.url &&
             lhs.data.isEqual(rhs.data)
     }
 
@@ -27,17 +27,17 @@ struct Event: Identifiable, Equatable {
     let user: User
     let time: Date
     let data: EventData
-    let pullRequestUrl: URL
+    let url: URL
 
-    var url: URL {
-        guard let dataUrl = data.url else {
-            return pullRequestUrl
-        }
-        if dataUrl.host() != nil {
-            return dataUrl
-        }
+    init(id: String, user: User, time: Date, data: EventData, pullRequestUrl: URL) {
+        self.id = id
+        self.user = user
+        self.time = time
+        self.data = data
 
-        return URL(string: dataUrl.path, relativeTo: pullRequestUrl) ?? pullRequestUrl
+        url = data.url.map { dataUrl in
+            dataUrl.host != nil ? dataUrl : pullRequestUrl.appendingPathComponent(dataUrl.path)
+        } ?? pullRequestUrl
     }
 
     static let previewClosed = Event(id: UUID().uuidString, user: User.preview(login: "person-1"), time: Date().addingTimeInterval(-10), data: EventClosedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
@@ -99,9 +99,9 @@ struct EventPushedData: EventData, Equatable {
         }
 
         if commits.count == 1 {
-            return URL(string: "files/\(first.id)")
+            return first.url
         }
-        return URL(string: "files/\(first.id)..\(last.id)")
+        return URL(string: "files/\(first.parentId ?? first.id)..\(last.id)")
     }
 
     let isForcePush: Bool
