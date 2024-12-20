@@ -75,6 +75,8 @@
 		6C66CF452C889C1F0060F290 /* toViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C66CF442C889C1F0060F290 /* toViewer.swift */; };
 		6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */ = {isa = PBXBuildFile; productRef = 6C7C4CA02C071A0400B9B4DA /* LinkHeaderParser */; };
 		6C7C4CA32C087A9900B9B4DA /* IfStringInterpolation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C7C4CA22C087A9900B9B4DA /* IfStringInterpolation.swift */; };
+		6C9322052D1317E200D6C057 /* ReadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9322042D1317DD00D6C057 /* ReadData.swift */; };
+		6C9322062D1317E200D6C057 /* ReadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C9322042D1317DD00D6C057 /* ReadData.swift */; };
 		6CB027262BFF817E00C4C3B1 /* PReekApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB027252BFF817E00C4C3B1 /* PReekApp.swift */; };
 		6CB0272A2BFF818000C4C3B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6CB027292BFF818000C4C3B1 /* Assets.xcassets */; };
 		6CB720392C7091D00067CA1D /* Commit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CB720382C7091D00067CA1D /* Commit.swift */; };
@@ -160,6 +162,7 @@
 		6C66CF422C889B980060F290 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 		6C66CF442C889C1F0060F290 /* toViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toViewer.swift; sourceTree = "<group>"; };
 		6C7C4CA22C087A9900B9B4DA /* IfStringInterpolation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IfStringInterpolation.swift; sourceTree = "<group>"; };
+		6C9322042D1317DD00D6C057 /* ReadData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadData.swift; sourceTree = "<group>"; };
 		6CB027222BFF817E00C4C3B1 /* PReek.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PReek.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6CB027252BFF817E00C4C3B1 /* PReekApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PReekApp.swift; sourceTree = "<group>"; };
 		6CB027292BFF818000C4C3B1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -342,6 +345,7 @@
 		6CE563FC2C008D78008E9A4B /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				6C9322042D1317DD00D6C057 /* ReadData.swift */,
 				6CE563FD2C008D9A008E9A4B /* PullRequest.swift */,
 				6CE563FF2C008DDC008E9A4B /* Event.swift */,
 				6C50F4372C04C590008F5B66 /* Notification.swift */,
@@ -525,6 +529,7 @@
 				6C1CB6EE2C921B8600305288 /* IfStringInterpolation.swift in Sources */,
 				6C1CB6F12C921C9900305288 /* CaseIterableDefaultsLast.swift in Sources */,
 				6C1CB6ED2C921B4600305288 /* NotificationDto.swift in Sources */,
+				6C9322062D1317E200D6C057 /* ReadData.swift in Sources */,
 				6C1F49B92CB5BB9B00C30677 /* SafeArrayIndex.swift in Sources */,
 				6C1CB6F52C921CB700305288 /* CodableAppStorage.swift in Sources */,
 				6C1CB6EC2C921B2100305288 /* mergeArray.swift in Sources */,
@@ -605,6 +610,7 @@
 				6CE563F72BFFAD3E008E9A4B /* ContentView.swift in Sources */,
 				6CE564022C0090BD008E9A4B /* EventView.swift in Sources */,
 				6CE563FE2C008D9A008E9A4B /* PullRequest.swift in Sources */,
+				6C9322052D1317E200D6C057 /* ReadData.swift in Sources */,
 				6C3605B82C751B6900664E66 /* toRepository.swift in Sources */,
 				6CB027262BFF817E00C4C3B1 /* PReekApp.swift in Sources */,
 				6C5FBDF42C6B41C100620B7A /* ConnectionSettingsView.swift in Sources */,

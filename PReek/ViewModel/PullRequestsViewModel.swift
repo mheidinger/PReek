@@ -6,6 +6,7 @@ class PullRequestsViewModel: ObservableObject {
     private let logger = Logger()
     private var cancellables = Set<AnyCancellable>()
     private var timer: Timer?
+    private var viewer: Viewer?
 
     enum SetFocusType {
         case first
@@ -51,7 +52,7 @@ class PullRequestsViewModel: ObservableObject {
         memoizedPullRequests
     }
 
-    @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: Date] = [:]
+    @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: ReadData] = [:]
     private var pullRequestMap: [String: PullRequest] = [:]
     @Published private var memoizedPullRequests: [PullRequest] = []
     private let invalidationTrigger = PassthroughSubject<Void, Never>()
@@ -75,7 +76,7 @@ class PullRequestsViewModel: ObservableObject {
 
             let updatedRead = self.pullRequestMap.map { entry in
                 var pullRequest = entry.value
-                pullRequest.lastMarkedAsRead = self.pullRequestReadMap[pullRequest.id]
+                pullRequest.calculateUnread(viewer: self.viewer, readData: self.pullRequestReadMap[pullRequest.id])
                 return pullRequest
             }
             let filtered = updatedRead.filter { pullRequest in
@@ -120,7 +121,8 @@ class PullRequestsViewModel: ObservableObject {
 
     func setRead(_ id: String, read: Bool) {
         if read {
-            pullRequestReadMap[id] = lastUpdated
+            let newestEventId = pullRequests.first(where: { $0.id == id })?.events.first?.id
+            pullRequestReadMap[id] = ReadData(date: lastUpdated ?? Date(), eventId: newestEventId)
         } else {
             pullRequestReadMap.removeValue(forKey: id)
         }
@@ -129,7 +131,8 @@ class PullRequestsViewModel: ObservableObject {
 
     func markAllAsRead() {
         for pullRequest in pullRequests {
-            pullRequestReadMap[pullRequest.id] = lastUpdated
+            let newestEventId = pullRequest.events.first?.id
+            pullRequestReadMap[pullRequest.id] = ReadData(date: lastUpdated ?? Date(), eventId: newestEventId)
         }
         invalidationTrigger.send()
     }
@@ -228,12 +231,12 @@ class PullRequestsViewModel: ObservableObject {
             }
 
             logger.info("Get current user")
-            let viewer = try await GitHubService.fetchViewer()
+            viewer = try await GitHubService.fetchViewer()
 
             logger.info("Start fetching notifications")
             let newLastUpdated = Date()
             let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: newLastUpdated)!
-            let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: { try await handleReceivedNotifications(notifications: $0, viewer: viewer) })
+            let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: { try await handleReceivedNotifications(notifications: $0, viewer: viewer!) })
 
             logger.info("Start fetching not updated pull requests")
             let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
@@ -246,7 +249,7 @@ class PullRequestsViewModel: ObservableObject {
 
                 return repoMapClone
             }
-            _ = try await fetchPullRequestMap(repoMap: notUpdatedRepoMap, viewer: viewer)
+            _ = try await fetchPullRequestMap(repoMap: notUpdatedRepoMap, viewer: viewer!)
 
             await MainActor.run {
                 self.lastUpdated = newLastUpdated
