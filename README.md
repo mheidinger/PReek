@@ -17,9 +17,15 @@ PReek brings a quick peek into relevant GitHub Pull Requests directly into your 
 
 A signed and notarized DMG installer can be found in the the [latest release](https://github.com/mheidinger/PReek/releases/latest).
 
-### Brew - Coming Soon
+### Brew
 
-Installation through Brew will come as soon as the project got some [popularity required for Brew](https://docs.brew.sh/Acceptable-Casks#rejected-casks), so feel free to ⭐ this repository!
+Brew installation is available through my personal homebrew tap:
+
+```bash
+brew install mheidinger/tap/preek
+```
+
+To make it possible for PReek to be available from the official tap, some [popularity is required](https://docs.brew.sh/Acceptable-Casks#rejected-casks). So feel free to ⭐ this repository!
 
 ### App Store - Maybe Coming Soon
 
