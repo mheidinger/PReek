@@ -143,7 +143,7 @@ class GitHubService {
             .compactMap { $0 } // [PullRequestsResponse.PullRequestDtoMap]
             .flatMap { $0 } // [Dictionary<String, PullRequestDto?>.Element]
             .compactMap { $0.value } // [PullRequestDto]
-        return toPullRequests(dtos: dtos, viewer: viewer)
+        return toPullRequests(dtos: dtos)
     }
 
     private static func sendRequest(request: URLRequest) async throws -> (Data, HTTPURLResponse) {
