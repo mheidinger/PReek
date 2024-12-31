@@ -2,6 +2,7 @@ import SwiftUI
 
 enum Screen: String, CaseIterable, Hashable {
     case settings
+    case excludedUsers
 }
 
 struct ContentView: View {
@@ -56,15 +57,19 @@ struct ContentView: View {
                 }
             }
             .navigationDestination(for: Screen.self) { screen in
-                switch screen {
-                case .settings:
-                    SettingsView(configViewModel: configViewModel)
-                        .onAppear {
-                            keyboardHandler.disabled = true
-                        }
-                        .onDisappear {
-                            keyboardHandler.disabled = false
-                        }
+                Group {
+                    switch screen {
+                    case .settings:
+                        SettingsView(configViewModel: configViewModel)
+                    case .excludedUsers:
+                        ExcludedUsersScreen(configViewModel: configViewModel)
+                    }
+                }
+                .onAppear {
+                    keyboardHandler.disabled = true
+                }
+                .onDisappear {
+                    keyboardHandler.disabled = false
                 }
             }
         }

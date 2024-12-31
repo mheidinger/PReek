@@ -78,10 +78,12 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
                 .padding()
                 .frame(width: 300)
             }
+
             Toggle(isOn: $configViewModel.useGitHubEnterprise) {
                 Text("Use GitHub Enterprise")
             }
             .toggleStyle(.switch)
+
             if configViewModel.useGitHubEnterprise {
                 HelpTextField(type: .textField, text: $configViewModel.gitHubEnterpriseUrl, label: "connection-settings.enterprise-url.label", prompt: "https://github.acme.org") {
                     VStack(alignment: .leading) {
@@ -89,9 +91,7 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
                     }
                     .padding()
                 }
-                #if os(iOS)
-                .textInputAutocapitalization(.never)
-                #endif
+                .disableAutoCapitalization()
                 .disableAutocorrection(true)
             }
 
