@@ -28,11 +28,9 @@ struct SettingsView: View {
     private var content: some View {
         VStack(alignment: .leading, spacing: 0) {
             Form {
-                Section {
+                #if os(macOS)
                     info
-                        .listRowInsets(EdgeInsets())
-                        .listRowBackground(Color.clear)
-                }
+                #endif
 
                 ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "GitHub Connection")
 
@@ -52,26 +50,30 @@ struct SettingsView: View {
     }
 
     private var info: some View {
-        HStack(spacing: 15) {
-            Image(.icon)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 50)
-            VStack(alignment: .leading) {
-                Text("PReek")
-                    .font(.title)
-                Text("by Max Heidinger")
-                    .font(.title3)
-            }
+        Section {
+            HStack(spacing: 15) {
+                Image(.icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50)
+                VStack(alignment: .leading) {
+                    Text("PReek")
+                        .font(.title)
+                    Text("by Max Heidinger")
+                        .font(.title3)
+                }
 
-            Spacer()
+                Spacer()
 
-            VStack(alignment: .trailing, spacing: 5) {
-                HoverableLink("GitHub", destination: URL(string: "https://github.com/mheidinger/PReek")!)
-                HoverableLink("FAQ", destination: URL(string: "https://github.com/mheidinger/PReek#faq")!)
-                HoverableLink("Create Issue", destination: URL(string: "https://github.com/mheidinger/PReek/issues/new")!)
+                VStack(alignment: .trailing, spacing: 5) {
+                    HoverableLink("GitHub", destination: URL(string: "https://github.com/mheidinger/PReek")!)
+                    HoverableLink("FAQ", destination: URL(string: "https://github.com/mheidinger/PReek#faq")!)
+                    HoverableLink("Create Issue", destination: URL(string: "https://github.com/mheidinger/PReek/issues/new")!)
+                }
             }
         }
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
     }
 
     private var pullRequestSettings: some View {
@@ -96,7 +98,13 @@ struct SettingsView: View {
                 }
             }
 
-            ExcludedUsersTable(configViewModel: configViewModel)
+            #if os(macOS)
+                ExcludedUsersTable(configViewModel: configViewModel)
+            #else
+                NavigationLink(value: Screen.excludedUsers) {
+                    Text("Excluded Users")
+                }
+            #endif
         }
     }
 }

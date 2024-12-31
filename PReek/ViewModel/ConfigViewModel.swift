@@ -80,6 +80,11 @@ class ConfigViewModel: ObservableObject {
         saveUpdateTrigger.send()
     }
 
+    func removeExcludedUserByIndexSet(_ indexSet: IndexSet) {
+        excludedUsers.remove(atOffsets: indexSet)
+        saveUpdateTrigger.send()
+    }
+
     private func setupSaveUpdate() {
         saveUpdateTrigger
             .debounce(for: .seconds(0.5), scheduler: RunLoop.main)
