@@ -89,8 +89,22 @@ struct PullRequest: Identifiable, Equatable {
             Date.FormatStyle()
                 .month(.abbreviated)
                 .day(.defaultDigits)
+                .hour()
         )
         return String(localized: "updated \(formattedDate) at \(formattedTime)")
+    }
+
+    var lastUpdatedFormattedShort: String {
+        if Calendar.current.isDateInToday(lastUpdated) {
+            return lastUpdated.formatted(date: .omitted, time: .shortened)
+        }
+        return lastUpdated.formatted(
+            Date.FormatStyle()
+                .month(.abbreviated)
+                .day(.defaultDigits)
+                .hour()
+                .minute()
+        )
     }
 
     var additionsFormatted: String {

@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PullRequestView: View {
+struct PullRequestDisclosureGroup: View {
     var pullRequest: PullRequest
     var setRead: (String, Bool) -> Void
 
@@ -38,7 +38,7 @@ struct PullRequestView: View {
 
 #Preview {
     ScrollView {
-        PullRequestView(
+        PullRequestDisclosureGroup(
             PullRequest.preview(title: "long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long lon"),
             setRead: { _, _ in },
             sectionExpanded: true
