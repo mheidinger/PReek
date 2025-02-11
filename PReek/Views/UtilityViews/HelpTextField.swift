@@ -10,6 +10,7 @@ struct HelpTextField<HelpContent: View>: View {
     let type: FieldType
     @Binding var text: String
     let label: LocalizedStringKey
+    let prompt: LocalizedStringKey
     // Only available on macOS
     let helpContent: () -> HelpContent
 
@@ -27,19 +28,19 @@ struct HelpTextField<HelpContent: View>: View {
     }
 
     var secureField: some View {
-        SecureField(text: $text) {
+        SecureField(text: $text, prompt: Text(prompt)) {
             labelContent
         }
     }
 
     var revealSecureField: some View {
-        RevealSecureField(text: $text) {
+        RevealSecureField(text: $text, prompt: Text(prompt)) {
             labelContent
         }
     }
 
     var textField: some View {
-        TextField(text: $text) {
+        TextField(text: $text, prompt: Text(prompt)) {
             labelContent
         }
     }
@@ -65,18 +66,19 @@ struct HelpTextField<HelpContent: View>: View {
 
 #Preview {
     Form {
-        HelpTextField(type: .secureField, text: .constant("My entered secure value"), label: "Some secure value") {
+        HelpTextField(type: .secureField, text: .constant(""), label: "Some secure value", prompt: "Enter your password") {
             Text("Some helpful secure help")
                 .padding()
         }
-        HelpTextField(type: .revealSecureField, text: .constant("My entered secure value"), label: "Some secure value") {
+        HelpTextField(type: .revealSecureField, text: .constant(""), label: "Some secure value", prompt: "Enter your password") {
             Text("Some helpful secure help")
                 .padding()
         }
-        HelpTextField(type: .textField, text: .constant("My entered value"), label: "Some value") {
+        HelpTextField(type: .textField, text: .constant(""), label: "Some value", prompt: "Enter your text") {
             Text("Some helpful help")
                 .padding()
         }
     }
+    .formStyle(.grouped)
     .padding()
 }

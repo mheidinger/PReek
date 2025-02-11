@@ -71,7 +71,7 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
 
     var body: some View {
         Section {
-            HelpTextField(type: .revealSecureField, text: $configViewModel.token, label: "connection-settings.pat.label") {
+            HelpTextField(type: .revealSecureField, text: $configViewModel.token, label: "connection-settings.pat.label", prompt: "Enter PAT") {
                 VStack(alignment: .leading) {
                     Text("connection-settings.pat.explanation")
                 }
@@ -83,7 +83,7 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
             }
             .toggleStyle(.switch)
             if configViewModel.useGitHubEnterprise {
-                HelpTextField(type: .textField, text: $configViewModel.gitHubEnterpriseUrl, label: "connection-settings.enterprise-url.label") {
+                HelpTextField(type: .textField, text: $configViewModel.gitHubEnterpriseUrl, label: "connection-settings.enterprise-url.label", prompt: "https://github.acme.org") {
                     VStack(alignment: .leading) {
                         Text("connection-settings.enterprise-url.explanation")
                     }
