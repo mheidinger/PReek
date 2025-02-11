@@ -101,16 +101,6 @@
         }
       }
     },
-    "Additional Content" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Weiterer Inhalt"
-          }
-        }
-      }
-    },
     "Additional Settings" : {
       "localizations" : {
         "de" : {
@@ -341,26 +331,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PAT eingeben"
-          }
-        }
-      }
-    },
-    "Enter your password" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Passwort eingeben"
-          }
-        }
-      }
-    },
-    "Enter your text" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text eingeben"
           }
         }
       }
@@ -821,46 +791,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einstellungen"
-          }
-        }
-      }
-    },
-    "Some helpful help" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Etwas hilfreiche Hilfe"
-          }
-        }
-      }
-    },
-    "Some helpful secure help" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Etwas hilfreiche sichere Hilfe"
-          }
-        }
-      }
-    },
-    "Some secure value" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein sicherer Wert"
-          }
-        }
-      }
-    },
-    "Some value" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein Wert"
           }
         }
       }

@@ -33,7 +33,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
+            Group {
                 if showWelcomeScreen {
                     WelcomeScreen(
                         configViewModel: configViewModel,

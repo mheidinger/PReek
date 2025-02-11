@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PullRequestsView: View {
+struct PullRequestsDisclosureGroupList: View {
     var pullRequests: [PullRequest]
     var setRead: (String, Bool) -> Void
     @Binding var toBeFocusedPullRequestId: String?
@@ -21,7 +21,7 @@ struct PullRequestsView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 4) {
                         DividedView(pullRequests) { pullRequest in
-                            PullRequestView(
+                            PullRequestDisclosureGroup(
                                 pullRequest,
                                 setRead: setRead
                             )
@@ -53,7 +53,7 @@ struct PullRequestsView: View {
 }
 
 #Preview {
-    PullRequestsView(
+    PullRequestsDisclosureGroupList(
         [
             PullRequest.preview(id: "1", title: "short"),
             PullRequest.preview(id: "2", title: "long long long long long long long long long long long long long long long long long long long"),
