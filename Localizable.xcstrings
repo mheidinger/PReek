@@ -186,13 +186,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Personal Access Token (PAT) sollte vom Typ 'Classic' sein und benötigt die 'notifications' Berechtigung. Für Zugang zu privaten repositories ist zusätzlich die 'repo' Berechtigung notwendig. Benachrichtigungen werden verwendet, um die für dich relevanten Pull Requests zu identifizieren. Informationen zum Generieren eines PAT findest du in der [GitHub Dokumentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)."
+            "value" : "Gebe die URL ohne Suffix an. Beispiel: `https://github.acme.org`"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the [GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) on how to generate a PAT."
+            "value" : "Provide the base URL without any suffix. For example: `https://github.acme.org`"
           }
         }
       }
@@ -218,13 +218,13 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gebe die URL ohne Suffix an. Beispiel: `https://github.acme.org`"
+            "value" : "Der Personal Access Token (PAT) sollte vom Typ 'Classic' sein und benötigt die 'notifications' Berechtigung. Für Zugang zu privaten repositories ist zusätzlich die 'repo' Berechtigung notwendig. Benachrichtigungen werden verwendet, um die für dich relevanten Pull Requests zu identifizieren. Informationen zum Generieren eines PAT findest du in der [GitHub Dokumentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provide the base URL without any suffix. For example: `https://github.acme.org`"
+            "value" : "The Personal Access Token (PAT) should be of type 'classic' and requires the 'notifications' scope. For access to private repositories, additionally the 'repo' scope is required. Notifications are used to get the Pull Requests that are shown yo you. See the [GitHub documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) on how to generate a PAT."
           }
         }
       }
