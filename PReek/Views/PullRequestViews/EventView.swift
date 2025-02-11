@@ -56,7 +56,7 @@ struct EventView: View {
                     .foregroundStyle(.secondary)
                     .frame(width: 130, alignment: .trailing)
                 HoverableLink(destination: event.url) {
-                    Image(systemName: "safari")
+                    Image(systemName: "arrow.up.forward.square")
                 }
             }
             EventDataView(event.data)
