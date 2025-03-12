@@ -52,6 +52,7 @@
 		6C2942BA2C89A67B00E7D0EF /* BulletPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C2942B92C89A67B00E7D0EF /* BulletPoint.swift */; };
 		6C2942BC2C8AF35700E7D0EF /* canMergeEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C2942BB2C8AF35700E7D0EF /* canMergeEvents.swift */; };
 		6C2942BE2C8AF98B00E7D0EF /* mergeArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C2942BD2C8AF98B00E7D0EF /* mergeArray.swift */; };
+		6C33485F2D5F8505007A5ABF /* DateSensitiveText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C33485E2D5F84DC007A5ABF /* DateSensitiveText.swift */; };
 		6C3605B42C751AD300664E66 /* timelineItemsToEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3605B32C751AD300664E66 /* timelineItemsToEvents.swift */; };
 		6C3605B62C751B4C00664E66 /* toUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3605B52C751B4C00664E66 /* toUser.swift */; };
 		6C3605B82C751B6900664E66 /* toRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C3605B72C751B6900664E66 /* toRepository.swift */; };
@@ -137,6 +138,7 @@
 		6C2942B92C89A67B00E7D0EF /* BulletPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulletPoint.swift; sourceTree = "<group>"; };
 		6C2942BB2C8AF35700E7D0EF /* canMergeEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = canMergeEvents.swift; sourceTree = "<group>"; };
 		6C2942BD2C8AF98B00E7D0EF /* mergeArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mergeArray.swift; sourceTree = "<group>"; };
+		6C33485E2D5F84DC007A5ABF /* DateSensitiveText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateSensitiveText.swift; sourceTree = "<group>"; };
 		6C35D5302CF7CB11002C5BE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6C3605B32C751AD300664E66 /* timelineItemsToEvents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = timelineItemsToEvents.swift; sourceTree = "<group>"; };
 		6C3605B52C751B4C00664E66 /* toUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = toUser.swift; sourceTree = "<group>"; };
@@ -271,6 +273,7 @@
 		6C5FBDEF2C6B3C6F00620B7A /* UtilityViews */ = {
 			isa = PBXGroup;
 			children = (
+				6C33485E2D5F84DC007A5ABF /* DateSensitiveText.swift */,
 				6C3F26B12CB40631007FFB25 /* HoverableLink.swift */,
 				6C1CB6FC2C92342F00305288 /* RevealSecureField.swift */,
 				6C5FBDF02C6B3C9D00620B7A /* HelpTextField.swift */,
@@ -603,6 +606,7 @@
 				6C1CB6FD2C92344200305288 /* RevealSecureField.swift in Sources */,
 				6CB7203B2C7096520067CA1D /* CommitsView.swift in Sources */,
 				6C3F26B22CB40638007FFB25 /* HoverableLink.swift in Sources */,
+				6C33485F2D5F8505007A5ABF /* DateSensitiveText.swift in Sources */,
 				6C232DF72C3F1ACA00C003B1 /* Repository.swift in Sources */,
 				6C232DED2C08CB9600C003B1 /* KeychainStorage.swift in Sources */,
 				6C84D9A82D1EC51300355C11 /* ExcludedUsersScreen.swift in Sources */,
