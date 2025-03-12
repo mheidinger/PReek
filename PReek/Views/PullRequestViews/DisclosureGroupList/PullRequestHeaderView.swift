@@ -76,7 +76,7 @@ struct PullRequestHeaderView: View {
 
             Text("·")
 
-            Text("\(pullRequest.lastUpdatedFormatted)")
+            DateSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
 
             Text("·")
 
@@ -122,6 +122,9 @@ struct PullRequestHeaderView: View {
 }
 
 #Preview {
-    PullRequestHeaderView(PullRequest.preview(title: "long long long long long long long long long long long long long long long long long"), setRead: { _, _ in })
-        .padding()
+    PullRequestHeaderView(
+        PullRequest.preview(title: "long long long long long long long long long long long long long long long long long"),
+        setRead: { _, _ in }
+    )
+    .padding()
 }
