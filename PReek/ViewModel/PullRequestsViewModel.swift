@@ -19,10 +19,10 @@ class PullRequestsViewModel: ObservableObject {
         pullRequestMap = Dictionary(uniqueKeysWithValues: initialPullRequests.map { ($0.id, $0) })
 
         // Directly access UserDefaults w/ same keys above for correct initial values in the subject
-        let storedHideClosed = UserDefaults.standard.bool(forKey: "hideClosed")
-        let storedHideRead = UserDefaults.standard.bool(forKey: "hideRead")
-        hideClosedSubject = CurrentValueSubject<Bool, Never>(storedHideClosed)
-        hideReadSubject = CurrentValueSubject<Bool, Never>(storedHideRead)
+        let storedShowClosed = UserDefaults.standard.bool(forKey: "showClosed")
+        let storedShowRead = UserDefaults.standard.bool(forKey: "showRead")
+        showClosedSubject = CurrentValueSubject<Bool, Never>(storedShowClosed)
+        showReadSubject = CurrentValueSubject<Bool, Never>(storedShowRead)
         setupPullRequestsMemoization()
         setupPullRequestFocus()
     }
@@ -32,17 +32,17 @@ class PullRequestsViewModel: ObservableObject {
     @Published var error: Error? = nil
     @Published private(set) var hasUnread: Bool = false
 
-    private var hideClosedSubject: CurrentValueSubject<Bool, Never>
-    @AppStorage("hideClosed") var hideClosed: Bool = false {
+    private var showClosedSubject: CurrentValueSubject<Bool, Never>
+    @AppStorage("showClosed") var showClosed: Bool = true {
         didSet {
-            hideClosedSubject.send(hideClosed)
+            showClosedSubject.send(showClosed)
         }
     }
 
-    private var hideReadSubject = CurrentValueSubject<Bool, Never>(false)
-    @AppStorage("hideRead") var hideRead: Bool = false {
+    private var showReadSubject = CurrentValueSubject<Bool, Never>(false)
+    @AppStorage("showRead") var showRead: Bool = true {
         didSet {
-            hideReadSubject.send(hideRead)
+            showReadSubject.send(showRead)
         }
     }
 
@@ -63,15 +63,15 @@ class PullRequestsViewModel: ObservableObject {
         // Combine dependencies that affect the pullRequests computation
         // Also add last updated as excluded users are not considered
         Publishers.CombineLatest4(
-            hideClosedSubject,
-            hideReadSubject,
+            showClosedSubject,
+            showReadSubject,
             $lastUpdated,
             invalidationTrigger
                 .prepend(())
                 .setFailureType(to: Never.self)
         )
         .throttle(for: .milliseconds(100), scheduler: DispatchQueue.main, latest: true)
-        .map { [weak self] hideClosed, hideRead, _, _ in
+        .map { [weak self] showClosed, showRead, _, _ in
             guard let self = self else { return ([], false) }
 
             let updatedRead = self.pullRequestMap.map { entry in
@@ -84,8 +84,8 @@ class PullRequestsViewModel: ObservableObject {
                     !ConfigService.excludedUsers.contains(event.user.login)
                 }
 
-                let passesClosedFilter = !hideClosed || !pullRequest.isClosed
-                let passesReadFilter = !hideRead || pullRequest.unread
+                let passesClosedFilter = showClosed || !pullRequest.isClosed
+                let passesReadFilter = showRead || pullRequest.unread
 
                 return containsNonExcludedUser && passesClosedFilter && passesReadFilter
             }

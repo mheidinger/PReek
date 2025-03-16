@@ -118,14 +118,11 @@ struct WelcomeScreen: View {
 }
 
 #Preview {
-    do {
-        try Tips.configure()
-        Tips.showAllTipsForTesting()
-    } catch {
-        print("Error initializing tips: \(error)")
-    }
-
-    return WelcomeScreen(configViewModel: ConfigViewModel(), testConnection: { AppError.forbidden }, dismissWelcomeView: {})
+    WelcomeScreen(configViewModel: ConfigViewModel(), testConnection: { AppError.forbidden }, dismissWelcomeView: {})
+        .onAppear {
+            try? Tips.configure()
+            Tips.showAllTipsForTesting()
+        }
     #if os(macOS)
         .frame(width: 600, height: 400)
     #endif
