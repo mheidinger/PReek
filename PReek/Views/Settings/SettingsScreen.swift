@@ -1,39 +1,51 @@
 import LaunchAtLogin
+import OSLog
 import SwiftUI
+#if os(iOS)
+    import CodeScanner
+#endif
 
 struct SettingsScreen: View {
     @ObservedObject var configViewModel: ConfigViewModel
 
     @State private var showShareSheet: Bool = false
+    @State private var showImportSheet: Bool = false
 
     var body: some View {
         content
             .background(.windowBackground)
             .navigationTitle("Settings")
-            .toolbar { // This toolbar does not show up on macOS
+        #if os(iOS)
+            // Not shown on macOS - https://stackoverflow.com/questions/77647716/macos-swiftui-using-navigationstack-toolbar-button-not-showing-in-menubarextra-a
+            .toolbar {
+                Button(action: { showImportSheet = true }) {
+                    Image(systemName: "qrcode.viewfinder")
+                }
                 Button(action: { showShareSheet = true }) {
                     Image(systemName: "square.and.arrow.up")
                 }
             }
-            // Not used on macOS as it contains bugs: https://stackoverflow.com/questions/77647716/macos-swiftui-using-navigationstack-toolbar-button-not-showing-in-menubarextra-a
+            // Not possible to use on macOS due to a bug - https://stackoverflow.com/questions/78835562/opening-a-sheet-inside-a-menubarextra
             .sheet(isPresented: $showShareSheet) {
                 NavigationStack {
-                    ShareView(onDismiss: { showShareSheet = false })
+                    ShareView(configViewModel: configViewModel, onDismiss: { showShareSheet = false })
                 }
             }
+            .importSheet(configViewModel: configViewModel, isPresented: $showImportSheet)
+        #endif
         #if os(macOS)
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                HStack {
-                    Button("Quit App", action: { NSApplication.shared.terminate(nil) })
-                    NavigationLink(value: Screen.share) {
-                        Text("Share")
-                    }
-                    Spacer()
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            HStack {
+                Button("Quit App", action: { NSApplication.shared.terminate(nil) })
+                NavigationLink(value: Screen.share) {
+                    Text("Share")
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 10)
-                .background(.windowBackground)
+                Spacer()
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .background(.windowBackground)
+        }
         #endif
     }
 

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ShareView: View {
+    @ObservedObject var configViewModel: ConfigViewModel
     let onDismiss: () -> Void
 
     @State private var qrCodeImage: Image?
@@ -8,17 +9,19 @@ struct ShareView: View {
     @State private var qrCodeError: Error?
 
     private func generateQRCode() async {
-        // Reset previous state
         qrCodeError = nil
         isGeneratingQrCode = true
 
-        // Move to background thread for processing
         do {
+            let shareData = configViewModel.getShareData()
+            guard let shareData else {
+                throw AppError.missingConfigToShare
+            }
+
             let image = try await Task.detached(priority: .userInitiated) {
-                try generateJsonQrCode(from: ConfigService.getShareData())
+                try generateJsonQrCode(from: shareData)
             }.value
 
-            // Update UI on main thread
             await MainActor.run {
                 qrCodeImage = image
                 isGeneratingQrCode = false
@@ -83,6 +86,6 @@ struct ShareView: View {
 
 #Preview {
     NavigationStack {
-        ShareView(onDismiss: {})
+        ShareView(configViewModel: ConfigViewModel(), onDismiss: {})
     }
 }

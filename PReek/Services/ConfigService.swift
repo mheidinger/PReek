@@ -15,12 +15,4 @@ class ConfigService {
     }
 
     @AppStorage("closeWindowOnLinkClick") static var closeWindowOnLinkClick: Bool = true
-
-    static func getShareData() throws -> ShareConfig {
-        guard let token, !token.isEmpty else {
-            throw AppError.missingConfigToShare
-        }
-
-        return ShareConfig.v1(ShareConfigDataV1(token: token, gitHubEnterpriseUrl: gitHubEnterpriseUrl))
-    }
 }

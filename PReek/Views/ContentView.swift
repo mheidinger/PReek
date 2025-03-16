@@ -79,7 +79,7 @@ struct ContentView: View {
                         case .settings:
                             SettingsScreen(configViewModel: configViewModel)
                         case .share:
-                            ShareScreen()
+                            ShareScreen(configViewModel: configViewModel)
                         default:
                             EmptyView()
                         }

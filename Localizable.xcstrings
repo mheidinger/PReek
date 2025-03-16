@@ -365,6 +365,16 @@
         }
       }
     },
+    "Failed to import shared configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren der geteilten Konfiguration fehlgeschlagen"
+          }
+        }
+      }
+    },
     "Failed to send request to GitHub" : {
       "localizations" : {
         "de" : {
@@ -475,6 +485,26 @@
         }
       }
     },
+    "Import an existing configuration for another device running PReek." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren eine existierende Konfiguration von einem anderen Gerät auf dem PReek läuft."
+          }
+        }
+      }
+    },
+    "Import Configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguration importieren"
+          }
+        }
+      }
+    },
     "Last updated at %@" : {
       "localizations" : {
         "de" : {
@@ -580,7 +610,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Konfiguration zum Teilen vorhanden"
+            "value" : "Keine Konfiguration zum Teilen"
           }
         }
       }
@@ -615,12 +645,32 @@
         }
       }
     },
+    "OK" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
     "Only remove closed PRs" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nur geschlossene PRs entfernen"
+          }
+        }
+      }
+    },
+    "Open PReek on another device and click on \"Share\" in the settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne PReek auf einem anderen Gerät und klicke auf “Share” in den Einstellungen."
           }
         }
       }
