@@ -21,6 +21,10 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
         var sectionHeader: some View {
             Text(headerLabel)
         }
+
+        var helpSheet: some View {
+            EmptyView()
+        }
     #else
         var sectionHeader: some View {
             HStack {
@@ -30,44 +34,38 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
                 }
             }
         }
-    #endif
 
-    // Only relevant for iOS
-    var helpSheet: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text(headerLabel)
-                    .font(.title)
-                Spacer()
-                Button(action: { showPopover.toggle() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .imageScale(.large)
-                }
-            }
-            .padding(.bottom)
+        var helpSheet: some View {
+            NavigationStack {
+                VStack(alignment: .leading) {
+                    Text("connection-settings.pat.label")
+                        .font(.title3)
+                    Text("connection-settings.pat.explanation")
+                        .font(.footnote)
+                        .padding(.bottom)
 
-            Spacer()
-
-            VStack(alignment: .leading) {
-                Text("connection-settings.pat.label")
-                    .font(.title3)
-                Text("connection-settings.pat.explanation")
+                    Text("connection-settings.enterprise-url.label")
+                        .font(.title3)
+                    Group {
+                        Text("connection-settings.enterprise-url.explanation")
+                    }
                     .font(.footnote)
-                    .padding(.bottom)
 
-                Text("connection-settings.enterprise-url.label")
-                    .font(.title3)
-                Group {
-                    Text("connection-settings.enterprise-url.explanation")
+                    Spacer()
                 }
-                .font(.footnote)
-
-                Spacer()
+                .padding()
+                .presentationDetents([.medium])
+                .navigationTitle(headerLabel)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    Button(action: { showPopover.toggle() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .imageScale(.large)
+                    }
+                }
             }
         }
-        .padding()
-        .presentationDetents([.medium])
-    }
+    #endif
 
     var body: some View {
         Section {

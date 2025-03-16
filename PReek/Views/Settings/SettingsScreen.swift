@@ -1,28 +1,40 @@
 import LaunchAtLogin
 import SwiftUI
 
-struct SettingsView: View {
+struct SettingsScreen: View {
     @ObservedObject var configViewModel: ConfigViewModel
+
+    @State private var showShareSheet: Bool = false
 
     var body: some View {
         content
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                bottomBar
-                    .background(.windowBackground)
-            }
             .background(.windowBackground)
             .navigationTitle("Settings")
-    }
-
-    private var bottomBar: some View {
-        HStack {
-            #if os(macOS)
-                Button("Quit App", action: { NSApplication.shared.terminate(nil) })
-            #endif
-            Spacer()
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 10)
+            .toolbar { // This toolbar does not show up on macOS
+                Button(action: { showShareSheet = true }) {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
+            // Not used on macOS as it contains bugs: https://stackoverflow.com/questions/77647716/macos-swiftui-using-navigationstack-toolbar-button-not-showing-in-menubarextra-a
+            .sheet(isPresented: $showShareSheet) {
+                NavigationStack {
+                    ShareView(onDismiss: { showShareSheet = false })
+                }
+            }
+        #if os(macOS)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                HStack {
+                    Button("Quit App", action: { NSApplication.shared.terminate(nil) })
+                    NavigationLink(value: Screen.share) {
+                        Text("Share")
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(.windowBackground)
+            }
+        #endif
     }
 
     private var content: some View {
@@ -78,24 +90,22 @@ struct SettingsView: View {
 
     private var pullRequestSettings: some View {
         Section("Pull Requests") {
-            Section("Data Fetching and Cleanup") {
-                Stepper(value: $configViewModel.onStartFetchWeeks, in: 0 ... 100) {
-                    HStack {
-                        Text("On start fetch PRs from notifications of last")
-                        Spacer()
-                        Text("\(configViewModel.onStartFetchWeeks) weeks")
-                    }
+            Stepper(value: $configViewModel.onStartFetchWeeks, in: 0 ... 100) {
+                HStack {
+                    Text("Fetch PRs from notifications of last")
+                    Spacer()
+                    Text("\(configViewModel.onStartFetchWeeks) weeks")
                 }
-                Stepper(value: $configViewModel.deleteAfterWeeks, in: 0 ... 100) {
-                    HStack {
-                        Text("Remove PRs not updated since")
-                        Spacer()
-                        Text("\(configViewModel.deleteAfterWeeks) weeks")
-                    }
+            }
+            Stepper(value: $configViewModel.deleteAfterWeeks, in: 0 ... 100) {
+                HStack {
+                    Text("Remove PRs not updated since")
+                    Spacer()
+                    Text("\(configViewModel.deleteAfterWeeks) weeks")
                 }
-                Toggle(isOn: $configViewModel.deleteOnlyClosed) {
-                    Text("Only remove closed PRs")
-                }
+            }
+            Toggle(isOn: $configViewModel.deleteOnlyClosed) {
+                Text("Only remove closed PRs")
             }
 
             #if os(macOS)
@@ -110,5 +120,7 @@ struct SettingsView: View {
 }
 
 #Preview {
-    SettingsView(configViewModel: ConfigViewModel())
+    NavigationStack {
+        SettingsScreen(configViewModel: ConfigViewModel())
+    }
 }

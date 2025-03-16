@@ -10,6 +10,9 @@ struct PReekApp: App {
 
     @FocusState private var isContentFocused: Bool
 
+    @State private var resetTask: Task<Void, Never>?
+    @State private var resetPath: Bool = false
+
     init() {
         let pullRequestsViewModel = PullRequestsViewModel()
         _pullRequestsViewModel = StateObject(wrappedValue: pullRequestsViewModel)
@@ -28,7 +31,7 @@ struct PReekApp: App {
     var body: some Scene {
         #if os(macOS)
             MenuBarExtra("PReek", image: pullRequestsViewModel.hasUnread ? "MenuBarIconUnread" : "MenuBarIcon") {
-                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: { isMenuPresented = false })
+                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: { isMenuPresented = false }, resetPath: $resetPath)
                     .frame(width: 600, height: 400)
                     .focused($isContentFocused)
             }
@@ -39,10 +42,22 @@ struct PReekApp: App {
                 if isMenuPresented {
                     isContentFocused = true
                 }
+
+                resetTask?.cancel()
+
+                if !isMenuPresented {
+                    resetTask = Task {
+                        try? await Task.sleep(for: .seconds(5))
+
+                        if !isMenuPresented {
+                            resetPath = true
+                        }
+                    }
+                }
             }
         #else
             WindowGroup {
-                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: {})
+                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: {}, resetPath: $resetPath)
             }
         #endif
     }

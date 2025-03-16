@@ -8,6 +8,8 @@ enum AppError: LocalizedError {
     case forbidden
     case apiError
     case insufficientScopes(missingScope: Scope?)
+    case missingConfigToShare
+    case qrCodeGenerationFailed
     case unknown
 
     var errorDescription: String? {
@@ -30,6 +32,10 @@ enum AppError: LocalizedError {
             } else {
                 return String(localized: "PAT is missing required scopes")
             }
+        case .missingConfigToShare:
+            return String(localized: "No configuration to share")
+        case .qrCodeGenerationFailed:
+            return String(localized: "Failed to generate QR code")
         case .unknown:
             return String(localized: "Unknown error happened")
         }

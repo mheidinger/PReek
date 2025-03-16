@@ -1,12 +1,5 @@
 import SwiftUI
 
-private let statusToIcon: [PullRequest.Status: ImageResource] = [
-    PullRequest.Status.draft: .prDraft,
-    PullRequest.Status.open: .prOpen,
-    PullRequest.Status.merged: .prMerged,
-    PullRequest.Status.closed: .prClosed,
-]
-
 struct PullRequestListItem: View {
     var pullRequest: PullRequest
 
@@ -20,9 +13,7 @@ struct PullRequestListItem: View {
                 Spacer()
                     .frame(maxHeight: 5)
 
-                Image(statusToIcon[pullRequest.status] ?? .prOpen)
-                    .foregroundStyle(.primary)
-                    .imageScale(.large)
+                StatusIcon(pullRequest.status)
 
                 Spacer()
                     .frame(maxHeight: 10)

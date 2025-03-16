@@ -285,16 +285,6 @@
         }
       }
     },
-    "Data Fetching and Cleanup" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Daten Abfrage und Löschung"
-          }
-        }
-      }
-    },
     "disabled auto-merge" : {
       "localizations" : {
         "de" : {
@@ -365,6 +355,16 @@
         }
       }
     },
+    "Failed to generate QR code" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR Code Generierung fehlgeschlagen"
+          }
+        }
+      }
+    },
     "Failed to send request to GitHub" : {
       "localizations" : {
         "de" : {
@@ -381,6 +381,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "FAQ"
+          }
+        }
+      }
+    },
+    "Fetch PRs from notifications of last" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PRs laden von Benachrichtigungen der letzten"
           }
         }
       }
@@ -485,6 +495,16 @@
         }
       }
     },
+    "Loading PRs..." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laden…"
+          }
+        }
+      }
+    },
     "Made by Max Heidinger" : {
       "localizations" : {
         "de" : {
@@ -501,6 +521,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alle als gelesen markieren"
+          }
+        }
+      }
+    },
+    "Mark read" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelesen markieren"
+          }
+        }
+      }
+    },
+    "Mark unread" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ungelesen markieren"
           }
         }
       }
@@ -535,6 +575,26 @@
         }
       }
     },
+    "No configuration to share" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Konfiguration zum Teilen vorhanden"
+          }
+        }
+      }
+    },
+    "No Connection" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Verbindung"
+          }
+        }
+      }
+    },
     "No Events" : {
       "localizations" : {
         "de" : {
@@ -551,16 +611,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kein Token"
-          }
-        }
-      }
-    },
-    "On start fetch PRs from notifications of last" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Beim Start PRs laden von Benachrichtigungen der letzten"
           }
         }
       }
@@ -785,12 +835,62 @@
         }
       }
     },
+    "Scan this QR code in the PReek App on another device to import your configuration." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanne diesen QR Code in the PReek App auf einem anderen Gerät, um deine Konfiguration zu importieren."
+          }
+        }
+      }
+    },
+    "Select a pull request" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle eine Pull Request aus"
+          }
+        }
+      }
+    },
     "Settings" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Einstellungen"
+          }
+        }
+      }
+    },
+    "Share" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teilen"
+          }
+        }
+      }
+    },
+    "Share Configuration" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguration Teilen"
+          }
+        }
+      }
+    },
+    "Shared Configuration includes:\n- Your GitHub token\n- If provided the GitHub Enterprise URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die geteilte Konfiguration enthält:\n- Dein GitHub Token\n- Falls vorhanden die GitHub Enterprise URL"
           }
         }
       }
