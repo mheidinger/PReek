@@ -16,21 +16,17 @@ struct EventDataView: View {
         case let commentData as EventCommentData:
             CommentsView(comments: commentData.comments)
         case let renamedTitleData as EventRenamedTitleData:
-            VStack(alignment: .leading, spacing: 5) {
-                HStack {
+            HStack {
+                VStack(alignment: .leading) {
                     Text("From:")
-                        .frame(width: 50, alignment: .leading)
-                        .foregroundStyle(.secondary)
-                    Text(renamedTitleData.previousTitle)
-                        .frame(width: 400, alignment: .leading)
-                        .lineLimit(1)
-                }
-                HStack {
                     Text("To:")
-                        .frame(width: 50, alignment: .leading)
-                        .foregroundStyle(.secondary)
+                }
+                .foregroundStyle(.secondary)
+
+                VStack(alignment: .leading) {
+                    Text(renamedTitleData.previousTitle)
+                        .lineLimit(1)
                     Text(renamedTitleData.currentTitle)
-                        .frame(width: 400, alignment: .leading)
                         .lineLimit(1)
                 }
             }

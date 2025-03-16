@@ -42,16 +42,44 @@ func eventDataToActionLabel(data: EventData) -> LocalizedStringKey {
 struct EventView: View {
     var event: Event
 
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+
     init(_ event: Event) {
         self.event = event
     }
 
     var body: some View {
         VStack(alignment: .leading) {
+            if horizontalSizeClass == .compact {
+                compactEventHeader
+            } else {
+                eventHeader
+            }
+            EventDataView(event.data)
+                .padding(.leading, 30)
+                .padding(.top, 2)
+        }
+    }
+
+    var eventHeader: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(event.user.displayName)
+            Spacer()
+            Text(eventDataToActionLabel(data: event.data))
+            Text(event.time.formatted(date: .numeric, time: .shortened))
+                .foregroundStyle(.secondary)
+                .frame(width: 130, alignment: .trailing)
+            HoverableLink(destination: event.url) {
+                Image(systemName: "arrow.up.forward.square")
+            }
+        }
+    }
+
+    var compactEventHeader: some View {
+        VStack(alignment: .leading) {
             HStack(alignment: .firstTextBaseline) {
                 Text(event.user.displayName)
                 Spacer()
-                Text(eventDataToActionLabel(data: event.data))
                 Text(event.time.formatted(date: .numeric, time: .shortened))
                     .foregroundStyle(.secondary)
                     .frame(width: 130, alignment: .trailing)
@@ -59,9 +87,7 @@ struct EventView: View {
                     Image(systemName: "arrow.up.forward.square")
                 }
             }
-            EventDataView(event.data)
-                .padding(.leading, 30)
-                .padding(.top, 2)
+            Text(eventDataToActionLabel(data: event.data))
         }
     }
 }

@@ -4,39 +4,59 @@ struct MainScreen: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     @ObservedObject var configViewModel: ConfigViewModel
 
+    var body: some View {
+        #if os(macOS)
+            VStack {
+                content
+                    .frame(maxHeight: .infinity, alignment: .center)
+
+                StatusBarView(pullRequestsViewModel: pullRequestsViewModel)
+                    .background(.background.opacity(0.7))
+            }
+            .background(.background.opacity(0.5))
+        #else
+            content
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.systemGroupedBackground)
+        #endif
+    }
+
     @ViewBuilder
     var content: some View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
-            PullRequestsDisclosureGroupList(
-                pullRequestsViewModel.pullRequests,
-                setRead: pullRequestsViewModel.setRead,
-                toBeFocusedPullRequestId: $pullRequestsViewModel.focusedPullRequestId,
-                lastFocusedPullRequestId: $pullRequestsViewModel.lastFocusedPullRequestId
-            )
+            #if os(macOS)
+                PullRequestsDisclosureGroupList(
+                    pullRequestsViewModel.pullRequests,
+                    setRead: pullRequestsViewModel.setRead,
+                    toBeFocusedPullRequestId: $pullRequestsViewModel.focusedPullRequestId,
+                    lastFocusedPullRequestId: $pullRequestsViewModel.lastFocusedPullRequestId
+                )
+            #else
+                PullRequestsList(pullRequestsViewModel.pullRequests, setRead: pullRequestsViewModel.setRead, footer: {
+                    HStack {
+                        Spacer()
+                        Text("Last updated at \(pullRequestsViewModel.lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "...")")
+                        Spacer()
+                    }
+                })
+            #endif
         } else if pullRequestsViewModel.error != nil {
-            Image(systemName: "icloud.slash")
-                .font(.largeTitle)
+            VStack {
+                Image(systemName: "icloud.slash")
+                    .font(.largeTitle)
+                Text("No Connection")
+                    .foregroundStyle(.secondary)
+            }
         } else if pullRequestsViewModel.isRefreshing {
-            ProgressView()
+            VStack {
+                ProgressView()
+                Text("Loading PRs...")
+                    .foregroundStyle(.secondary)
+            }
         } else {
             Text("You are done for today! 🎉")
                 .font(.title2)
         }
-    }
-
-    var body: some View {
-        VStack {
-            content
-                .frame(maxHeight: .infinity, alignment: .center)
-
-            StatusBarView(pullRequestsViewModel: pullRequestsViewModel)
-                .background(.background.opacity(0.7))
-        }
-        #if os(macOS)
-        .background(.background.opacity(0.5))
-        #else
-        .background(.windowBackground)
-        #endif
     }
 }
 
@@ -48,5 +68,5 @@ struct MainScreen: View {
         PullRequest.preview(id: "4", lastUpdated: Calendar.current.date(byAdding: .day, value: -3, to: Date())!),
         PullRequest.preview(id: "5"),
     ])
-    return ContentView(pullRequestsViewModel: pullRequestViewModel, configViewModel: ConfigViewModel(), closeWindow: {})
+    return MainScreen(pullRequestsViewModel: pullRequestViewModel, configViewModel: ConfigViewModel())
 }

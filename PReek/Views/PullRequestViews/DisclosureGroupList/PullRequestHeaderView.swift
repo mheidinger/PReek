@@ -1,12 +1,5 @@
 import SwiftUI
 
-private let statusToIcon: [PullRequest.Status: ImageResource] = [
-    PullRequest.Status.draft: .prDraft,
-    PullRequest.Status.open: .prOpen,
-    PullRequest.Status.merged: .prMerged,
-    PullRequest.Status.closed: .prClosed,
-]
-
 private func usersToString(_ users: [User]) -> String {
     return users.map {
         $0.displayName
@@ -26,9 +19,7 @@ struct PullRequestHeaderView: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            Image(statusToIcon[pullRequest.status] ?? .prOpen)
-                .foregroundStyle(.primary)
-                .imageScale(.large)
+            StatusIcon(pullRequest.status)
 
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 3) {
