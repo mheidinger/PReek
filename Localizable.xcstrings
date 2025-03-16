@@ -141,6 +141,16 @@
         }
       }
     },
+    "Click the icon again to confirm the action." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke erneut auf das Icon, um die Aktion zu bestätigen."
+          }
+        }
+      }
+    },
     "Close window when opening a link, press CMD on click to get opposite behaviour" : {
       "localizations" : {
         "de" : {
@@ -455,26 +465,6 @@
         }
       }
     },
-    "Hide closed" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Geschlossene Ausblenden"
-          }
-        }
-      }
-    },
-    "Hide read" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gelesene Ausblenden"
-          }
-        }
-      }
-    },
     "https://github.acme.org" : {
       "localizations" : {
         "de" : {
@@ -546,6 +536,16 @@
       }
     },
     "Mark all as read" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle als gelesen markieren"
+          }
+        }
+      }
+    },
+    "Mark All as Read" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -941,6 +941,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Die geteilte Konfiguration enthält:\n- Dein GitHub Token\n- Falls vorhanden die GitHub Enterprise URL"
+          }
+        }
+      }
+    },
+    "Show closed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschlossene zeigen"
+          }
+        }
+      }
+    },
+    "Show read" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelesene zeigen"
           }
         }
       }
