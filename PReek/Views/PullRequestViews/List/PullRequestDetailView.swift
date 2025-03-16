@@ -2,11 +2,16 @@ import SwiftUI
 
 struct PullRequestDetailView: View {
     var pullRequest: PullRequest
-    var setRead: (String, Bool) -> Void
+    var setRead: (PullRequest.ID, Bool) -> Void
 
-    init(_ pullRequest: PullRequest, setRead: @escaping (String, Bool) -> Void) {
+    @Binding private var setUnreadOnChange: Bool
+
+    @Environment(\.dismiss) private var dismiss
+
+    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, setUnreadOnChange: Binding<Bool>) {
         self.pullRequest = pullRequest
         self.setRead = setRead
+        _setUnreadOnChange = setUnreadOnChange
     }
 
     var body: some View {
@@ -26,12 +31,10 @@ struct PullRequestDetailView: View {
                 .padding()
             }
         }
-        .onAppear {
-            setRead(pullRequest.id, true)
-        }
         .toolbar {
             Button("Mark unread") {
-                setRead(pullRequest.id, false)
+                setUnreadOnChange = true
+                dismiss()
             }
         }
     }
@@ -80,5 +83,5 @@ struct PullRequestDetailView: View {
 }
 
 #Preview {
-    PullRequestDetailView(PullRequest.preview(id: "1", title: "long long long long long long long long long"), setRead: { _, _ in })
+    PullRequestDetailView(PullRequest.preview(id: "1", title: "long long long long long long long long long"), setRead: { _, _ in }, setUnreadOnChange: .constant(false))
 }

@@ -2,11 +2,11 @@ import SwiftUI
 
 struct PullRequestDisclosureGroup: View {
     var pullRequest: PullRequest
-    var setRead: (String, Bool) -> Void
+    var setRead: (PullRequest.ID, Bool) -> Void
 
     @State var sectionExpanded: Bool = false
 
-    init(_ pullRequest: PullRequest, setRead: @escaping (String, Bool) -> Void, sectionExpanded: Bool = false) {
+    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, sectionExpanded: Bool = false) {
         self.pullRequest = pullRequest
         self.setRead = setRead
         self.sectionExpanded = sectionExpanded

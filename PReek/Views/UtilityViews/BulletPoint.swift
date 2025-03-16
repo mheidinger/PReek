@@ -11,6 +11,7 @@ struct BulletPoint: View {
         HStack(alignment: .top) {
             Text("•")
             Text(text)
+                .multilineTextAlignment(.leading)
         }
     }
 }
@@ -18,7 +19,7 @@ struct BulletPoint: View {
 #Preview {
     VStack(alignment: .leading) {
         BulletPoint("short")
-        BulletPoint("long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long long ")
+        BulletPoint("my first commit has a really long commit message long long")
     }
     .frame(width: 400)
     .padding()

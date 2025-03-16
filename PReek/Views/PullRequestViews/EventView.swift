@@ -56,7 +56,7 @@ struct EventView: View {
                 eventHeader
             }
             EventDataView(event.data)
-                .padding(.leading, 30)
+                .padding(.leading, 20)
                 .padding(.top, 2)
         }
     }
@@ -97,7 +97,7 @@ struct EventView: View {
         Event.previewClosed,
         Event.previewCommit(),
         Event.previewCommit(commits: [
-            Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!, parentId: nil),
+            Commit(id: "1", messageHeadline: "my first commit has a really long commit message!", url: URL(string: "https://example.com")!, parentId: nil),
         ]),
         Event.previewCommit(commits: [
             Commit(id: "1", messageHeadline: "my first commit!", url: URL(string: "https://example.com")!, parentId: "2"),

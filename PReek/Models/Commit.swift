@@ -5,5 +5,5 @@ struct Commit: Identifiable, Equatable {
     let id: String
     let messageHeadline: String
     let url: URL?
-    let parentId: String?
+    let parentId: Commit.ID?
 }

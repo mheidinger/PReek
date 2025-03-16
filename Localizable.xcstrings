@@ -121,6 +121,16 @@
         }
       }
     },
+    "Are you sure?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bist du sicher?"
+          }
+        }
+      }
+    },
     "by %@" : {
       "localizations" : {
         "de" : {
@@ -515,7 +525,7 @@
         }
       }
     },
-    "Loading PRs..." : {
+    "Loading Pull Requests..." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {

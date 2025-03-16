@@ -46,8 +46,8 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
 
-    @Published var lastFocusedPullRequestId: String?
-    @Published var focusedPullRequestId: String?
+    @Published var lastFocusedPullRequestId: PullRequest.ID?
+    @Published var focusedPullRequestId: PullRequest.ID?
     var pullRequests: [PullRequest] {
         memoizedPullRequests
     }
@@ -119,7 +119,7 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
 
-    func setRead(_ id: String, read: Bool) {
+    func setRead(_ id: PullRequest.ID, read: Bool) {
         if read {
             let newestEventId = pullRequests.first(where: { $0.id == id })?.events.first?.id
             pullRequestReadMap[id] = ReadData(date: lastUpdated ?? Date(), eventId: newestEventId)
