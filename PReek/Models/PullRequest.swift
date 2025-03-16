@@ -45,7 +45,7 @@ struct PullRequest: Identifiable, Equatable {
         }
     }
 
-    private mutating func calculateUnreadFromEventId(viewer: Viewer?, lastMarkedAsReadEventId: String?) -> Bool {
+    private mutating func calculateUnreadFromEventId(viewer: Viewer?, lastMarkedAsReadEventId: Event.ID?) -> Bool {
         guard let lastMarkedAsReadEventId else {
             return false
         }
@@ -119,7 +119,7 @@ struct PullRequest: Identifiable, Equatable {
         url.appendingPathComponent("files")
     }
 
-    static func preview(id: String? = nil, title: String? = nil, status: Status? = nil, events: [Event]? = nil, lastUpdated: Date? = nil) -> PullRequest {
+    static func preview(id: PullRequest.ID? = nil, title: String? = nil, status: Status? = nil, events: [Event]? = nil, lastUpdated: Date? = nil) -> PullRequest {
         PullRequest(
             id: id ?? UUID().uuidString,
             repository: Repository(name: "max-heidinger/PReek", url: URL(string: "https://example.com")!),

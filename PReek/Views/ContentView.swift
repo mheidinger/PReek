@@ -112,16 +112,16 @@ struct ContentView: View {
 
                 NavigationStack {
                     SettingsScreen(configViewModel: configViewModel)
-                }
-                .navigationDestination(for: Screen.self) { screen in
-                    Group {
-                        switch screen {
-                        case .excludedUsers:
-                            ExcludedUsersScreen(configViewModel: configViewModel)
-                        default:
-                            EmptyView()
+                        .navigationDestination(for: Screen.self) { screen in
+                            Group {
+                                switch screen {
+                                case .excludedUsers:
+                                    ExcludedUsersScreen(configViewModel: configViewModel)
+                                default:
+                                    EmptyView()
+                                }
+                            }
                         }
-                    }
                 }
                 .tabItem {
                     Label("Settings", systemImage: "gear")

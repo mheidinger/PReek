@@ -8,11 +8,11 @@ private func usersToString(_ users: [User]) -> String {
 
 struct PullRequestHeaderView: View {
     var pullRequest: PullRequest
-    var setRead: (String, Bool) -> Void
+    var setRead: (PullRequest.ID, Bool) -> Void
 
     @Environment(\.colorScheme) var colorScheme
 
-    init(_ pullRequest: PullRequest, setRead: @escaping (String, Bool) -> Void) {
+    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void) {
         self.pullRequest = pullRequest
         self.setRead = setRead
     }

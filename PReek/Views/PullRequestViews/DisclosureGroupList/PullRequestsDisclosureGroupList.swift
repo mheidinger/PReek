@@ -2,13 +2,13 @@ import SwiftUI
 
 struct PullRequestsDisclosureGroupList: View {
     var pullRequests: [PullRequest]
-    var setRead: (String, Bool) -> Void
-    @Binding var toBeFocusedPullRequestId: String?
-    @Binding var lastFocusedPullRequestId: String?
+    var setRead: (PullRequest.ID, Bool) -> Void
+    @Binding var toBeFocusedPullRequestId: PullRequest.ID?
+    @Binding var lastFocusedPullRequestId: PullRequest.ID?
 
-    @FocusState var focusedPullRequestId: String?
+    @FocusState var focusedPullRequestId: PullRequest.ID?
 
-    init(_ pullRequests: [PullRequest], setRead: @escaping (String, Bool) -> Void, toBeFocusedPullRequestId: Binding<String?>, lastFocusedPullRequestId: Binding<String?>) {
+    init(_ pullRequests: [PullRequest], setRead: @escaping (PullRequest.ID, Bool) -> Void, toBeFocusedPullRequestId: Binding<String?>, lastFocusedPullRequestId: Binding<String?>) {
         self.pullRequests = pullRequests
         self.setRead = setRead
         _toBeFocusedPullRequestId = toBeFocusedPullRequestId

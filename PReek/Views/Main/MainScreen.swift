@@ -32,7 +32,7 @@ struct MainScreen: View {
                     lastFocusedPullRequestId: $pullRequestsViewModel.lastFocusedPullRequestId
                 )
             #else
-                PullRequestsList(pullRequestsViewModel.pullRequests, setRead: pullRequestsViewModel.setRead, footer: {
+                PullRequestsList(pullRequestsViewModel: pullRequestsViewModel, footer: {
                     HStack {
                         Spacer()
                         Text("Last updated at \(pullRequestsViewModel.lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "...")")
@@ -50,7 +50,7 @@ struct MainScreen: View {
         } else if pullRequestsViewModel.isRefreshing {
             VStack {
                 ProgressView()
-                Text("Loading PRs...")
+                Text("Loading Pull Requests...")
                     .foregroundStyle(.secondary)
             }
         } else {
@@ -61,12 +61,12 @@ struct MainScreen: View {
 }
 
 #Preview {
-    @ObservedObject var pullRequestViewModel = PullRequestsViewModel(initialPullRequests: [
+    @ObservedObject var pullRequestsViewModel = PullRequestsViewModel(initialPullRequests: [
         PullRequest.preview(id: "1", title: "short"),
         PullRequest.preview(id: "2", title: "long long long long long long long long long long long long long long long long long long long"),
         PullRequest.preview(id: "3", lastUpdated: Calendar.current.date(byAdding: .day, value: -1, to: Date())!),
         PullRequest.preview(id: "4", lastUpdated: Calendar.current.date(byAdding: .day, value: -3, to: Date())!),
         PullRequest.preview(id: "5"),
     ])
-    return MainScreen(pullRequestsViewModel: pullRequestViewModel, configViewModel: ConfigViewModel())
+    return MainScreen(pullRequestsViewModel: pullRequestsViewModel, configViewModel: ConfigViewModel())
 }

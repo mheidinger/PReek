@@ -29,7 +29,7 @@ struct Event: Identifiable, Equatable {
     let data: EventData
     let url: URL
 
-    init(id: String, user: User, time: Date, data: EventData, pullRequestUrl: URL) {
+    init(id: Event.ID, user: User, time: Date, data: EventData, pullRequestUrl: URL) {
         self.id = id
         self.user = user
         self.time = time
