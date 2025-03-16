@@ -1,4 +1,15 @@
 import SwiftUI
+import TipKit
+
+struct ImportTip: Tip {
+    var title: Text {
+        Text("Import Configuration")
+    }
+
+    var message: Text? {
+        Text("Import an existing configuration for another device running PReek.")
+    }
+}
 
 struct WelcomeScreen: View {
     @ObservedObject var configViewModel: ConfigViewModel
@@ -7,6 +18,9 @@ struct WelcomeScreen: View {
     var dismissWelcomeView: () async -> Void
 
     @State private var error: Error?
+    @State private var showImportSheet: Bool = false
+
+    var importTip = ImportTip()
 
     private func doSave() {
         Task {
@@ -19,18 +33,33 @@ struct WelcomeScreen: View {
     }
 
     var body: some View {
-        VStack {
-            headerView
+        NavigationStack {
+            VStack {
+                headerView
 
-            formView
+                formView
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                HoverableLink("Made by Max Heidinger", destination: URL(string: "https://github.com/mheidinger/PReek")!)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.secondary)
+                    .padding(.bottom)
+            }
+            .background(.windowBackground)
+            #if os(iOS)
+                // Not shown on macOS - https://stackoverflow.com/questions/77647716/macos-swiftui-using-navigationstack-toolbar-button-not-showing-in-menubarextra-a
+                .toolbar {
+                    Button(action: {
+                        showImportSheet = true
+                        importTip.invalidate(reason: .actionPerformed)
+                    }) {
+                        Image(systemName: "qrcode.viewfinder")
+                    }
+                    .popoverTip(importTip)
+                }
+                .importSheet(configViewModel: configViewModel, isPresented: $showImportSheet)
+            #endif
         }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            HoverableLink("Made by Max Heidinger", destination: URL(string: "https://github.com/mheidinger/PReek")!)
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-                .padding(.bottom)
-        }
-        .background(.windowBackground)
     }
 
     #if os(macOS)
@@ -72,10 +101,8 @@ struct WelcomeScreen: View {
             ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "Required Settings") {
                 HStack {
                     Spacer()
-                    Button(action: doSave) {
-                        Text("Continue")
-                    }
-                    .buttonStyle(.borderedProminent)
+                    Button("Continue", action: doSave)
+                        .buttonStyle(.borderedProminent)
                 }
             }
 
@@ -91,7 +118,14 @@ struct WelcomeScreen: View {
 }
 
 #Preview {
-    WelcomeScreen(configViewModel: ConfigViewModel(), testConnection: { AppError.forbidden }, dismissWelcomeView: {})
+    do {
+        try Tips.configure()
+        Tips.showAllTipsForTesting()
+    } catch {
+        print("Error initializing tips: \(error)")
+    }
+
+    return WelcomeScreen(configViewModel: ConfigViewModel(), testConnection: { AppError.forbidden }, dismissWelcomeView: {})
     #if os(macOS)
         .frame(width: 600, height: 400)
     #endif

@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct ShareScreen: View {
+    @ObservedObject var configViewModel: ConfigViewModel
+
     var body: some View {
-        ShareView(onDismiss: {})
+        ShareView(configViewModel: configViewModel, onDismiss: {})
             .padding()
             .navigationTitle("Share Configuration")
     }

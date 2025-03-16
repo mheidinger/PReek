@@ -10,6 +10,7 @@ enum AppError: LocalizedError {
     case insufficientScopes(missingScope: Scope?)
     case missingConfigToShare
     case qrCodeGenerationFailed
+    case failedToImportShareData
     case unknown
 
     var errorDescription: String? {
@@ -36,8 +37,19 @@ enum AppError: LocalizedError {
             return String(localized: "No configuration to share")
         case .qrCodeGenerationFailed:
             return String(localized: "Failed to generate QR code")
+        case .failedToImportShareData:
+            return String(localized: "Failed to import shared configuration")
         case .unknown:
             return String(localized: "Unknown error happened")
+        }
+    }
+
+    var recoverySuggestion: String? {
+        switch self {
+        case .failedToImportShareData:
+            return "Please verify you are using the latest version of the app on both devices. If the issue persists, please report the issue."
+        default:
+            return nil
         }
     }
 }

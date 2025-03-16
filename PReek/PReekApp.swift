@@ -1,8 +1,12 @@
 import MenuBarExtraAccess
+import OSLog
 import SwiftUI
+import TipKit
 
 @main
 struct PReekApp: App {
+    private let logger = Logger()
+
     @StateObject private var pullRequestsViewModel: PullRequestsViewModel
     @StateObject private var configViewModel = ConfigViewModel()
 
@@ -23,6 +27,12 @@ struct PReekApp: App {
                 return
             }
         #endif
+
+        do {
+            try Tips.configure()
+        } catch {
+            logger.error("Error initializing tips: \(error)")
+        }
 
         pullRequestsViewModel.triggerUpdatePullRequests()
         pullRequestsViewModel.startFetchTimer()

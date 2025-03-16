@@ -4,6 +4,7 @@ import OSLog
 
 class ConfigViewModel: ObservableObject {
     private let logger = Logger()
+    private let decoder = JSONDecoder()
     private var cancellables = Set<AnyCancellable>()
     private let saveUpdateTrigger = PassthroughSubject<Void, Never>()
 
@@ -109,5 +110,33 @@ class ConfigViewModel: ObservableObject {
         ConfigService.excludedUsers = excludedUsers.map { excludedUser in excludedUser.username }
 
         ConfigService.closeWindowOnLinkClick = closeWindowOnLinkClick
+    }
+
+    func getShareData() -> ShareConfig? {
+        if token.isEmpty {
+            return nil
+        }
+
+        return ShareConfig.v1(ShareConfigDataV1(token: token, gitHubEnterpriseUrl: useGitHubEnterprise ? gitHubEnterpriseUrl : nil))
+    }
+
+    func importShareData(_ shareData: Data) throws {
+        do {
+            let parsedData = try decoder.decode(ShareConfig.self, from: shareData)
+
+            switch parsedData {
+            case let .v1(parsedData):
+                token = parsedData.token
+                if let parsedGitHubEnterpriseUrl = parsedData.gitHubEnterpriseUrl {
+                    useGitHubEnterprise = true
+                    gitHubEnterpriseUrl = parsedGitHubEnterpriseUrl
+                } else {
+                    useGitHubEnterprise = false
+                }
+            }
+        } catch {
+            logger.error("Failed to decode imported share data: \(error)")
+            throw AppError.failedToImportShareData
+        }
     }
 }

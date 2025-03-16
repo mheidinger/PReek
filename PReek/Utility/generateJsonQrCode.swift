@@ -2,9 +2,8 @@ import CoreImage.CIFilterBuiltins
 import OSLog
 import SwiftUI
 
-func generateJsonQrCode<FromType: Codable>(from: FromType) -> Image {
+func generateJsonQrCode<FromType: Codable>(from: FromType) throws -> Image {
     let logger = Logger()
-    let fallbackImage = Image(systemName: "xmark.circle")
 
     do {
         let cgImage = try generateJsonQrCodeCgImage(from: from)
@@ -15,8 +14,8 @@ func generateJsonQrCode<FromType: Codable>(from: FromType) -> Image {
             return Image(uiImage: UIImage(cgImage: cgImage))
         #endif
     } catch {
-        logger.error("Failed to generate QR Code: \(error.localizedDescription)")
-        return fallbackImage
+        logger.error("Failed to generate QR Code: \(error)")
+        throw AppError.qrCodeGenerationFailed
     }
 }
 
