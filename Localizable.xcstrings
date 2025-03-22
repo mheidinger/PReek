@@ -161,6 +161,16 @@
         }
       }
     },
+    "Click to reveal" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicken zum Anzeigen"
+          }
+        }
+      }
+    },
     "Close window when opening a link, press CMD on click to get opposite behaviour" : {
       "localizations" : {
         "de" : {
@@ -971,6 +981,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gelesene zeigen"
+          }
+        }
+      }
+    },
+    "Tap to reveal" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippen zum Anzeigen"
           }
         }
       }
