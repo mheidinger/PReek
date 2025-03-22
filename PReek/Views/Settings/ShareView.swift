@@ -7,6 +7,7 @@ struct ShareView: View {
     @State private var qrCodeImage: Image?
     @State private var isGeneratingQrCode = false
     @State private var qrCodeError: Error?
+    @State private var revealQrCode = false
 
     private func generateQRCode() async {
         qrCodeError = nil
@@ -33,6 +34,14 @@ struct ShareView: View {
             }
         }
     }
+    
+    private var revealText: Text {
+        #if os(macOS)
+        Text("Click to reveal")
+        #else
+        Text("Tap to reveal")
+        #endif
+    }
 
     var body: some View {
         VStack {
@@ -52,11 +61,29 @@ struct ShareView: View {
                 Text("Scan this QR code in the PReek App on another device to import your configuration.")
                     .multilineTextAlignment(.center)
                     .padding(.bottom, 3)
-                image
-                    .interpolation(.none)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
+                ZStack {
+                    image
+                        .interpolation(.none)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 200, height: 200)
+                        .blur(radius: revealQrCode ? 0 : 8)
+                        .animation(.easeInOut(duration: 0.6), value: !revealQrCode)
+                        .padding(20)
+                        .onTapGesture {
+                            revealQrCode.toggle()
+                        }
+                    revealText
+                        .font(.title2)
+                        .tracking(0.8)
+                        .foregroundStyle(.white)
+                        .shadow(color: .black, radius: 0, x: 1, y: 1)
+                        .shadow(color: .black, radius: 0, x: -1, y: -1)
+                        .shadow(color: .black, radius: 0, x: 1, y: -1)
+                        .shadow(color: .black, radius: 0, x: -1, y: 1)
+                        .opacity(revealQrCode ? 0 : 1)
+                        .animation(revealQrCode ? .easeInOut(duration: 0.2) : .easeInOut(duration: 0.3).delay(0.3), value: !revealQrCode)
+                }
             }
 
             Spacer()
@@ -87,5 +114,6 @@ struct ShareView: View {
 #Preview {
     NavigationStack {
         ShareView(configViewModel: ConfigViewModel(), onDismiss: {})
+            .padding()
     }
 }
