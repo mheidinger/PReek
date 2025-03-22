@@ -51,18 +51,22 @@ struct PullRequestsList<Footer: View>: View {
                 }
             }
             .toolbar {
-                Button(action: { showFilterSheet = true }) {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
-                        .font(.title)
-                }
-
-                Button(action: { showMarkAllAsReadConfirm = true }) {
-                    Image(systemName: "eye.circle")
-                        .font(.title)
-                }
-                .confirmationDialog("Are you sure?", isPresented: $showMarkAllAsReadConfirm) {
-                    Button("Mark all as read") {
-                        pullRequestsViewModel.markAllAsRead()
+                ToolbarItem {
+                    HStack(spacing: 4) {
+                        Button(action: { showFilterSheet = true }) {
+                            Image(systemName: "line.3.horizontal.decrease.circle")
+                                .font(.title)
+                        }
+                        
+                        Button(action: { showMarkAllAsReadConfirm = true }) {
+                            Image(systemName: "eye.circle")
+                                .font(.title)
+                        }
+                        .confirmationDialog("Are you sure?", isPresented: $showMarkAllAsReadConfirm) {
+                            Button("Mark all as read") {
+                                pullRequestsViewModel.markAllAsRead()
+                            }
+                        }
                     }
                 }
             }

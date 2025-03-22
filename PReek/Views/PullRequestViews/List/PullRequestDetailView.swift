@@ -7,7 +7,9 @@ struct PullRequestDetailView: View {
     @Binding private var setUnreadOnChange: Bool
 
     @Environment(\.dismiss) private var dismiss
-
+    
+    @State var showNavigationHeader: Bool = false
+    
     init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, setUnreadOnChange: Binding<Bool>) {
         self.pullRequest = pullRequest
         self.setRead = setRead
@@ -15,73 +17,108 @@ struct PullRequestDetailView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack {
-                header
+        GeometryReader { geometry in
+            ScrollView {
+                LazyVStack {
+                    header
 
-                Divider()
-
-                VStack {
-                    DividedView(pullRequest.events) { event in
-                        EventView(event)
-                    } shouldHighlight: { event in
-                        event.id == pullRequest.oldestUnreadEvent?.id ? String(localized: "New") : nil
+                    Divider()
+                    
+                    LazyVStack {
+                        DividedView(pullRequest.events) { event in
+                            EventView(event)
+                        } shouldHighlight: { event in
+                            event.id == pullRequest.oldestUnreadEvent?.id ? String(localized: "New") : nil
+                        }
+                    }
+                    .padding([.leading, .trailing, .bottom])
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    VStack(alignment: .leading) {
+                        Text(pullRequest.repository.name)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                        Text(pullRequest.title)
+                            .font(.headline)
+                            .lineLimit(1)
+                    }
+                    .opacity(showNavigationHeader ? 1 : 0)
+                    .frame(maxWidth: geometry.size.width * 0.5)
+                }
+                
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Mark unread") {
+                        setUnreadOnChange = true
+                        dismiss()
                     }
                 }
-                .padding()
-            }
-        }
-        .toolbar {
-            Button("Mark unread") {
-                setUnreadOnChange = true
-                dismiss()
             }
         }
     }
-
+    
     var header: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Group {
-                    HStack {
-                        Text(pullRequest.repository.name)
-                        Text(pullRequest.numberFormatted)
-                            .foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(pullRequest.repository.name)
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                
+                Text(pullRequest.numberFormatted)
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+                
+                StatusLabel(pullRequest.status)
+            }
+            
+            Text(pullRequest.title)
+                .font(.title3)
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
+                .onScrollVisibilityChange { isVisible in
+                    withAnimation {
+                        showNavigationHeader = !isVisible
                     }
-
-                    HStack {
-                        Text("by \(pullRequest.author.displayName)")
-                        Text("·")
-                        DateSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
-                    }
-
-                    HStack(spacing: 2) {
-                        Text(pullRequest.additionsFormatted)
-                            .foregroundStyle(.success)
-                        Text(pullRequest.deletionsFormatted)
-                            .foregroundStyle(.failure)
-                    }
+                }
+            
+            HStack {
+                Text("by \(pullRequest.author.displayName)")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+                
+                TimeSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            HStack {
+                HStack {
+                    Text(pullRequest.additionsFormatted)
+                        .foregroundColor(.green)
+                    Text(pullRequest.deletionsFormatted)
+                        .foregroundColor(.red)
                 }
                 .font(.subheadline)
-
-                HStack {
-                    StatusIcon(pullRequest.status)
-                        .padding(.top, 3)
-                        .padding(.trailing, 5)
-                    Text(pullRequest.title)
-                        .font(.title)
-                        .lineLimit(2)
-                    HoverableLink(destination: pullRequest.url) {
-                        Image(systemName: "arrow.up.forward.square")
-                    }
+                
+                Spacer()
+                
+                HoverableLink(destination: pullRequest.url) {
+                    Image(systemName: "arrow.up.forward.square")
                 }
             }
-            Spacer()
         }
         .padding([.top, .leading, .trailing])
     }
 }
 
 #Preview {
-    PullRequestDetailView(PullRequest.preview(id: "1", title: "long long long long long long long long long"), setRead: { _, _ in }, setUnreadOnChange: .constant(false))
+    NavigationStack {
+        PullRequestDetailView(PullRequest.preview(id: "1", title: "long long long long long long long long long"), setRead: { _, _ in }, setUnreadOnChange: .constant(false))
+    }
 }

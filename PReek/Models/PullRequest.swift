@@ -76,14 +76,17 @@ struct PullRequest: Identifiable, Equatable {
     var numberFormatted: String {
         "#\(number.formatted(.number.grouping(.never)))"
     }
-
+    
     var lastUpdatedFormatted: String {
+        let relativeFormatter = RelativeDateTimeFormatter()
+        relativeFormatter.unitsStyle = .full
+        
         let formattedTime = lastUpdated.formatted(date: .omitted, time: .shortened)
-        if Calendar.current.isDateInToday(lastUpdated) {
-            return String(localized: "updated at \(formattedTime)")
-        }
         if Calendar.current.isDateInYesterday(lastUpdated) {
             return String(localized: "updated yesterday at \(formattedTime)")
+        }
+        if isDateInLastSevenDays(lastUpdated) {
+            return String(localized: "updated \(lastUpdated.formatRelative)")
         }
         let formattedDate = lastUpdated.formatted(
             Date.FormatStyle()
@@ -95,8 +98,8 @@ struct PullRequest: Identifiable, Equatable {
     }
 
     var lastUpdatedFormattedShort: String {
-        if Calendar.current.isDateInToday(lastUpdated) {
-            return lastUpdated.formatted(date: .omitted, time: .shortened)
+        if isDateInLastSevenDays(lastUpdated) {
+            return lastUpdated.formatRelative
         }
         return lastUpdated.formatted(
             Date.FormatStyle()

@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "-%lld" : {
+
+    },
     "·" : {
       "localizations" : {
         "de" : {
@@ -10,6 +13,9 @@
           }
         }
       }
+    },
+    "#%@" : {
+
     },
     "%@" : {
       "localizations" : {
@@ -81,6 +87,9 @@
         }
       }
     },
+    "+%lld" : {
+
+    },
     "< Image >" : {
       "localizations" : {
         "de" : {
@@ -110,6 +119,9 @@
           }
         }
       }
+    },
+    "Approve" : {
+
     },
     "approved" : {
       "localizations" : {
@@ -190,6 +202,12 @@
           }
         }
       }
+    },
+    "Closed" : {
+
+    },
+    "Comment" : {
+
     },
     "commented" : {
       "localizations" : {
@@ -334,6 +352,9 @@
           }
         }
       }
+    },
+    "Draft" : {
+
     },
     "enabled auto-merge (%@)" : {
       "localizations" : {
@@ -615,6 +636,9 @@
         }
       }
     },
+    "Merged" : {
+
+    },
     "New" : {
       "localizations" : {
         "de" : {
@@ -665,6 +689,9 @@
         }
       }
     },
+    "now" : {
+
+    },
     "OK" : {
       "localizations" : {
         "de" : {
@@ -684,6 +711,12 @@
           }
         }
       }
+    },
+    "Open" : {
+
+    },
+    "Open in Browser" : {
+
     },
     "Open PReek on another device and click on \"Share\" in the settings." : {
       "localizations" : {
@@ -744,6 +777,9 @@
           }
         }
       }
+    },
+    "Pull Request" : {
+
     },
     "Pull Requests" : {
       "localizations" : {
@@ -854,6 +890,9 @@
           }
         }
       }
+    },
+    "Request Changes" : {
+
     },
     "requested changes" : {
       "localizations" : {
@@ -1035,6 +1074,9 @@
         }
       }
     },
+    "updated %@" : {
+
+    },
     "updated %@ at %@" : {
       "localizations" : {
         "de" : {
@@ -1052,6 +1094,7 @@
       }
     },
     "updated at %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
