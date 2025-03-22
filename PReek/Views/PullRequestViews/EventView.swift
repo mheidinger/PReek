@@ -66,7 +66,7 @@ struct EventView: View {
             Text(event.user.displayName)
             Spacer()
             Text(eventDataToActionLabel(data: event.data))
-            Text(event.time.formatted(date: .numeric, time: .shortened))
+            TimeSensitiveText(getText: {event.timeFormatted})
                 .foregroundStyle(.secondary)
                 .frame(width: 130, alignment: .trailing)
             HoverableLink(destination: event.url) {
@@ -79,15 +79,19 @@ struct EventView: View {
         VStack(alignment: .leading) {
             HStack(alignment: .firstTextBaseline) {
                 Text(event.user.displayName)
+                    .fontWeight(.medium)
                 Spacer()
-                Text(event.time.formatted(date: .numeric, time: .shortened))
+                Text(event.timeFormatted)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(width: 130, alignment: .trailing)
                 HoverableLink(destination: event.url) {
                     Image(systemName: "arrow.up.forward.square")
+                        .font(.subheadline)
                 }
             }
             Text(eventDataToActionLabel(data: event.data))
+                .font(.subheadline)
         }
     }
 }

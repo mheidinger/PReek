@@ -67,7 +67,7 @@ struct PullRequestHeaderView: View {
 
             Text("·")
 
-            DateSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
+            TimeSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
 
             Text("·")
 

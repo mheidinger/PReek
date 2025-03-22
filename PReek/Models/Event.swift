@@ -39,6 +39,19 @@ struct Event: Identifiable, Equatable {
             dataUrl.host != nil ? dataUrl : pullRequestUrl.appendingPathComponent(dataUrl.path)
         } ?? pullRequestUrl
     }
+    
+    var timeFormatted: String {
+        if isDateInLastSevenDays(time) {
+            return time.formatRelative
+        }
+        return time.formatted(
+            Date.FormatStyle()
+                .month(.abbreviated)
+                .day(.defaultDigits)
+                .hour()
+                .minute()
+        )
+    }
 
     static let previewClosed = Event(id: UUID().uuidString, user: User.preview(login: "person-1"), time: Date().addingTimeInterval(-10), data: EventClosedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewForcePushed = Event(id: UUID().uuidString, user: User.preview(login: "person-with-long-name-2"), time: Date().addingTimeInterval(-20), data: EventPushedData(isForcePush: true, commits: []), pullRequestUrl: URL(string: "https://example.com")!)

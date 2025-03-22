@@ -49,7 +49,7 @@ struct PullRequestListItem: View {
 
                 Text("·")
 
-                DateSensitiveText(getText: { pullRequest.lastUpdatedFormattedShort })
+                TimeSensitiveText(getText: { pullRequest.lastUpdatedFormattedShort })
             }
 
             HStack(spacing: 5) {
