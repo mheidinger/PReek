@@ -66,7 +66,7 @@ struct EventView: View {
             Text(event.user.displayName)
             Spacer()
             Text(eventDataToActionLabel(data: event.data))
-            TimeSensitiveText(getText: {event.timeFormatted})
+            TimeSensitiveText(getText: { event.timeFormatted })
                 .foregroundStyle(.secondary)
                 .frame(width: 130, alignment: .trailing)
             HoverableLink(destination: event.url) {

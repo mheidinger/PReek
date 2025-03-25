@@ -34,17 +34,14 @@ struct ShareView: View {
             }
         }
     }
-    
-    private var revealText: Text {
-        #if os(macOS)
-        Text("Click to reveal")
-        #else
-        Text("Tap to reveal")
-        #endif
-    }
 
     var body: some View {
         VStack {
+            Text("Scan this QR code in the PReek App on another device to import your configuration.")
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 3)
+            Spacer()
+
             if isGeneratingQrCode {
                 ProgressView()
                     .controlSize(.large)
@@ -58,22 +55,16 @@ struct ShareView: View {
                         .multilineTextAlignment(.center)
                 }
             } else if let image = qrCodeImage {
-                Text("Scan this QR code in the PReek App on another device to import your configuration.")
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 3)
                 ZStack {
                     image
                         .interpolation(.none)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 200, height: 200)
-                        .blur(radius: revealQrCode ? 0 : 8)
+                        .frame(width: 180, height: 180)
+                        .blur(radius: revealQrCode ? 0 : 5)
                         .animation(.easeInOut(duration: 0.6), value: !revealQrCode)
-                        .padding(20)
-                        .onTapGesture {
-                            revealQrCode.toggle()
-                        }
-                    revealText
+                        .padding(5)
+                    Text("Tap to reveal")
                         .font(.title2)
                         .tracking(0.8)
                         .foregroundStyle(.white)
@@ -83,6 +74,9 @@ struct ShareView: View {
                         .shadow(color: .black, radius: 0, x: -1, y: 1)
                         .opacity(revealQrCode ? 0 : 1)
                         .animation(revealQrCode ? .easeInOut(duration: 0.2) : .easeInOut(duration: 0.3).delay(0.3), value: !revealQrCode)
+                }
+                .onTapGesture {
+                    revealQrCode.toggle()
                 }
             }
 

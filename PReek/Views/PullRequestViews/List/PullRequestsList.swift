@@ -57,7 +57,7 @@ struct PullRequestsList<Footer: View>: View {
                             Image(systemName: "line.3.horizontal.decrease.circle")
                                 .font(.title)
                         }
-                        
+
                         Button(action: { showMarkAllAsReadConfirm = true }) {
                             Image(systemName: "eye.circle")
                                 .font(.title)

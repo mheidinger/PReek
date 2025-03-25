@@ -7,9 +7,9 @@ struct PullRequestDetailView: View {
     @Binding private var setUnreadOnChange: Bool
 
     @Environment(\.dismiss) private var dismiss
-    
+
     @State var showNavigationHeader: Bool = false
-    
+
     init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, setUnreadOnChange: Binding<Bool>) {
         self.pullRequest = pullRequest
         self.setRead = setRead
@@ -23,7 +23,7 @@ struct PullRequestDetailView: View {
                     header
 
                     Divider()
-                    
+
                     LazyVStack {
                         DividedView(pullRequest.events) { event in
                             EventView(event)
@@ -34,6 +34,7 @@ struct PullRequestDetailView: View {
                     .padding([.leading, .trailing, .bottom])
                 }
             }
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -48,7 +49,7 @@ struct PullRequestDetailView: View {
                     .opacity(showNavigationHeader ? 1 : 0)
                     .frame(maxWidth: geometry.size.width * 0.5)
                 }
-                
+
                 ToolbarItem(placement: .primaryAction) {
                     Button("Mark unread") {
                         setUnreadOnChange = true
@@ -56,47 +57,50 @@ struct PullRequestDetailView: View {
                     }
                 }
             }
+            #endif
         }
     }
-    
+
     var header: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(pullRequest.repository.name)
                     .font(.headline)
                     .foregroundColor(.primary)
-                
+
                 Text(pullRequest.numberFormatted)
                     .font(.headline)
                     .foregroundColor(.secondary)
-                
+
                 Spacer()
-                
+
                 StatusLabel(pullRequest.status)
             }
-            
+
             Text(pullRequest.title)
                 .font(.title3)
                 .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
+            #if os(iOS)
                 .onScrollVisibilityChange { isVisible in
                     withAnimation {
                         showNavigationHeader = !isVisible
                     }
                 }
-            
+            #endif
+
             HStack {
                 Text("by \(pullRequest.author.displayName)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                
+
                 Spacer()
-                
+
                 TimeSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            
+
             HStack {
                 HStack {
                     Text(pullRequest.additionsFormatted)
@@ -105,9 +109,9 @@ struct PullRequestDetailView: View {
                         .foregroundColor(.red)
                 }
                 .font(.subheadline)
-                
+
                 Spacer()
-                
+
                 HoverableLink(destination: pullRequest.url) {
                     Image(systemName: "arrow.up.forward.square")
                 }

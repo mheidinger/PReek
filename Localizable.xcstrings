@@ -2,7 +2,14 @@
   "sourceLanguage" : "en",
   "strings" : {
     "-%lld" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-%lld"
+          }
+        }
+      }
     },
     "·" : {
       "localizations" : {
@@ -15,7 +22,14 @@
       }
     },
     "#%@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#%@"
+          }
+        }
+      }
     },
     "%@" : {
       "localizations" : {
@@ -88,7 +102,14 @@
       }
     },
     "+%lld" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%lld"
+          }
+        }
+      }
     },
     "< Image >" : {
       "localizations" : {
@@ -119,9 +140,6 @@
           }
         }
       }
-    },
-    "Approve" : {
-
     },
     "approved" : {
       "localizations" : {
@@ -173,16 +191,6 @@
         }
       }
     },
-    "Click to reveal" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Klicken zum Anzeigen"
-          }
-        }
-      }
-    },
     "Close window when opening a link, press CMD on click to get opposite behaviour" : {
       "localizations" : {
         "de" : {
@@ -204,10 +212,14 @@
       }
     },
     "Closed" : {
-
-    },
-    "Comment" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschlossen"
+          }
+        }
+      }
     },
     "commented" : {
       "localizations" : {
@@ -354,7 +366,14 @@
       }
     },
     "Draft" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwurf"
+          }
+        }
+      }
     },
     "enabled auto-merge (%@)" : {
       "localizations" : {
@@ -637,7 +656,14 @@
       }
     },
     "Merged" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Merged"
+          }
+        }
+      }
     },
     "New" : {
       "localizations" : {
@@ -690,7 +716,14 @@
       }
     },
     "now" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "jetzt"
+          }
+        }
+      }
     },
     "OK" : {
       "localizations" : {
@@ -713,10 +746,14 @@
       }
     },
     "Open" : {
-
-    },
-    "Open in Browser" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offen"
+          }
+        }
+      }
     },
     "Open PReek on another device and click on \"Share\" in the settings." : {
       "localizations" : {
@@ -777,9 +814,6 @@
           }
         }
       }
-    },
-    "Pull Request" : {
-
     },
     "Pull Requests" : {
       "localizations" : {
@@ -891,9 +925,6 @@
         }
       }
     },
-    "Request Changes" : {
-
-    },
     "requested changes" : {
       "localizations" : {
         "de" : {
@@ -994,12 +1025,12 @@
         }
       }
     },
-    "Shared Configuration includes:\n- Your GitHub token\n- If provided the GitHub Enterprise URL" : {
+    "Shared Configuration includes:\n- Your GitHub token\n- If provided the GitHub Enterprise URL\n- PR fetch and remove config values\n- Excluded Users" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die geteilte Konfiguration enthält:\n- Dein GitHub Token\n- Falls vorhanden die GitHub Enterprise URL"
+            "value" : "Die geteilte Konfiguration enthält:\n- Dein GitHub Token\n- Falls vorhanden die GitHub Enterprise URL\n- Einstellungen zum Laden und Entfernen von PRs\n- Ignorierte Nutzer"
           }
         }
       }
@@ -1027,9 +1058,39 @@
     "Tap to reveal" : {
       "localizations" : {
         "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tippen zum Anzeigen"
+          "variations" : {
+            "device" : {
+              "mac" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Klicken zum Anzeigen"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Tippen zum Anzeigen"
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "device" : {
+              "mac" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Click to reveal"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "new",
+                  "value" : "Tap to reveal"
+                }
+              }
+            }
           }
         }
       }
@@ -1075,7 +1136,14 @@
       }
     },
     "updated %@" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aktualisiert %@"
+          }
+        }
+      }
     },
     "updated %@ at %@" : {
       "localizations" : {
@@ -1089,17 +1157,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "updated %1$@ at %2$@"
-          }
-        }
-      }
-    },
-    "updated at %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "aktualisiert um %@"
           }
         }
       }
