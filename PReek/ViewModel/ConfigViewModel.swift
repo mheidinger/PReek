@@ -55,7 +55,7 @@ class ConfigViewModel: ObservableObject {
         }
     }
 
-    @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { username in ExcludedUser(username: username) } {
+    @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { ExcludedUser(username: $0) } {
         didSet {
             saveUpdateTrigger.send()
         }
@@ -107,7 +107,7 @@ class ConfigViewModel: ObservableObject {
         ConfigService.onStartFetchWeeks = onStartFetchWeeks
         ConfigService.deleteAfterWeeks = deleteAfterWeeks
         ConfigService.deleteOnlyClosed = deleteOnlyClosed
-        ConfigService.excludedUsers = excludedUsers.map { excludedUser in excludedUser.username }
+        ConfigService.excludedUsers = excludedUsers.map { $0.username }
 
         ConfigService.closeWindowOnLinkClick = closeWindowOnLinkClick
     }
@@ -117,7 +117,14 @@ class ConfigViewModel: ObservableObject {
             return nil
         }
 
-        return ShareConfig.v1(ShareConfigDataV1(token: token, gitHubEnterpriseUrl: useGitHubEnterprise ? gitHubEnterpriseUrl : nil))
+        return ShareConfig.v1(ShareConfigDataV1(
+            token: token,
+            gitHubEnterpriseUrl: useGitHubEnterprise ? gitHubEnterpriseUrl : nil,
+            onStartFetchWeeks: onStartFetchWeeks,
+            deleteAfterWeeks: deleteAfterWeeks,
+            deleteOnlyClosed: deleteOnlyClosed,
+            excludedUsers: excludedUsers.map({$0.username})
+        ))
     }
 
     func importShareData(_ shareData: Data) throws {
@@ -133,6 +140,10 @@ class ConfigViewModel: ObservableObject {
                 } else {
                     useGitHubEnterprise = false
                 }
+                onStartFetchWeeks = parsedData.onStartFetchWeeks
+                deleteAfterWeeks = parsedData.deleteAfterWeeks
+                deleteOnlyClosed = parsedData.deleteOnlyClosed
+                excludedUsers = parsedData.excludedUsers.map({ ExcludedUser(username: $0) })
             }
         } catch {
             logger.error("Failed to decode imported share data: \(error)")

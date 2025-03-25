@@ -33,22 +33,28 @@ struct ShareConfigDataV1: Codable {
     let version: Int
     let token: String
     let gitHubEnterpriseUrl: String?
+    let onStartFetchWeeks: Int
+    let deleteAfterWeeks: Int
+    let deleteOnlyClosed: Bool
+    let excludedUsers: [String]
 
     private enum CodingKeys: String, CodingKey {
-        case version, token, gitHubEnterpriseUrl
+        case version, token, gitHubEnterpriseUrl, onStartFetchWeeks, deleteAfterWeeks, deleteOnlyClosed, excludedUsers
     }
 
-    init(token: String, gitHubEnterpriseUrl: String?) {
+    init(token: String, gitHubEnterpriseUrl: String?, onStartFetchWeeks: Int, deleteAfterWeeks: Int, deleteOnlyClosed: Bool, excludedUsers: [String]) {
         version = 1
         self.token = token
         self.gitHubEnterpriseUrl = gitHubEnterpriseUrl
+        self.onStartFetchWeeks = onStartFetchWeeks
+        self.deleteAfterWeeks = deleteAfterWeeks
+        self.deleteOnlyClosed = deleteOnlyClosed
+        self.excludedUsers = excludedUsers
     }
 
-    // Custom decoder implementation
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        // Verify the version is correct
         let version = try container.decode(Int.self, forKey: .version)
         guard version == 1 else {
             throw DecodingError.dataCorruptedError(
@@ -61,5 +67,9 @@ struct ShareConfigDataV1: Codable {
         self.version = version
         token = try container.decode(String.self, forKey: .token)
         gitHubEnterpriseUrl = try container.decodeIfPresent(String.self, forKey: .gitHubEnterpriseUrl)
+        onStartFetchWeeks = try container.decode(Int.self, forKey: .onStartFetchWeeks)
+        deleteAfterWeeks = try container.decode(Int.self, forKey: .deleteAfterWeeks)
+        deleteOnlyClosed = try container.decode(Bool.self, forKey: .deleteOnlyClosed)
+        excludedUsers = try container.decode([String].self, forKey: .excludedUsers)
     }
 }

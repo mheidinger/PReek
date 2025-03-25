@@ -92,6 +92,8 @@ struct ShareView: View {
             Shared Configuration includes:
             - Your GitHub token
             - If provided the GitHub Enterprise URL
+            - PR fetch and remove config values
+            - Excluded Users
             """)
             .font(.footnote)
         }
