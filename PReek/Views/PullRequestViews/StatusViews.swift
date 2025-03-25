@@ -42,7 +42,7 @@ struct StatusLabel: View {
     init(_ status: PullRequest.Status) {
         self.status = status
     }
-    
+
     var color: Color {
         return statusToColor[status] ?? .green
     }
@@ -55,7 +55,6 @@ struct StatusLabel: View {
             .background(color.opacity(0.2))
             .foregroundColor(color)
             .cornerRadius(12)
-
     }
 }
 

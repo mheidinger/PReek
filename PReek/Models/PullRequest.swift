@@ -76,11 +76,8 @@ struct PullRequest: Identifiable, Equatable {
     var numberFormatted: String {
         "#\(number.formatted(.number.grouping(.never)))"
     }
-    
+
     var lastUpdatedFormatted: String {
-        let relativeFormatter = RelativeDateTimeFormatter()
-        relativeFormatter.unitsStyle = .full
-        
         let formattedTime = lastUpdated.formatted(date: .omitted, time: .shortened)
         if Calendar.current.isDateInYesterday(lastUpdated) {
             return String(localized: "updated yesterday at \(formattedTime)")

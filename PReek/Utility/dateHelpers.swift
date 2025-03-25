@@ -16,7 +16,6 @@ func isDateInLastSevenDays(_ date: Date) -> Bool {
     return date >= sevenDaysAgo && date <= now
 }
 
-
 extension Date {
     var formatRelative: String {
         if isDateInLastMinuteOrFuture(self) {

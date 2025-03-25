@@ -123,7 +123,7 @@ class ConfigViewModel: ObservableObject {
             onStartFetchWeeks: onStartFetchWeeks,
             deleteAfterWeeks: deleteAfterWeeks,
             deleteOnlyClosed: deleteOnlyClosed,
-            excludedUsers: excludedUsers.map({$0.username})
+            excludedUsers: excludedUsers.map { $0.username }
         ))
     }
 
@@ -143,7 +143,7 @@ class ConfigViewModel: ObservableObject {
                 onStartFetchWeeks = parsedData.onStartFetchWeeks
                 deleteAfterWeeks = parsedData.deleteAfterWeeks
                 deleteOnlyClosed = parsedData.deleteOnlyClosed
-                excludedUsers = parsedData.excludedUsers.map({ ExcludedUser(username: $0) })
+                excludedUsers = parsedData.excludedUsers.map { ExcludedUser(username: $0) }
             }
         } catch {
             logger.error("Failed to decode imported share data: \(error)")

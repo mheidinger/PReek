@@ -39,7 +39,7 @@ struct Event: Identifiable, Equatable {
             dataUrl.host != nil ? dataUrl : pullRequestUrl.appendingPathComponent(dataUrl.path)
         } ?? pullRequestUrl
     }
-    
+
     var timeFormatted: String {
         if isDateInLastSevenDays(time) {
             return time.formatRelative
