@@ -30,61 +30,61 @@ private func createPullRequest() -> PullRequest {
 
 struct PullRequestUnreadTests {
     @Test func noData() async throws {
-        var pullRequest = createPullRequest()
-        pullRequest.calculateUnread(viewer: viewer, readData: nil)
+        let pullRequest = createPullRequest()
+        let result = PullRequestUnreadCalculator.calculateUnread(for: pullRequest, viewer: viewer, readData: nil)
 
-        #expect(pullRequest.unread == true)
-        #expect(pullRequest.oldestUnreadEvent == nil)
+        #expect(result.unread == true)
+        #expect(result.oldestUnreadEvent == nil)
     }
 
     @Test func missingEventUnread() async throws {
-        var pullRequest = createPullRequest()
-        pullRequest.calculateUnread(viewer: viewer, readData: ReadData(date: toDate(minute: 15), eventId: "does-not-exist"))
+        let pullRequest = createPullRequest()
+        let result = PullRequestUnreadCalculator.calculateUnread(for: pullRequest, viewer: viewer, readData: ReadData(date: toDate(minute: 15), eventId: "does-not-exist"))
 
-        #expect(pullRequest.unread == true)
-        #expect(pullRequest.oldestUnreadEvent?.id == "2")
+        #expect(result.unread == true)
+        #expect(result.oldestUnreadEvent?.id == "2")
     }
 
     @Test func missingEventRead() async throws {
-        var pullRequest = createPullRequest()
-        pullRequest.calculateUnread(viewer: viewer, readData: ReadData(date: toDate(minute: 40), eventId: "does-not-exist"))
+        let pullRequest = createPullRequest()
+        let result = PullRequestUnreadCalculator.calculateUnread(for: pullRequest, viewer: viewer, readData: ReadData(date: toDate(minute: 40), eventId: "does-not-exist"))
 
-        #expect(pullRequest.unread == false)
-        #expect(pullRequest.oldestUnreadEvent == nil)
+        #expect(result.unread == false)
+        #expect(result.oldestUnreadEvent == nil)
     }
 
     @Test func missingEventReadIgnoringViewerEvent() async throws {
-        var pullRequest = createPullRequest()
-        pullRequest.calculateUnread(viewer: viewer, readData: ReadData(date: toDate(minute: 25), eventId: "does-not-exist"))
+        let pullRequest = createPullRequest()
+        let result = PullRequestUnreadCalculator.calculateUnread(for: pullRequest, viewer: viewer, readData: ReadData(date: toDate(minute: 25), eventId: "does-not-exist"))
 
-        #expect(pullRequest.unread == false)
-        #expect(pullRequest.oldestUnreadEvent == nil)
+        #expect(result.unread == false)
+        #expect(result.oldestUnreadEvent == nil)
     }
 
     @Test func eventUnread() async throws {
-        var pullRequest = createPullRequest()
+        let pullRequest = createPullRequest()
         // Date is ignored, demonstrated by date having a 'read' value
-        pullRequest.calculateUnread(viewer: viewer, readData: ReadData(date: toDate(minute: 40), eventId: "1"))
+        let result = PullRequestUnreadCalculator.calculateUnread(for: pullRequest, viewer: viewer, readData: ReadData(date: toDate(minute: 40), eventId: "1"))
 
-        #expect(pullRequest.unread == true)
-        #expect(pullRequest.oldestUnreadEvent?.id == "2")
+        #expect(result.unread == true)
+        #expect(result.oldestUnreadEvent?.id == "2")
     }
 
     @Test func eventRead() async throws {
-        var pullRequest = createPullRequest()
+        let pullRequest = createPullRequest()
         // Date is ignored, demonstrated by date having a 'unread' value
-        pullRequest.calculateUnread(viewer: viewer, readData: ReadData(date: toDate(minute: 0), eventId: "3"))
+        let result = PullRequestUnreadCalculator.calculateUnread(for: pullRequest, viewer: viewer, readData: ReadData(date: toDate(minute: 0), eventId: "3"))
 
-        #expect(pullRequest.unread == false)
-        #expect(pullRequest.oldestUnreadEvent == nil)
+        #expect(result.unread == false)
+        #expect(result.oldestUnreadEvent == nil)
     }
 
     @Test func eventReadIgnoringViewerEvent() async throws {
-        var pullRequest = createPullRequest()
+        let pullRequest = createPullRequest()
         // Date is ignored, demonstrated by date having a 'unread' value
-        pullRequest.calculateUnread(viewer: viewer, readData: ReadData(date: toDate(minute: 0), eventId: "2"))
+        let result = PullRequestUnreadCalculator.calculateUnread(for: pullRequest, viewer: viewer, readData: ReadData(date: toDate(minute: 0), eventId: "2"))
 
-        #expect(pullRequest.unread == false)
-        #expect(pullRequest.oldestUnreadEvent == nil)
+        #expect(result.unread == false)
+        #expect(result.oldestUnreadEvent == nil)
     }
 }

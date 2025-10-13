@@ -25,50 +25,6 @@ struct PullRequest: Identifiable, Equatable {
     var unread = true
     var oldestUnreadEvent: Event? = nil
 
-    mutating func calculateUnread(viewer: Viewer?, readData: ReadData?) {
-        guard let readData else {
-            unread = true
-            oldestUnreadEvent = nil
-            return
-        }
-
-        if calculateUnreadFromEventId(viewer: viewer, lastMarkedAsReadEventId: readData.eventId) {
-            return
-        }
-
-        // Fallback to time based approach in case it could not be calculated from the event id (non existent / event no longer available)
-        let nonViewerEvents = events.filter { event in event.user.login != viewer?.login }
-        let lastMarkedAsReadComparisonDate = nonViewerEvents.first?.time ?? lastUpdated // Ignore updates from viewer, take first non-viewer event as reference to compare
-        unread = readData.date < lastMarkedAsReadComparisonDate
-        oldestUnreadEvent = nonViewerEvents.reversed().first { event in
-            event.time > readData.date
-        }
-    }
-
-    private mutating func calculateUnreadFromEventId(viewer: Viewer?, lastMarkedAsReadEventId: Event.ID?) -> Bool {
-        guard let lastMarkedAsReadEventId else {
-            return false
-        }
-
-        let lastReadEventIndex = events.firstIndex(where: { $0.id == lastMarkedAsReadEventId })
-        guard let lastReadEventIndex else {
-            return false
-        }
-
-        let newerNonViewerEvents = Array(events.prefix(upTo: lastReadEventIndex))
-            .filter { event in event.user.login != viewer?.login }
-
-        if newerNonViewerEvents.count == 0 {
-            unread = false
-            oldestUnreadEvent = nil
-            return true
-        }
-
-        unread = true
-        oldestUnreadEvent = newerNonViewerEvents.last
-        return true
-    }
-
     var isClosed: Bool {
         return status == .closed || status == .merged
     }
