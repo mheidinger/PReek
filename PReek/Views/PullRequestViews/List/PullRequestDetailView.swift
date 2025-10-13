@@ -36,6 +36,7 @@ struct PullRequestDetailView: View {
             }
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     VStack(alignment: .leading) {

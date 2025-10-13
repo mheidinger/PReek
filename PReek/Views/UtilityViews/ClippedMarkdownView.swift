@@ -2,7 +2,7 @@ import MarkdownUI
 import SwiftUI
 
 private struct NoneImageProvider: ImageProvider {
-    public func makeImage(url _: URL?) -> some View {
+    func makeImage(url _: URL?) -> some View {
         Text("< Image >")
     }
 }
@@ -12,7 +12,7 @@ private struct NoneInlineImageProvider: InlineImageProvider {
         case someError
     }
 
-    public func image(with _: URL, label _: String) async throws -> Image {
+    func image(with _: URL, label _: String) async throws -> Image {
         throw SomeError.someError
     }
 }
