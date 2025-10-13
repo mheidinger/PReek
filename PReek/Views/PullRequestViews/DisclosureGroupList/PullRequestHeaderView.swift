@@ -52,13 +52,21 @@ struct PullRequestHeaderView: View {
         }
     }
 
+    var authorText: some View {
+        Text("by \(pullRequest.author.displayName)")
+            .lineLimit(1)
+            .truncationMode(.tail)
+    }
+
     var details: some View {
         HStack(spacing: 5) {
             Group {
                 if let authorUrl = pullRequest.author.url {
-                    HoverableLink("by \(pullRequest.author.displayName)", destination: authorUrl)
+                    HoverableLink(destination: authorUrl) {
+                        authorText
+                    }
                 } else {
-                    Text("by \(pullRequest.author.displayName)")
+                    authorText
                 }
             }
             .if(pullRequest.author.login != pullRequest.author.displayName) { view in
