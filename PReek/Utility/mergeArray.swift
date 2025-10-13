@@ -1,15 +1,18 @@
 import Foundation
 
 func mergeArray<T, I>(_ array: [T], indicator: KeyPath<T, I?>) -> [T] {
-    return array.reduce([T]()) { dataArray, element in
+    var result: [T] = []
+    result.reserveCapacity(array.count)
+
+    for element in array {
         let merge = element[keyPath: indicator] != nil
 
-        var newDataArray = dataArray
-        if !dataArray.isEmpty, merge {
-            newDataArray[newDataArray.endIndex - 1] = element
+        if !result.isEmpty && merge {
+            result[result.endIndex - 1] = element
         } else {
-            newDataArray.append(element)
+            result.append(element)
         }
-        return newDataArray
     }
+
+    return result
 }

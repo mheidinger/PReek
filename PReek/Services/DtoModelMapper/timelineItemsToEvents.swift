@@ -129,16 +129,19 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRe
     }
 
     // Step 1: Convert timeline items to data and merge information
-    let pairs = timelineItems.reduce(into: [TimelineItemEventDataPair]()) { result, timelineItem in
-        guard let _ = timelineItem.id else {
-            return
+    var pairs: [TimelineItemEventDataPair] = []
+    pairs.reserveCapacity(timelineItems.count)
+
+    for timelineItem in timelineItems {
+        guard timelineItem.id != nil else {
+            continue
         }
 
-        let pair = timelineItemToData(timelineItem: timelineItem, prevPair: result.last)
-        guard let pair else {
-            return
+        guard let pair = timelineItemToData(timelineItem: timelineItem, prevPair: pairs.last) else {
+            continue
         }
-        result.append(pair)
+
+        pairs.append(pair)
     }
 
     // Step 2: Merge items if necessary
