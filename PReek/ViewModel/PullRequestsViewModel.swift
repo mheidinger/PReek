@@ -57,7 +57,69 @@ class PullRequestsViewModel: ObservableObject {
     @Published private var memoizedPullRequests: [PullRequest] = []
     private let invalidationTrigger = PassthroughSubject<Void, Never>()
 
+    private var unreadCache: [String: (unread: Bool, oldestEvent: Event?)] = [:]
+    private var lastProcessedVersions: [String: TimeInterval] = [:]
+
     private let setFocusTrigger = PassthroughSubject<SetFocusType, Never>()
+
+    private func updateUnreadCacheIfNeeded() {
+        for (id, pr) in pullRequestMap {
+            let version = pr.lastUpdated.timeIntervalSince1970
+
+            // Only recalculate if PR has changed since last computation or if cache is empty
+            if lastProcessedVersions[id] != version || unreadCache[id] == nil {
+                let result = PullRequestUnreadCalculator.calculateUnread(
+                    for: pr,
+                    viewer: viewer,
+                    readData: pullRequestReadMap[id]
+                )
+                unreadCache[id] = (result.unread, result.oldestUnreadEvent)
+                lastProcessedVersions[id] = version
+            }
+        }
+
+        // Clean up cache for removed PRs
+        let currentPRIds = Set(pullRequestMap.keys)
+        unreadCache = unreadCache.filter { currentPRIds.contains($0.key) }
+        lastProcessedVersions = lastProcessedVersions.filter { currentPRIds.contains($0.key) }
+    }
+
+    private func getFilteredPullRequests(showClosed: Bool, showRead: Bool) -> ([PullRequest], Bool) {
+        updateUnreadCacheIfNeeded()
+
+        var filteredPRs: [PullRequest] = []
+        filteredPRs.reserveCapacity(pullRequestMap.count)
+
+        for (_, pr) in pullRequestMap {
+            guard let cachedUnread = unreadCache[pr.id] else { continue }
+
+            // Apply cached unread state
+            var updatedPR = pr
+            updatedPR.unread = cachedUnread.unread
+            updatedPR.oldestUnreadEvent = cachedUnread.oldestEvent
+
+            // Check for filters
+            let passesClosedFilter = showClosed || !updatedPR.isClosed
+            let passesReadFilter = showRead || updatedPR.unread
+
+            guard passesClosedFilter, passesReadFilter else { continue }
+
+            // Check for excluded users
+            let containsNonExcludedUser = updatedPR.events.contains { event in
+                !ConfigService.excludedUsersSet.contains(event.user.login)
+            }
+            
+            guard containsNonExcludedUser else { continue }
+
+            filteredPRs.append(updatedPR)
+        }
+
+        filteredPRs.sort { $0.lastUpdated > $1.lastUpdated }
+
+        let hasUnread = filteredPRs.contains { $0.unread }
+
+        return (filteredPRs, hasUnread)
+    }
 
     private func setupPullRequestsMemoization() {
         // Combine dependencies that affect the pullRequests computation
@@ -74,27 +136,7 @@ class PullRequestsViewModel: ObservableObject {
         .map { [weak self] showClosed, showRead, _, _ in
             guard let self = self else { return ([], false) }
 
-            let updatedRead = self.pullRequestMap.map { entry in
-                var pullRequest = entry.value
-                pullRequest.calculateUnread(viewer: self.viewer, readData: self.pullRequestReadMap[pullRequest.id])
-                return pullRequest
-            }
-            let filtered = updatedRead.filter { pullRequest in
-                let containsNonExcludedUser = pullRequest.events.contains { event in
-                    !ConfigService.excludedUsers.contains(event.user.login)
-                }
-
-                let passesClosedFilter = showClosed || !pullRequest.isClosed
-                let passesReadFilter = showRead || pullRequest.unread
-
-                return containsNonExcludedUser && passesClosedFilter && passesReadFilter
-            }
-            let filteredAndSorted = filtered.sorted {
-                $0.lastUpdated > $1.lastUpdated
-            }
-
-            let hasUnread = filteredAndSorted.contains { $0.unread }
-            return (filteredAndSorted, hasUnread)
+            return self.getFilteredPullRequests(showClosed: showClosed, showRead: showRead)
         }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] (pullRequests: [PullRequest], hasUnread: Bool) in
@@ -126,6 +168,9 @@ class PullRequestsViewModel: ObservableObject {
         } else {
             pullRequestReadMap.removeValue(forKey: id)
         }
+
+        // Invalidate cache for this specific PR
+        unreadCache.removeValue(forKey: id)
         invalidationTrigger.send()
     }
 
@@ -134,6 +179,9 @@ class PullRequestsViewModel: ObservableObject {
             let newestEventId = pullRequest.events.first?.id
             pullRequestReadMap[pullRequest.id] = ReadData(date: lastUpdated ?? Date(), eventId: newestEventId)
         }
+
+        // Clear unread cache as all items are now read
+        unreadCache.removeAll()
         invalidationTrigger.send()
     }
 
@@ -203,6 +251,8 @@ class PullRequestsViewModel: ObservableObject {
             await MainActor.run {
                 for pullRequest in pullRequests {
                     self.pullRequestMap[pullRequest.id] = pullRequest
+                    // Invalidate cache for updated PRs
+                    self.unreadCache.removeValue(forKey: pullRequest.id)
                 }
                 self.invalidationTrigger.send()
             }
