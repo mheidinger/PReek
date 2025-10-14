@@ -6,7 +6,7 @@ private func usersToString(_ users: [User]) -> String {
     }.joined(separator: "\n")
 }
 
-struct PullRequestHeaderView: View {
+struct PullRequestHeaderView: View, Equatable {
     var pullRequest: PullRequest
     var setRead: (PullRequest.ID, Bool) -> Void
 
@@ -15,6 +15,14 @@ struct PullRequestHeaderView: View {
     init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void) {
         self.pullRequest = pullRequest
         self.setRead = setRead
+    }
+
+    static func == (lhs: PullRequestHeaderView, rhs: PullRequestHeaderView) -> Bool {
+        lhs.pullRequest.id == rhs.pullRequest.id &&
+            lhs.pullRequest.unread == rhs.pullRequest.unread &&
+            lhs.pullRequest.title == rhs.pullRequest.title &&
+            lhs.pullRequest.lastUpdated == rhs.pullRequest.lastUpdated &&
+            lhs.pullRequest.status == rhs.pullRequest.status
     }
 
     var body: some View {

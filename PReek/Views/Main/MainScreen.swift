@@ -29,7 +29,7 @@ struct MainScreen: View {
                     pullRequestsViewModel.pullRequests,
                     setRead: pullRequestsViewModel.setRead,
                     toBeFocusedPullRequestId: $pullRequestsViewModel.focusedPullRequestId,
-                    lastFocusedPullRequestId: $pullRequestsViewModel.lastFocusedPullRequestId
+                    lastUIFocusedPullRequestId: $pullRequestsViewModel.lastUIFocusedPullRequestId
                 )
             #else
                 PullRequestsList(pullRequestsViewModel: pullRequestsViewModel, footer: {

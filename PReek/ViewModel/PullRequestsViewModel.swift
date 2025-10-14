@@ -46,7 +46,7 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
 
-    @Published var lastFocusedPullRequestId: PullRequest.ID?
+    @Published var lastUIFocusedPullRequestId: PullRequest.ID?
     @Published var focusedPullRequestId: PullRequest.ID?
     var pullRequests: [PullRequest] {
         memoizedPullRequests
@@ -108,7 +108,7 @@ class PullRequestsViewModel: ObservableObject {
             let containsNonExcludedUser = updatedPR.events.contains { event in
                 !ConfigService.excludedUsersSet.contains(event.user.login)
             }
-            
+
             guard containsNonExcludedUser else { continue }
 
             filteredPRs.append(updatedPR)
@@ -187,23 +187,27 @@ class PullRequestsViewModel: ObservableObject {
 
     private func setupPullRequestFocus() {
         setFocusTrigger
-            .throttle(for: .milliseconds(20), scheduler: DispatchQueue.main, latest: true)
-            .map { [weak self] type in
-                guard let self = self else { return nil }
+            .throttle(for: .milliseconds(40), scheduler: DispatchQueue.main, latest: true)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] type in
+                guard let self = self else { return }
 
+                let newFocusId: String?
                 switch type {
                 case .first:
-                    return self.pullRequests.first?.id
+                    newFocusId = self.pullRequests.first?.id
                 case .last:
-                    return self.pullRequests.last?.id
+                    newFocusId = self.pullRequests.last?.id
                 case .next:
-                    return self.getNextFocusIdByOffset(by: 1)
+                    newFocusId = self.getNextFocusIdByOffset(by: 1)
                 case .previous:
-                    return self.getNextFocusIdByOffset(by: -1)
+                    newFocusId = self.getNextFocusIdByOffset(by: -1)
                 }
+
+                // Update both focus IDs synchronously to avoid divergation
+                self.lastUIFocusedPullRequestId = newFocusId
+                self.focusedPullRequestId = newFocusId
             }
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.focusedPullRequestId, on: self)
             .store(in: &cancellables)
     }
 
@@ -213,11 +217,10 @@ class PullRequestsViewModel: ObservableObject {
 
     private func getNextFocusIdByOffset(by offset: Int) -> String? {
         if pullRequests.count == 0 {
-            focusedPullRequestId = nil
             return nil
         }
 
-        let basePullRequestId = lastFocusedPullRequestId ?? focusedPullRequestId
+        let basePullRequestId = lastUIFocusedPullRequestId ?? focusedPullRequestId
 
         // Calculate next PR by current focus
         let currentIndex = basePullRequestId.flatMap { focusedId in

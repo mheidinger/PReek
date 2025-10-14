@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PullRequestDisclosureGroup: View {
+struct PullRequestDisclosureGroup: View, Equatable {
     var pullRequest: PullRequest
     var setRead: (PullRequest.ID, Bool) -> Void
 
@@ -12,10 +12,21 @@ struct PullRequestDisclosureGroup: View {
         self.sectionExpanded = sectionExpanded
     }
 
+    static func == (lhs: PullRequestDisclosureGroup, rhs: PullRequestDisclosureGroup) -> Bool {
+        lhs.pullRequest.id == rhs.pullRequest.id &&
+            lhs.pullRequest.unread == rhs.pullRequest.unread &&
+            lhs.pullRequest.title == rhs.pullRequest.title &&
+            lhs.pullRequest.lastUpdated == rhs.pullRequest.lastUpdated &&
+            lhs.pullRequest.status == rhs.pullRequest.status
+    }
+
     var body: some View {
         VStack {
             DisclosureGroup(isExpanded: $sectionExpanded) {
-                PullRequestContentView(pullRequest)
+                // Only create content view when expanded
+                if sectionExpanded {
+                    PullRequestContentView(pullRequest)
+                }
             } label: {
                 PullRequestHeaderView(pullRequest, setRead: setRead)
                     .padding(.leading, 10)

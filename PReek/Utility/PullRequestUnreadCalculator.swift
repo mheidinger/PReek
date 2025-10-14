@@ -1,8 +1,7 @@
 import Foundation
 
 /// Utility for calculating unread status externally without mutating PullRequest instances
-struct PullRequestUnreadCalculator {
-
+enum PullRequestUnreadCalculator {
     /// Result of unread calculation
     struct UnreadResult {
         let unread: Bool
