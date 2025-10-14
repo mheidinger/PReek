@@ -4,15 +4,15 @@ struct PullRequestsDisclosureGroupList: View {
     var pullRequests: [PullRequest]
     var setRead: (PullRequest.ID, Bool) -> Void
     @Binding var toBeFocusedPullRequestId: PullRequest.ID?
-    @Binding var lastFocusedPullRequestId: PullRequest.ID?
+    @Binding var lastUIFocusedPullRequestId: PullRequest.ID?
 
     @FocusState var focusedPullRequestId: PullRequest.ID?
 
-    init(_ pullRequests: [PullRequest], setRead: @escaping (PullRequest.ID, Bool) -> Void, toBeFocusedPullRequestId: Binding<String?>, lastFocusedPullRequestId: Binding<String?>) {
+    init(_ pullRequests: [PullRequest], setRead: @escaping (PullRequest.ID, Bool) -> Void, toBeFocusedPullRequestId: Binding<String?>, lastUIFocusedPullRequestId: Binding<String?>) {
         self.pullRequests = pullRequests
         self.setRead = setRead
         _toBeFocusedPullRequestId = toBeFocusedPullRequestId
-        _lastFocusedPullRequestId = lastFocusedPullRequestId
+        _lastUIFocusedPullRequestId = lastUIFocusedPullRequestId
     }
 
     var body: some View {
@@ -23,7 +23,7 @@ struct PullRequestsDisclosureGroupList: View {
                         DividedView(pullRequests) { pullRequest in
                             PullRequestDisclosureGroup(
                                 pullRequest,
-                                setRead: setRead
+                                setRead: setRead,
                             )
                             .focused($focusedPullRequestId, equals: pullRequest.id)
                         }
@@ -44,7 +44,7 @@ struct PullRequestsDisclosureGroupList: View {
                 }
                 .onChange(of: focusedPullRequestId) { _, newValue in
                     if let id = newValue {
-                        lastFocusedPullRequestId = id
+                        lastUIFocusedPullRequestId = id
                     }
                 }
             }
@@ -76,6 +76,6 @@ struct PullRequestsDisclosureGroupList: View {
         ],
         setRead: { _, _ in },
         toBeFocusedPullRequestId: .constant(""),
-        lastFocusedPullRequestId: .constant("")
+        lastUIFocusedPullRequestId: .constant("")
     )
 }

@@ -1,10 +1,20 @@
 import SwiftUI
 
-struct PullRequestListItem: View {
+struct PullRequestListItem: View, Equatable {
     var pullRequest: PullRequest
 
     init(_ pullRequest: PullRequest) {
         self.pullRequest = pullRequest
+    }
+
+    static func == (lhs: PullRequestListItem, rhs: PullRequestListItem) -> Bool {
+        lhs.pullRequest.id == rhs.pullRequest.id &&
+            lhs.pullRequest.unread == rhs.pullRequest.unread &&
+            lhs.pullRequest.title == rhs.pullRequest.title &&
+            lhs.pullRequest.lastUpdated == rhs.pullRequest.lastUpdated &&
+            lhs.pullRequest.status == rhs.pullRequest.status &&
+            lhs.pullRequest.approvalFrom.count == rhs.pullRequest.approvalFrom.count &&
+            lhs.pullRequest.changesRequestedFrom.count == rhs.pullRequest.changesRequestedFrom.count
     }
 
     var body: some View {
