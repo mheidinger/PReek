@@ -4,7 +4,7 @@ struct CommitsView: View {
     let commits: [Commit]
 
     var body: some View {
-        VStack(alignment: .leading) {
+        LazyVStack(alignment: .leading) {
             ForEach(commits) { commit in
                 if let url = commit.url {
                     HoverableLink(destination: url) {

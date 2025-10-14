@@ -27,17 +27,15 @@ struct PullRequestContentView: View, Equatable {
     }
 
     var eventsBody: some View {
-        VStack {
-            LazyVStack(spacing: 0) {
-                DividedView(pullRequest.events[0 ..< eventLimit]) { event in
-                    EventView(event)
-                } shouldHighlight: { event in
-                    event.id == pullRequest.oldestUnreadEvent?.id ? String(localized: "New") : nil
-                } additionalContent: {
-                    if self.eventLimit < pullRequest.events.count {
-                        Button(action: loadMore) {
-                            Label("Load More", systemImage: "ellipsis.circle")
-                        }
+        LazyVStack {
+            DividedView(pullRequest.events[0 ..< eventLimit]) { event in
+                EventView(event)
+            } shouldHighlight: { event in
+                event.id == pullRequest.oldestUnreadEvent?.id ? String(localized: "New") : nil
+            } additionalContent: {
+                if self.eventLimit < pullRequest.events.count {
+                    Button(action: loadMore) {
+                        Label("Load More", systemImage: "ellipsis.circle")
                     }
                 }
             }
@@ -50,12 +48,16 @@ struct PullRequestContentView: View, Equatable {
     var body: some View {
         if pullRequest.events.isEmpty {
             noEventsBody
+        } else {
+            eventsBody
         }
-        eventsBody
     }
 }
 
 #Preview {
-    PullRequestContentView(PullRequest.preview())
-        .padding()
+    ScrollView {
+        PullRequestContentView(PullRequest.preview())
+            .padding()
+    }
+    .frame(height: 400)
 }
