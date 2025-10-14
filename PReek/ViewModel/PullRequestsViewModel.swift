@@ -25,6 +25,7 @@ class PullRequestsViewModel: ObservableObject {
         showReadSubject = CurrentValueSubject<Bool, Never>(storedShowRead)
         setupPullRequestsMemoization()
         setupPullRequestFocus()
+        updatePullRequestIndexMap()
     }
 
     @Published private(set) var lastUpdated: Date? = nil
@@ -61,6 +62,14 @@ class PullRequestsViewModel: ObservableObject {
     private var lastProcessedVersions: [String: TimeInterval] = [:]
 
     private let setFocusTrigger = PassthroughSubject<SetFocusType, Never>()
+    private var pullRequestIndexMap: [String: Int] = [:]
+
+    private func updatePullRequestIndexMap() {
+        pullRequestIndexMap = Dictionary(
+            pullRequests.enumerated().map { index, pr in (pr.id, index) },
+            uniquingKeysWith: { first, _ in first }
+        )
+    }
 
     private func updateUnreadCacheIfNeeded() {
         for (id, pr) in pullRequestMap {
@@ -142,6 +151,7 @@ class PullRequestsViewModel: ObservableObject {
         .sink { [weak self] (pullRequests: [PullRequest], hasUnread: Bool) in
             self?.memoizedPullRequests = pullRequests
             self?.hasUnread = hasUnread
+            self?.updatePullRequestIndexMap()
         }
         .store(in: &cancellables)
     }
@@ -216,19 +226,16 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     private func getNextFocusIdByOffset(by offset: Int) -> String? {
-        if pullRequests.count == 0 {
-            return nil
-        }
+        guard !pullRequests.isEmpty else { return nil }
 
         let basePullRequestId = lastUIFocusedPullRequestId ?? focusedPullRequestId
 
-        // Calculate next PR by current focus
         let currentIndex = basePullRequestId.flatMap { focusedId in
-            pullRequests.firstIndex { $0.id == focusedId }
+            pullRequestIndexMap[focusedId]
         }
         let newIndex = ((currentIndex ?? (offset < 0 ? pullRequests.count : -1)) + offset + pullRequests.count) % pullRequests.count
 
-        return pullRequests[safe: newIndex].map { $0.id }
+        return pullRequests[safe: newIndex]?.id
     }
 
     private func handleReceivedNotifications(notifications: [Notification], viewer: Viewer) async throws -> [String] {

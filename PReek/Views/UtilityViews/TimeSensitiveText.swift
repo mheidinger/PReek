@@ -19,7 +19,7 @@ struct TimeSensitiveText: View {
 
     init(getText: @escaping () -> String) {
         self.getText = getText
-        self._currentText = State(initialValue: getText())
+        _currentText = State(initialValue: getText())
     }
 
     var body: some View {

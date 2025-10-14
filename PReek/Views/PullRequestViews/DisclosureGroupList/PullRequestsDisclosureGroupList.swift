@@ -23,7 +23,7 @@ struct PullRequestsDisclosureGroupList: View {
                         DividedView(pullRequests) { pullRequest in
                             PullRequestDisclosureGroup(
                                 pullRequest,
-                                setRead: setRead,
+                                setRead: setRead
                             )
                             .focused($focusedPullRequestId, equals: pullRequest.id)
                         }
