@@ -9,7 +9,7 @@
 - [x] **[Cache unread calculations](#1-expensive-data-processing-in-pull-request-memoization--completed)** - ✅ COMPLETED - 70-80% reduction in processing time
 - [x] **[Pre-allocate array capacity](#1-expensive-data-processing-in-pull-request-memoization--completed)** - ✅ COMPLETED - 50% reduction in memory allocations
 - [x] **[Optimize `ConfigService.excludedUsers`](#6-configserviceexcludedusers-performance--completed)** - ✅ COMPLETED - O(1) Set lookup performance
-- [ ] **[Use `LazyVStack` consistently](#5-list-performance-optimization)** - Better memory usage for large lists
+- [x] **[Use `LazyVStack` consistently](#5-list-performance-optimization--completed)** - ✅ COMPLETED - Better memory usage for large lists
 - [ ] **Throttle operations properly** - Already partially implemented, optimize further
 
 ### High Priority (Critical Performance Issues)
@@ -28,7 +28,7 @@
 - [ ] **Implement memory usage alerts** - Development tools
 - [ ] **Create performance regression tests** - Quality assurance
 
-**Progress**: 5 of 13 optimizations completed (38%)
+**Progress**: 6 of 13 optimizations completed (46%)
 
 ---
 
@@ -56,113 +56,21 @@ This analysis identifies critical performance bottlenecks in the PReek applicati
 **✅ Implemented Optimized Solution**:
 
 **Phase 1: Intelligent Caching System**
-```swift
-// Performance optimization: Cache expensive calculations
-private var unreadCache: [String: (unread: Bool, oldestEvent: Event?)] = [:]
-private var lastProcessedVersions: [String: TimeInterval] = [:]
+- Implemented intelligent caching for expensive unread calculations
+- Cache only updates when PR data actually changes, avoiding redundant computations
+- Clean up cache entries for removed PRs to prevent memory leaks
 
-private func updateUnreadCacheIfNeeded() {
-    for (id, pr) in pullRequestMap {
-        let version = pr.lastUpdated.timeIntervalSince1970
+**Phase 2: External Unread Calculation**
+- Created separate `PullRequestUnreadCalculator` for clean separation of concerns
+- Eliminated copy-mutate-extract anti-pattern from main model
+- Improved testability with independent calculation logic
+- Implemented dual calculation approach (event ID + time-based fallback)
 
-        // Only recalculate if PR has changed since last computation or if cache is empty
-        if lastProcessedVersions[id] != version || unreadCache[id] == nil {
-            let result = PullRequestUnreadCalculator.calculateUnread(
-                for: pr,
-                viewer: viewer,
-                readData: pullRequestReadMap[id]
-            )
-            unreadCache[id] = (result.unread, result.oldestUnreadEvent)
-            lastProcessedVersions[id] = version
-        }
-    }
-
-    // Clean up cache for removed PRs
-    let currentPRIds = Set(pullRequestMap.keys)
-    unreadCache = unreadCache.filter { currentPRIds.contains($0.key) }
-    lastProcessedVersions = lastProcessedVersions.filter { currentPRIds.contains($0.key) }
-}
-```
-
-**Phase 2: External Unread Calculation ✅ COMPLETED**
-```swift
-// PullRequestUnreadCalculator.swift - Clean separation of concerns
-struct PullRequestUnreadCalculator {
-    struct UnreadResult {
-        let unread: Bool
-        let oldestUnreadEvent: Event?
-    }
-
-    static func calculateUnread(
-        for pullRequest: PullRequest,
-        viewer: Viewer?,
-        readData: ReadData?
-    ) -> UnreadResult {
-        guard let readData else {
-            return UnreadResult(unread: true, oldestUnreadEvent: nil)
-        }
-
-        // Try event ID based calculation first
-        if let eventBasedResult = calculateUnreadFromEventId(
-            events: pullRequest.events,
-            viewer: viewer,
-            lastMarkedAsReadEventId: readData.eventId
-        ) {
-            return eventBasedResult
-        }
-
-        // Fallback to time-based approach
-        return calculateUnreadFromDate(
-            events: pullRequest.events,
-            lastUpdated: pullRequest.lastUpdated,
-            viewer: viewer,
-            readDate: readData.date
-        )
-    }
-
-    // ... helper methods for clean, testable logic
-}
-```
-
-private func getOptimizedFilteredPullRequests(showClosed: Bool, showRead: Bool) -> ([PullRequest], Bool) {
-    updateUnreadCacheIfNeeded()
-
-    var filteredPRs: [PullRequest] = []
-    filteredPRs.reserveCapacity(pullRequestMap.count) // Pre-allocate capacity
-
-    for (_, pr) in pullRequestMap {
-        guard let cached = unreadCache[pr.id] else { continue }
-
-        // Apply cached unread state
-        var updatedPR = pr
-        updatedPR.unread = cached.unread
-        updatedPR.oldestUnreadEvent = cached.oldestEvent
-
-        // Check filters efficiently
-        let passesClosedFilter = showClosed || !updatedPR.isClosed
-        let passesReadFilter = showRead || updatedPR.unread
-
-        guard passesClosedFilter, passesReadFilter else { continue }
-
-        // Check excluded users using optimized Set (O(1) lookup vs O(n) array search)
-        let containsNonExcludedUser = updatedPR.events.contains { event in
-            !ConfigService.excludedUsersSet.contains(event.user.login)
-        }
-
-        if containsNonExcludedUser {
-            filteredPRs.append(updatedPR)
-        }
-    }
-
-    // Sort once at the end
-    filteredPRs.sort { $0.lastUpdated > $1.lastUpdated }
-
-    // Calculate hasUnread efficiently
-    let hasUnread = filteredPRs.contains { $0.unread }
-
-    return (filteredPRs, hasUnread)
-}
-```
+**Phase 3: Optimized Filtering Pipeline**
+- Pre-allocated array capacity to reduce memory allocation overhead
+- Used cached unread states instead of recalculating on every filter operation
+- Leveraged optimized Set lookups for excluded user filtering
+- Single sort operation at the end of pipeline
 
 **Performance Results**:
 - **Processing Speed**: 70-80% reduction in filtering time for large datasets
@@ -185,79 +93,17 @@ private func getOptimizedFilteredPullRequests(showClosed: Bool, showRead: Bool) 
 - O(n²) complexity due to array copying in both `timelineItemsToEvents` and `mergeArray`
 - Memory pressure from intermediate allocations
 
-**Original Code**:
-```swift
-// In timelineItemsToEvents.swift
-let pairs = timelineItems.reduce(into: [TimelineItemEventDataPair]()) { result, timelineItem in
-    // Creates new array elements repeatedly
-}
-
-// In mergeArray.swift
-func mergeArray<T, I>(_ array: [T], indicator: KeyPath<T, I?>) -> [T] {
-    return array.reduce([T]()) { dataArray, element in
-        var newDataArray = dataArray  // Copies entire array on each iteration!
-        // ... modification logic
-        return newDataArray
-    }
-}
-```
-
 **✅ Implemented Optimized Solution**:
 
 **Phase 1: Optimized `mergeArray` Function**
-```swift
-func mergeArray<T, I>(_ array: [T], indicator: KeyPath<T, I?>) -> [T] {
-    // Performance optimization: Use direct iteration instead of reduce to avoid O(n²) array copying
-    var result: [T] = []
-    result.reserveCapacity(array.count) // Pre-allocate capacity for better memory performance
-
-    for element in array {
-        let merge = element[keyPath: indicator] != nil
-
-        if !result.isEmpty && merge {
-            result[result.endIndex - 1] = element
-        } else {
-            result.append(element)
-        }
-    }
-
-    return result
-}
-```
+- Replaced `reduce` with direct iteration to eliminate O(n²) array copying
+- Pre-allocated array capacity to reduce memory allocations
+- Used efficient in-place element replacement for merge operations
 
 **Phase 2: Optimized `timelineItemsToEvents` Function**
-```swift
-func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRequestUrl: URL) -> [Event] {
-    guard let timelineItems = timelineItems else {
-        return []
-    }
-
-    // Step 1: Convert timeline items to data and merge information
-    // Performance optimization: Use direct iteration with pre-allocated capacity
-    var pairs: [TimelineItemEventDataPair] = []
-    pairs.reserveCapacity(timelineItems.count) // Pre-allocate to avoid repeated reallocations
-
-    for timelineItem in timelineItems {
-        guard timelineItem.id != nil else {
-            continue
-        }
-
-        guard let pair = timelineItemToData(timelineItem: timelineItem, prevPair: pairs.last) else {
-            continue
-        }
-
-        pairs.append(pair)
-    }
-
-    // Step 2: Merge items if necessary (now using optimized mergeArray)
-    let mergedPairs = mergeArray(pairs, indicator: \.mergedFromOldest)
-
-    // Step 3: Convert to Event objects
-    return mergedPairs.map { pair in
-        // ... existing mapping logic
-    }
-}
-```
+- Converted from `reduce` to direct iteration with pre-allocated capacity
+- Eliminated repeated array reallocations during timeline processing
+- Maintained all existing logic while improving algorithmic complexity
 
 **Performance Results**:
 - **Algorithm Complexity**: Improved from O(n²) to O(n) for both functions
@@ -347,134 +193,24 @@ struct TimeSensitiveText: View {
 **✅ Implemented Optimized Solutions**:
 
 **Phase 1: Optimized Disclosure Group with Conditional Rendering**
-```swift
-struct PullRequestDisclosureGroup: View {
-    var body: some View {
-        VStack {
-            DisclosureGroup(isExpanded: $sectionExpanded) {
-                // Performance optimization: Only create content view when expanded
-                if sectionExpanded {
-                    PullRequestContentView(pullRequest)  // Direct usage, Equatable built-in
-                }
-            } label: {
-                PullRequestHeaderView(pullRequest, setRead: setRead)  // Direct usage, Equatable built-in
-                    .padding(.leading, 10)
-                    .padding(.trailing, 5)
-            }
-        }
-        // ... existing modifiers
-    }
-}
-```
+- Implemented conditional rendering - content views only created when disclosure groups expanded
+- Eliminated unnecessary view creation for collapsed items
+- Maintained direct usage of Equatable-conforming views
 
 **Phase 2: Direct Equatable Conformance for Re-render Prevention**
-```swift
-// PullRequestHeaderView.swift - Direct optimization, no wrapper needed
-struct PullRequestHeaderView: View, Equatable {
-    var pullRequest: PullRequest
-    var setRead: (PullRequest.ID, Bool) -> Void
-
-    @Environment(\.colorScheme) var colorScheme
-
-    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void) {
-        self.pullRequest = pullRequest
-        self.setRead = setRead
-    }
-
-    // Performance optimization: Equatable conformance to prevent unnecessary re-renders
-    static func == (lhs: PullRequestHeaderView, rhs: PullRequestHeaderView) -> Bool {
-        lhs.pullRequest.id == rhs.pullRequest.id &&
-        lhs.pullRequest.unread == rhs.pullRequest.unread &&
-        lhs.pullRequest.title == rhs.pullRequest.title &&
-        lhs.pullRequest.lastUpdated == rhs.pullRequest.lastUpdated &&
-        lhs.pullRequest.status == rhs.pullRequest.status
-    }
-
-    var body: some View {
-        // ... existing implementation
-    }
-}
-
-// PullRequestContentView.swift - Direct optimization
-struct PullRequestContentView: View, Equatable {
-    @State var eventLimit = 0
-    var pullRequest: PullRequest
-
-    init(_ pullRequest: PullRequest) {
-        eventLimit = min(pullRequest.events.count, 5)
-        self.pullRequest = pullRequest
-    }
-
-    // Performance optimization: Equatable conformance for better performance
-    static func == (lhs: PullRequestContentView, rhs: PullRequestContentView) -> Bool {
-        lhs.pullRequest.id == rhs.pullRequest.id &&
-        lhs.pullRequest.events.count == rhs.pullRequest.events.count &&
-        lhs.pullRequest.events.first?.id == rhs.pullRequest.events.first?.id &&
-        lhs.pullRequest.events.last?.id == rhs.pullRequest.events.last?.id
-    }
-
-    var body: some View {
-        // ... existing implementation with LazyVStack
-    }
-}
-```
+- Added Equatable conformance to `PullRequestHeaderView` with key property comparison
+- Added Equatable conformance to `PullRequestContentView` with event-based comparison
+- Eliminated wrapper views, using direct Equatable conformance for better performance
 
 **Phase 3: LazyVStack for Better Memory Usage**
-```swift
-struct PullRequestContentView: View {
-    @State var eventLimit = 0
-
-    var pullRequest: PullRequest
-
-    init(_ pullRequest: PullRequest) {
-        eventLimit = min(pullRequest.events.count, 5)  // Simple, direct initialization
-        self.pullRequest = pullRequest
-    }
-
-    var eventsBody: some View {
-        VStack {
-            // Performance optimization: Use LazyVStack for better memory usage with large event lists
-            LazyVStack(spacing: 0) {
-                DividedView(pullRequest.events[0 ..< eventLimit]) { event in
-                    EventView(event)
-                } shouldHighlight: { event in
-                    event.id == pullRequest.oldestUnreadEvent?.id ? String(localized: "New") : nil
-                } additionalContent: {
-                    if self.eventLimit < pullRequest.events.count {
-                        Button(action: loadMore) {
-                            Label("Load More", systemImage: "ellipsis.circle")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-```
-
-**Note**: *Initial implementation included an `isInitialized` flag for "lazy initialization" but this was reverted as over-optimization. The `min()` calculation is trivial (O(1)) and the added complexity wasn't justified for such a cheap operation.*
+- Implemented LazyVStack in `PullRequestContentView` for efficient event list rendering
+- Used simple, direct initialization without over-optimization
+- Maintained existing "Load More" functionality with improved memory characteristics
 
 **Phase 4: Equatable List Items**
-```swift
-struct PullRequestListItem: View, Equatable {
-    var pullRequest: PullRequest
-
-    // Performance optimization: Equatable conformance to prevent unnecessary re-renders
-    static func == (lhs: PullRequestListItem, rhs: PullRequestListItem) -> Bool {
-        lhs.pullRequest.id == rhs.pullRequest.id &&
-        lhs.pullRequest.unread == rhs.pullRequest.unread &&
-        lhs.pullRequest.title == rhs.pullRequest.title &&
-        lhs.pullRequest.lastUpdated == rhs.pullRequest.lastUpdated &&
-        lhs.pullRequest.status == rhs.pullRequest.status &&
-        lhs.pullRequest.approvalFrom.count == rhs.pullRequest.approvalFrom.count &&
-        lhs.pullRequest.changesRequestedFrom.count == rhs.pullRequest.changesRequestedFrom.count
-    }
-
-    var body: some View {
-        // ... existing implementation
-    }
-}
-```
+- Added Equatable conformance to `PullRequestListItem` with comprehensive property comparison
+- Included approval and change request counts in equality check
+- Prevented unnecessary re-renders when list data hasn't meaningfully changed
 
 **Performance Results**:
 - **View Re-rendering**: 60-75% reduction in unnecessary view updates (from Equatable conformance)
@@ -497,43 +233,37 @@ struct PullRequestListItem: View, Equatable {
 3. **LazyVStack usage** - Better memory characteristics
 4. ~~**Lazy initialization logic**~~ - Reverted as over-optimization for trivial calculations
 
-### 5. List Performance Optimization
+### 5. List Performance Optimization ✅ **COMPLETED**
 
-**Current Issues**:
-- Non-lazy rendering in some views
-- Complex nested structures
-- Missing view recycling
+**Location**: `CommentsView.swift:8`, `CommitsView.swift:7`
 
-**Solutions**:
-```swift
-// Optimize main list rendering
-struct PullRequestsDisclosureGroupList: View {
-    let pullRequests: [PullRequest]
-    let setRead: (PullRequest.ID, Bool) -> Void
+**Problem**:
+- Non-lazy rendering in comment and commit list views
+- Regular `VStack` components created all child views immediately
+- Memory pressure when PRs had many comments or commits
 
-    var body: some View {
-        GeometryReader { geometry in
-            ScrollViewReader { proxy in
-                ScrollView {
-                    // Use LazyVStack for better memory management
-                    LazyVStack(alignment: .leading, spacing: 4) {
-                        ForEach(pullRequests) { pullRequest in
-                            OptimizedPullRequestRow(
-                                pullRequest: pullRequest,
-                                setRead: setRead
-                            )
-                            .frame(width: geometry.size.width - 23)
-                        }
-                    }
-                    .padding(.leading, 3)
-                    .padding(.vertical, 5)
-                }
-                // ... rest of implementation
-            }
-        }
-    }
-}
-```
+**✅ Implemented Solution**:
+
+**Phase 1: CommentsView LazyVStack Optimization**
+- Converted `VStack` to `LazyVStack` for comment list rendering
+- Maintained existing spacing and alignment properties
+- Enabled lazy loading for large comment threads
+
+**Phase 2: CommitsView LazyVStack Optimization**
+- Converted `VStack` to `LazyVStack` for commit list rendering
+- Preserved existing URL handling and styling logic
+- Improved memory efficiency for PRs with many commits
+
+**Performance Results**:
+- **Memory Efficiency**: LazyVStack only creates visible views, reducing memory pressure
+- **Improved Scrolling**: Views created lazily as needed rather than all at once
+- **Consistent Implementation**: All major list views now use LazyVStack consistently
+- **Behavioral Consistency**: Maintained all existing functionality while improving performance
+
+**Real-World Impact**:
+- PRs with many comments: Better memory usage when scrolling through comment threads
+- PRs with many commits: Improved performance when viewing commit lists
+- Consistent lazy rendering across all list-type views in the application
 
 ## Data Structure Optimizations
 
@@ -545,39 +275,11 @@ struct PullRequestsDisclosureGroupList: View {
 - String splitting/joining on every access
 - Linear search in array for filtering
 
-**Original Implementation**:
-```swift
-static var excludedUsers: [String] {
-    set { excludedUsersStr = newValue.joined(separator: "|") }
-    get { return excludedUsersStr.split(separator: "|").map { String($0) } }
-}
-```
-
 **✅ Implemented Optimized Solution**:
-```swift
-// Performance optimization: Cache excluded users as Set for O(1) lookups
-private static var excludedUsersCache: Set<String>?
-private static var lastExcludedUsersStr: String = ""
-
-static var excludedUsersSet: Set<String> {
-    if excludedUsersStr != lastExcludedUsersStr || excludedUsersCache == nil {
-        excludedUsersCache = Set(excludedUsersStr.split(separator: "|").map { String($0) })
-        lastExcludedUsersStr = excludedUsersStr
-    }
-    return excludedUsersCache!
-}
-
-static var excludedUsers: [String] {
-    set {
-        excludedUsersStr = newValue.joined(separator: "|")
-        // Invalidate cache when setting new value
-        excludedUsersCache = nil
-    }
-    get {
-        return Array(excludedUsersSet) // Use the cached Set, converted to Array
-    }
-}
-```
+- Implemented intelligent caching with `excludedUsersSet` for O(1) lookups
+- Cache invalidation only when the underlying string data changes
+- Maintained backward compatibility with existing array-based API
+- Added optimized Set-based access for filtering operations
 
 **Performance Results**:
 - **Filtering Performance**: Improved from O(n) array search to O(1) Set lookup

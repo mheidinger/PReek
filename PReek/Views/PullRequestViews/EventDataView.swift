@@ -10,11 +10,17 @@ struct EventDataView: View {
     var body: some View {
         switch data {
         case let pushedData as EventPushedData:
-            CommitsView(commits: pushedData.commits)
+            if !pushedData.commits.isEmpty {
+                CommitsView(commits: pushedData.commits)
+            }
         case let reviewData as EventReviewData:
-            CommentsView(comments: reviewData.comments)
+            if !reviewData.comments.isEmpty {
+                CommentsView(comments: reviewData.comments)
+            }
         case let commentData as EventCommentData:
-            CommentsView(comments: commentData.comments)
+            if !commentData.comments.isEmpty {
+                CommentsView(comments: commentData.comments)
+            }
         case let renamedTitleData as EventRenamedTitleData:
             HStack {
                 VStack(alignment: .leading) {
@@ -46,8 +52,6 @@ struct EventDataView: View {
                         }
                     }
                 }
-            } else {
-                EmptyView()
             }
         default:
             EmptyView()

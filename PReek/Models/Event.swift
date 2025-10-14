@@ -53,7 +53,7 @@ struct Event: Identifiable, Equatable {
         )
     }
 
-    static let previewClosed = Event(id: UUID().uuidString, user: User.preview(login: "person-1"), time: Date().addingTimeInterval(-10), data: EventClosedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
+    static let previewClosed = Event(id: UUID().uuidString, user: User.preview(login: "person-with-long-name-1"), time: Date().addingTimeInterval(-10), data: EventClosedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewForcePushed = Event(id: UUID().uuidString, user: User.preview(login: "person-with-long-name-2"), time: Date().addingTimeInterval(-20), data: EventPushedData(isForcePush: true, commits: []), pullRequestUrl: URL(string: "https://example.com")!)
     static let previewMerged = Event(id: UUID().uuidString, user: User.preview(login: "per3"), time: Date().addingTimeInterval(-30), data: EventMergedData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)
     static func previewCommit(commits: [Commit] = []) -> Event {
