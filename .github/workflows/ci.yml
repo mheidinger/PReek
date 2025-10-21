@@ -28,7 +28,7 @@ jobs:
 
   test:
     name: Test
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout
