@@ -22,7 +22,7 @@ jobs:
       - name: Select XCode Version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "16.1"
+          xcode-version: "latest-stable"
       - name: Build
         run: xcodebuild clean build analyze -scheme "PReek" -project "PReek.xcodeproj" -destination "generic/platform=${{ matrix.platform }}" CODE_SIGNING_ALLOWED=NO | xcpretty && exit ${PIPESTATUS[0]}
 
@@ -36,6 +36,6 @@ jobs:
       - name: Select XCode Version
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "16.1"
+          xcode-version: "latest-stable"
       - name: Test
         run: xcodebuild test -scheme "PReek" -project "PReek.xcodeproj" -destination "platform=macOS,arch=arm64" CODE_SIGNING_ALLOWED=NO | xcpretty && exit ${PIPESTATUS[0]}
