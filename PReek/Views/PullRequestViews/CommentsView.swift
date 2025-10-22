@@ -5,7 +5,7 @@ struct CommentsView: View {
     var comments: [Comment]
 
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 5) {
             ForEach(comments) { comment in
                 CommentView(comment: comment)
             }
@@ -43,4 +43,5 @@ private struct CommentView: View {
 
     return CommentsView(comments: comments)
         .padding()
+        .frame(height: 250)
 }
