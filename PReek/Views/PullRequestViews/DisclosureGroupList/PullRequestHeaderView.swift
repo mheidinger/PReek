@@ -106,6 +106,7 @@ struct PullRequestHeaderView: View, Equatable {
                             ResourceIcon(image: .check)
                                 .frame(width: 13)
                                 .foregroundColor(.success)
+                                .padding(.top, 1)
                         }
                         .help(usersToString(pullRequest.approvalFrom))
                     }
@@ -115,7 +116,7 @@ struct PullRequestHeaderView: View, Equatable {
                             ResourceIcon(image: .fileDiff)
                                 .frame(width: 12)
                                 .foregroundColor(.failure)
-                                .padding(.top, 1)
+                                .padding(.top, 2)
                         }
                         .help(usersToString(pullRequest.changesRequestedFrom))
                     }
