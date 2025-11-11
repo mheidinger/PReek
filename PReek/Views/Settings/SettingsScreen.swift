@@ -5,6 +5,14 @@ import SwiftUI
     import CodeScanner
 #endif
 
+func getAppVersion() -> String {
+    if let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
+        return appVersion
+    }
+    return "Unknown"
+}
+
+
 struct SettingsScreen: View {
     @ObservedObject var configViewModel: ConfigViewModel
 
@@ -32,20 +40,21 @@ struct SettingsScreen: View {
                 }
             }
             .importSheet(configViewModel: configViewModel, isPresented: $showImportSheet)
-        #endif
-        #if os(macOS)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            HStack {
-                Button("Quit App", action: { NSApplication.shared.terminate(nil) })
-                NavigationLink(value: Screen.share) {
-                    Text("Share")
+        #elseif os(macOS)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                HStack {
+                    Button("Quit App", action: { NSApplication.shared.terminate(nil) })
+                    NavigationLink(value: Screen.share) {
+                        Text("Share")
+                    }
+                    Spacer()
+                    Text("Version: \(getAppVersion())")
+                        .foregroundStyle(.secondary)
                 }
-                Spacer()
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(.windowBackground)
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 10)
-            .background(.windowBackground)
-        }
         #endif
     }
 
