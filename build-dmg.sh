@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Exit on error
-set -e
-
 # Configuration
 SCHEME_NAME="PReek"
 PROJECT_PATH="PReek.xcodeproj"
