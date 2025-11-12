@@ -12,7 +12,6 @@ func getAppVersion() -> String {
     return "Unknown"
 }
 
-
 struct SettingsScreen: View {
     @ObservedObject var configViewModel: ConfigViewModel
 
