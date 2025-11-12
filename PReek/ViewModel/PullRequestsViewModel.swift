@@ -28,6 +28,12 @@ class PullRequestsViewModel: ObservableObject {
         updatePullRequestIndexMap()
     }
 
+    deinit {
+        timer?.invalidate()
+        timer = nil
+        cancellables.removeAll()
+    }
+
     @Published private(set) var lastUpdated: Date? = nil
     @Published private(set) var isRefreshing = false
     @Published var error: Error? = nil
@@ -63,6 +69,8 @@ class PullRequestsViewModel: ObservableObject {
 
     private let setFocusTrigger = PassthroughSubject<SetFocusType, Never>()
     private var pullRequestIndexMap: [String: Int] = [:]
+
+    private let maxCacheSize = 500
 
     private func updatePullRequestIndexMap() {
         pullRequestIndexMap = Dictionary(
@@ -166,8 +174,8 @@ class PullRequestsViewModel: ObservableObject {
         if timer != nil {
             return
         }
-        timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { _ in
-            self.triggerUpdatePullRequests()
+        timer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
+            self?.triggerUpdatePullRequests()
         }
     }
 
@@ -332,8 +340,18 @@ class PullRequestsViewModel: ObservableObject {
         let daysToDeduct = (ConfigService.deleteAfterWeeks * 7) + 1
         let deleteFrom = Calendar.current.date(byAdding: .day, value: daysToDeduct * -1, to: Date())!
 
-        let filteredPullRequestMap = pullRequestMap.filter { _, pullRequest in
+        var filteredPullRequestMap = pullRequestMap.filter { _, pullRequest in
             pullRequest.lastUpdated > deleteFrom || (ConfigService.deleteOnlyClosed && !pullRequest.isClosed)
+        }
+
+        // Enforce maximum cache size to prevent unbounded memory growth
+        if filteredPullRequestMap.count > maxCacheSize {
+            let sortedPRs = filteredPullRequestMap.values.sorted { $0.lastUpdated > $1.lastUpdated }
+            let keysToKeep = Set(sortedPRs.prefix(maxCacheSize).map { $0.id })
+            filteredPullRequestMap = filteredPullRequestMap.filter { keysToKeep.contains($0.key) }
+            // swiftformat:disable redundantSelf
+            logger.info("Limiting cache to \(self.maxCacheSize) most recent pull requests")
+            // swiftformat:enable redundantSelf
         }
 
         let filteredPullRequestReadMap = pullRequestReadMap.filter { pullRequestId, _ in
@@ -345,7 +363,7 @@ class PullRequestsViewModel: ObservableObject {
             logger.info("Removing \(self.pullRequestMap.count - filteredPullRequestMap.count) pull requests")
             logger.info("Removing \(self.pullRequestReadMap.count - filteredPullRequestReadMap.count) pull requests read info")
             // swiftformat:enable redundantSelf
-            await MainActor.run {
+            await MainActor.run { [filteredPullRequestMap, filteredPullRequestReadMap] in
                 self.pullRequestMap = filteredPullRequestMap
                 self.pullRequestReadMap = filteredPullRequestReadMap
             }
