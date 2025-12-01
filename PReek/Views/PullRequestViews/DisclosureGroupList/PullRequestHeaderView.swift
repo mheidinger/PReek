@@ -94,6 +94,7 @@ struct PullRequestHeaderView: View, Equatable {
                     Text(pullRequest.deletionsFormatted)
                         .foregroundStyle(.failure)
                 }
+                .drawingGroup() // Prevent MacOS to randomly draw this upside down
             }
 
             if !pullRequest.approvalFrom.isEmpty || !pullRequest.changesRequestedFrom.isEmpty {
