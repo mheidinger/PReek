@@ -11,7 +11,7 @@ struct PullRequestsResponse: Decodable {
 enum PullRequestsQueryBuilder {
     /// GitHub validates GraphQL queries with a short timeout; large batched queries fail with
     /// "Timeout on validation of query".
-    static let maxPullRequestsPerBatch = 10
+    static let maxPullRequestsPerBatch = 25
 
     static func chunkRepoMap(_ repoMap: [String: [Int]], batchSize: Int = maxPullRequestsPerBatch) -> [[String: [Int]]] {
         guard batchSize > 0 else { return [repoMap] }

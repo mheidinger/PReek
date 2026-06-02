@@ -51,6 +51,9 @@ class PullRequestsViewModel: ObservableObject {
     @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: ReadData] =
         [:]
     private var pullRequestMap: [String: PullRequest] = [:]
+    /// Wall-clock time each PR was last fetched from GitHub, used to skip refetching recently
+    /// updated non-notified PRs (stale-while-revalidate).
+    private var pullRequestLastFetched: [String: Date] = [:]
     @Published private var memoizedPullRequests: [PullRequest] = []
     private let invalidationTrigger = PassthroughSubject<Void, Never>()
 
@@ -58,6 +61,10 @@ class PullRequestsViewModel: ObservableObject {
     private var lastProcessedVersions: [String: TimeInterval] = [:]
 
     private let maxCacheSize = 500
+
+    /// Non-notified PRs fetched within this window are skipped on refresh; they are only
+    /// re-fetched once their cached copy is older than this interval.
+    private let staleRefreshInterval: TimeInterval = 3 * 60
 
     private func setupPullRequestsMemoization() {
         // Each emission means the derived list may have changed. Excluded user changes are
@@ -198,11 +205,14 @@ class PullRequestsViewModel: ObservableObject {
                 repoMap: batch, viewer: viewer)
             logger.info("Got \(pullRequests.count) pull requests")
 
+            updatedPullRequestIds.formUnion(pullRequests.map { $0.id })
+
+            let fetchedAt = Date()
             await MainActor.run {
                 for pullRequest in pullRequests {
                     self.pullRequestMap[pullRequest.id] = pullRequest
+                    self.pullRequestLastFetched[pullRequest.id] = fetchedAt
                     self.unreadCache.removeValue(forKey: pullRequest.id)
-                    updatedPullRequestIds.insert(pullRequest.id)
                 }
                 self.invalidationTrigger.send()
             }
@@ -244,8 +254,20 @@ class PullRequestsViewModel: ObservableObject {
                 })
 
             logger.info("Start fetching not updated pull requests")
+            let staleThreshold = Date().addingTimeInterval(-staleRefreshInterval)
             let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
-                !updatedPullRequestIds.contains(pullRequest.id) && pullRequest.status != .merged
+                guard !updatedPullRequestIds.contains(pullRequest.id),
+                    pullRequest.status != .merged
+                else {
+                    return false
+                }
+                // Skip PRs we fetched recently; their cached copy is still fresh enough.
+                if let lastFetched = pullRequestLastFetched[pullRequest.id],
+                    lastFetched > staleThreshold
+                {
+                    return false
+                }
+                return true
             }.reduce([String: [Int]]()) { repoMap, pullRequest in
                 var repoMapClone = repoMap
 
@@ -312,6 +334,9 @@ class PullRequestsViewModel: ObservableObject {
             await MainActor.run { [filteredPullRequestMap, filteredPullRequestReadMap] in
                 self.pullRequestMap = filteredPullRequestMap
                 self.pullRequestReadMap = filteredPullRequestReadMap
+                self.pullRequestLastFetched = self.pullRequestLastFetched.filter {
+                    filteredPullRequestMap.index(forKey: $0.key) != nil
+                }
                 self.invalidationTrigger.send()
             }
         }
