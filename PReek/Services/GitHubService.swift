@@ -51,6 +51,8 @@ class GitHubService {
         switch errors?.first?.type {
         case "INSUFFICIENT_SCOPES":
             return AppError.insufficientScopes(missingScope: nil)
+        case "RATE_LIMITED":
+            return AppError.rateLimited
         default:
             // If there are errors, then they should already be logged
             if errors?.first == nil {
