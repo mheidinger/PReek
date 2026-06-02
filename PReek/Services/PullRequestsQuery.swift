@@ -9,6 +9,44 @@ struct PullRequestsResponse: Decodable {
 }
 
 enum PullRequestsQueryBuilder {
+    /// GitHub validates GraphQL queries with a short timeout; large batched queries fail with
+    /// "Timeout on validation of query".
+    static let maxPullRequestsPerBatch = 10
+
+    static func chunkRepoMap(_ repoMap: [String: [Int]], batchSize: Int = maxPullRequestsPerBatch) -> [[String: [Int]]] {
+        guard batchSize > 0 else { return [repoMap] }
+
+        var batches: [[String: [Int]]] = []
+        var currentBatch: [String: [Int]] = [:]
+        var currentCount = 0
+
+        for (repo, prNumbers) in repoMap {
+            var remainingPRs = prNumbers
+
+            while !remainingPRs.isEmpty {
+                if currentCount >= batchSize {
+                    batches.append(currentBatch)
+                    currentBatch = [:]
+                    currentCount = 0
+                }
+
+                let spaceInBatch = batchSize - currentCount
+                let takeCount = min(remainingPRs.count, spaceInBatch)
+                let taken = Array(remainingPRs.prefix(takeCount))
+                remainingPRs.removeFirst(takeCount)
+
+                currentBatch[repo] = (currentBatch[repo] ?? []) + taken
+                currentCount += takeCount
+            }
+        }
+
+        if !currentBatch.isEmpty {
+            batches.append(currentBatch)
+        }
+
+        return batches
+    }
+
     static func fetchPullRequestQuery(repoMap: [String: [Int]], fetchRequestedTeamReview: Bool) -> String {
         var repoCount = 0
         let queryContent = repoMap.reduce("") { query, repo in

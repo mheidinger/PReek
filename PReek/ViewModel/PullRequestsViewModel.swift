@@ -262,23 +262,38 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     private func fetchPullRequestMap(repoMap: [String: [Int]], viewer: Viewer) async throws -> [String] {
-        if !repoMap.isEmpty {
-            let pullRequests = try await GitHubService.fetchPullRequests(repoMap: repoMap, viewer: viewer)
+        if repoMap.isEmpty {
+            logger.info("No new PRs to fetch")
+            return []
+        }
+
+        let batches = PullRequestsQueryBuilder.chunkRepoMap(repoMap)
+        let totalPullRequests = repoMap.values.reduce(0) { $0 + $1.count }
+
+        if batches.count > 1 {
+            logger.info("Fetching \(totalPullRequests) pull requests in \(batches.count) GraphQL batches")
+        }
+
+        var updatedPullRequestIds: [String] = []
+        updatedPullRequestIds.reserveCapacity(totalPullRequests)
+
+        for batch in batches {
+            let pullRequests = try await GitHubService.fetchPullRequests(repoMap: batch, viewer: viewer)
             logger.info("Got \(pullRequests.count) pull requests")
+
+            let batchIds = pullRequests.map(\.id)
+            updatedPullRequestIds.append(contentsOf: batchIds)
 
             await MainActor.run {
                 for pullRequest in pullRequests {
                     self.pullRequestMap[pullRequest.id] = pullRequest
-                    // Invalidate cache for updated PRs
                     self.unreadCache.removeValue(forKey: pullRequest.id)
                 }
                 self.invalidationTrigger.send()
             }
-            return pullRequests.map { $0.id }
-        } else {
-            logger.info("No new PRs to fetch")
         }
-        return []
+
+        return updatedPullRequestIds
     }
 
     func testConnection() async -> Error? {
