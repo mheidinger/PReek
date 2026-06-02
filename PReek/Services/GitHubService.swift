@@ -87,7 +87,7 @@ class GitHubService {
     }
 
     // returns IDs of all fetched PRs to update all that did not have new notifications
-    static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> [String]) async throws -> [String] {
+    static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> Set<String>) async throws -> Set<String> {
         logger.info("Fetching notifications since \(since.formatted())")
         var url: URL? = try restApiUrl().appending(path: "notifications")
             .appending(queryItems: [
@@ -95,7 +95,7 @@ class GitHubService {
                 URLQueryItem(name: "since", value: since.formatted(.iso8601)),
             ])
 
-        var updatedPullRequestIds: [String] = []
+        var updatedPullRequestIds = Set<String>()
         repeat {
             var request = URLRequest(url: url!)
             request.httpMethod = "GET"
@@ -104,7 +104,7 @@ class GitHubService {
 
             let parsedData = try decoder.decode([NotificationDto].self, from: data)
             let batchUpdatedPullRequestIds = try await onNotificationsReceived(toNotifications(dtos: parsedData)) // TODO: Let this run async?
-            updatedPullRequestIds.append(contentsOf: batchUpdatedPullRequestIds)
+            updatedPullRequestIds.formUnion(batchUpdatedPullRequestIds)
 
             guard let linkHeader = response.value(forHTTPHeaderField: "Link") else {
                 break

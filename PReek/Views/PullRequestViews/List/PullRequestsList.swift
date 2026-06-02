@@ -29,6 +29,7 @@ struct PullRequestsList<Footer: View>: View {
                 Section {
                     ForEach(pullRequests) { pullRequest in
                         PullRequestListItem(pullRequest)
+                            .equatable()
                             .contextMenu {
                                 Button(pullRequest.unread ? "Mark read" : "Mark unread", action: { pullRequestsViewModel.setRead(pullRequest.id, read: pullRequest.unread) })
                             }

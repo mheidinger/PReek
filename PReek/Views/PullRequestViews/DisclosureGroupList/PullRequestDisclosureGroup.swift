@@ -18,9 +18,11 @@ struct PullRequestDisclosureGroup: View {
                 // Only create content view when expanded
                 if sectionExpanded {
                     PullRequestContentView(pullRequest)
+                        .equatable()
                 }
             } label: {
                 PullRequestHeaderView(pullRequest, setRead: setRead)
+                    .equatable()
                     .padding(.leading, 10)
                     .padding(.trailing, 5)
             }

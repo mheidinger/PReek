@@ -61,10 +61,7 @@ struct ContentView: View {
         @State private var path = NavigationPath()
         var navigationContent: some View {
             NavigationStack(path: $path) {
-                MainScreen(
-                    pullRequestsViewModel: pullRequestsViewModel,
-                    configViewModel: configViewModel
-                )
+                MainScreen(pullRequestsViewModel: pullRequestsViewModel)
                 .navigationDestination(for: Screen.self) { screen in
                     Group {
                         switch screen {
@@ -88,10 +85,7 @@ struct ContentView: View {
     #else
         var navigationContent: some View {
             TabView {
-                MainScreen(
-                    pullRequestsViewModel: pullRequestsViewModel,
-                    configViewModel: configViewModel
-                )
+                MainScreen(pullRequestsViewModel: pullRequestsViewModel)
                 .tabItem {
                     Label("Pull Requests", systemImage: "list.bullet")
                 }

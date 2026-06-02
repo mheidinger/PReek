@@ -2,7 +2,6 @@ import SwiftUI
 
 struct MainScreen: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
-    @ObservedObject var configViewModel: ConfigViewModel
 
     var body: some View {
         #if os(macOS)
@@ -66,5 +65,5 @@ struct MainScreen: View {
         PullRequest.preview(id: "4", lastUpdated: Calendar.current.date(byAdding: .day, value: -3, to: Date())!),
         PullRequest.preview(id: "5"),
     ])
-    return MainScreen(pullRequestsViewModel: pullRequestsViewModel, configViewModel: ConfigViewModel())
+    return MainScreen(pullRequestsViewModel: pullRequestsViewModel)
 }

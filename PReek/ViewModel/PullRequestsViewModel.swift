@@ -48,96 +48,71 @@ class PullRequestsViewModel: ObservableObject {
         memoizedPullRequests
     }
 
-    @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: ReadData] = [:]
+    @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: ReadData] =
+        [:]
     private var pullRequestMap: [String: PullRequest] = [:]
     @Published private var memoizedPullRequests: [PullRequest] = []
     private let invalidationTrigger = PassthroughSubject<Void, Never>()
 
-    private var unreadCache: [String: (unread: Bool, oldestEvent: Event?)] = [:]
+    private var unreadCache: [String: PullRequestListFilter.UnreadCacheEntry] = [:]
     private var lastProcessedVersions: [String: TimeInterval] = [:]
 
     private let maxCacheSize = 500
 
-    private func updateUnreadCacheIfNeeded() {
-        for (id, pr) in pullRequestMap {
-            let version = pr.lastUpdated.timeIntervalSince1970
-
-            // Only recalculate if PR has changed since last computation or if cache is empty
-            if lastProcessedVersions[id] != version || unreadCache[id] == nil {
-                let result = PullRequestUnreadCalculator.calculateUnread(
-                    for: pr,
-                    viewer: viewer,
-                    readData: pullRequestReadMap[id]
-                )
-                unreadCache[id] = (result.unread, result.oldestUnreadEvent)
-                lastProcessedVersions[id] = version
-            }
-        }
-
-        // Clean up cache for removed PRs
-        let currentPRIds = Set(pullRequestMap.keys)
-        unreadCache = unreadCache.filter { currentPRIds.contains($0.key) }
-        lastProcessedVersions = lastProcessedVersions.filter { currentPRIds.contains($0.key) }
-    }
-
-    private func getFilteredPullRequests(showClosed: Bool, showRead: Bool) -> ([PullRequest], Bool) {
-        updateUnreadCacheIfNeeded()
-
-        var filteredPRs: [PullRequest] = []
-        filteredPRs.reserveCapacity(pullRequestMap.count)
-
-        for (_, pr) in pullRequestMap {
-            guard let cachedUnread = unreadCache[pr.id] else { continue }
-
-            // Apply cached unread state
-            var updatedPR = pr
-            updatedPR.unread = cachedUnread.unread
-            updatedPR.oldestUnreadEvent = cachedUnread.oldestEvent
-
-            // Check for filters
-            let passesClosedFilter = showClosed || !updatedPR.isClosed
-            let passesReadFilter = showRead || updatedPR.unread
-
-            guard passesClosedFilter, passesReadFilter else { continue }
-
-            // Check for excluded users
-            let containsNonExcludedUser = updatedPR.events.contains { event in
-                !ConfigService.excludedUsersSet.contains(event.user.login)
-            }
-
-            guard containsNonExcludedUser else { continue }
-
-            filteredPRs.append(updatedPR)
-        }
-
-        filteredPRs.sort { $0.lastUpdated > $1.lastUpdated }
-
-        let hasUnread = filteredPRs.contains { $0.unread }
-
-        return (filteredPRs, hasUnread)
-    }
-
     private func setupPullRequestsMemoization() {
-        // Combine dependencies that affect the pullRequests computation
-        // Also add last updated as excluded users are not considered
+        // Each emission means the derived list may have changed. Excluded user changes are
+        // included so the list re-filters without refetching from GitHub.
+        let triggers = Publishers.CombineLatest(
+            invalidationTrigger.prepend(()),
+            ConfigService.excludedUsersDidChange.prepend(())
+        )
+        .setFailureType(to: Never.self)
+
         Publishers.CombineLatest4(
             showClosedSubject,
             showReadSubject,
             $lastUpdated,
-            invalidationTrigger
-                .prepend(())
-                .setFailureType(to: Never.self)
+            triggers
         )
         .throttle(for: .milliseconds(100), scheduler: DispatchQueue.main, latest: true)
-        .map { [weak self] showClosed, showRead, _, _ in
-            guard let self = self else { return ([], false) }
+        .map {
+            [weak self] showClosed, showRead, _, _ -> AnyPublisher<
+                PullRequestListFilter.Output, Never
+            > in
+            guard let self = self else {
+                return Just(
+                    PullRequestListFilter.Output(
+                        pullRequests: [], hasUnread: false, unreadCache: [:],
+                        lastProcessedVersions: [:])
+                ).eraseToAnyPublisher()
+            }
 
-            return self.getFilteredPullRequests(showClosed: showClosed, showRead: showRead)
+            // Snapshot mutable state on the main thread, then filter on a background queue.
+            let input = PullRequestListFilter.Input(
+                pullRequests: Array(self.pullRequestMap.values),
+                readMap: self.pullRequestReadMap,
+                viewer: self.viewer,
+                excludedUsers: ConfigService.excludedUsersSet,
+                showClosed: showClosed,
+                showRead: showRead,
+                unreadCache: self.unreadCache,
+                lastProcessedVersions: self.lastProcessedVersions
+            )
+
+            return Future<PullRequestListFilter.Output, Never> { promise in
+                DispatchQueue.global(qos: .userInitiated).async {
+                    promise(.success(PullRequestListFilter.compute(input)))
+                }
+            }.eraseToAnyPublisher()
         }
+        .switchToLatest()
         .receive(on: DispatchQueue.main)
-        .sink { [weak self] (pullRequests: [PullRequest], hasUnread: Bool) in
-            self?.memoizedPullRequests = pullRequests
-            self?.hasUnread = hasUnread
+        .sink { [weak self] output in
+            guard let self = self else { return }
+            self.unreadCache = output.unreadCache
+            self.lastProcessedVersions = output.lastProcessedVersions
+            self.memoizedPullRequests = output.pullRequests
+            self.hasUnread = output.hasUnread
         }
         .store(in: &cancellables)
     }
@@ -173,7 +148,8 @@ class PullRequestsViewModel: ObservableObject {
     func markAllAsRead() {
         for pullRequest in pullRequests {
             let newestEventId = pullRequest.events.first?.id
-            pullRequestReadMap[pullRequest.id] = ReadData(date: lastUpdated ?? Date(), eventId: newestEventId)
+            pullRequestReadMap[pullRequest.id] = ReadData(
+                date: lastUpdated ?? Date(), eventId: newestEventId)
         }
 
         // Clear unread cache as all items are now read
@@ -181,7 +157,9 @@ class PullRequestsViewModel: ObservableObject {
         invalidationTrigger.send()
     }
 
-    private func handleReceivedNotifications(notifications: [Notification], viewer: Viewer) async throws -> [String] {
+    private func handleReceivedNotifications(notifications: [Notification], viewer: Viewer)
+        async throws -> Set<String>
+    {
         logger.info("Got \(notifications.count) notifications")
 
         let repoMap = notifications.reduce([String: [Int]]()) { repoMap, notification in
@@ -196,7 +174,9 @@ class PullRequestsViewModel: ObservableObject {
         return try await fetchPullRequestMap(repoMap: repoMap, viewer: viewer)
     }
 
-    private func fetchPullRequestMap(repoMap: [String: [Int]], viewer: Viewer) async throws -> [String] {
+    private func fetchPullRequestMap(repoMap: [String: [Int]], viewer: Viewer) async throws -> Set<
+        String
+    > {
         if repoMap.isEmpty {
             logger.info("No new PRs to fetch")
             return []
@@ -206,23 +186,23 @@ class PullRequestsViewModel: ObservableObject {
         let totalPullRequests = repoMap.values.reduce(0) { $0 + $1.count }
 
         if batches.count > 1 {
-            logger.info("Fetching \(totalPullRequests) pull requests in \(batches.count) GraphQL batches")
+            logger.info(
+                "Fetching \(totalPullRequests) pull requests in \(batches.count) GraphQL batches")
         }
 
-        var updatedPullRequestIds: [String] = []
+        var updatedPullRequestIds = Set<String>()
         updatedPullRequestIds.reserveCapacity(totalPullRequests)
 
         for batch in batches {
-            let pullRequests = try await GitHubService.fetchPullRequests(repoMap: batch, viewer: viewer)
+            let pullRequests = try await GitHubService.fetchPullRequests(
+                repoMap: batch, viewer: viewer)
             logger.info("Got \(pullRequests.count) pull requests")
-
-            let batchIds = pullRequests.map(\.id)
-            updatedPullRequestIds.append(contentsOf: batchIds)
 
             await MainActor.run {
                 for pullRequest in pullRequests {
                     self.pullRequestMap[pullRequest.id] = pullRequest
                     self.unreadCache.removeValue(forKey: pullRequest.id)
+                    updatedPullRequestIds.insert(pullRequest.id)
                 }
                 self.invalidationTrigger.send()
             }
@@ -253,8 +233,15 @@ class PullRequestsViewModel: ObservableObject {
 
             logger.info("Start fetching notifications")
             let newLastUpdated = Date()
-            let since = lastUpdated ?? Calendar.current.date(byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1, to: newLastUpdated)!
-            let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(since: since, onNotificationsReceived: { try await handleReceivedNotifications(notifications: $0, viewer: viewer!) })
+            let since =
+                lastUpdated ?? Calendar.current.date(
+                    byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1,
+                    to: newLastUpdated)!
+            let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(
+                since: since,
+                onNotificationsReceived: {
+                    try await handleReceivedNotifications(notifications: $0, viewer: viewer!)
+                })
 
             logger.info("Start fetching not updated pull requests")
             let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
@@ -263,7 +250,8 @@ class PullRequestsViewModel: ObservableObject {
                 var repoMapClone = repoMap
 
                 let existingPRs = repoMap[pullRequest.repository.name]
-                repoMapClone[pullRequest.repository.name] = (existingPRs ?? []) + [pullRequest.number]
+                repoMapClone[pullRequest.repository.name] =
+                    (existingPRs ?? []) + [pullRequest.number]
 
                 return repoMapClone
             }
@@ -288,10 +276,12 @@ class PullRequestsViewModel: ObservableObject {
 
     private func cleanupPullRequests() async {
         let daysToDeduct = (ConfigService.deleteAfterWeeks * 7) + 1
-        let deleteFrom = Calendar.current.date(byAdding: .day, value: daysToDeduct * -1, to: Date())!
+        let deleteFrom = Calendar.current.date(
+            byAdding: .day, value: daysToDeduct * -1, to: Date())!
 
         var filteredPullRequestMap = pullRequestMap.filter { _, pullRequest in
-            pullRequest.lastUpdated > deleteFrom || (ConfigService.deleteOnlyClosed && !pullRequest.isClosed)
+            pullRequest.lastUpdated > deleteFrom
+                || (ConfigService.deleteOnlyClosed && !pullRequest.isClosed)
         }
 
         // Enforce maximum cache size to prevent unbounded memory growth
@@ -308,14 +298,21 @@ class PullRequestsViewModel: ObservableObject {
             filteredPullRequestMap.index(forKey: pullRequestId) != nil
         }
 
-        if filteredPullRequestMap.count != pullRequestMap.count || filteredPullRequestReadMap.count != pullRequestReadMap.count {
+        if filteredPullRequestMap.count != pullRequestMap.count
+            || filteredPullRequestReadMap.count != pullRequestReadMap.count
+        {
             // swiftformat:disable redundantSelf
-            logger.info("Removing \(self.pullRequestMap.count - filteredPullRequestMap.count) pull requests")
-            logger.info("Removing \(self.pullRequestReadMap.count - filteredPullRequestReadMap.count) pull requests read info")
+            logger.info(
+                "Removing \(self.pullRequestMap.count - filteredPullRequestMap.count) pull requests"
+            )
+            logger.info(
+                "Removing \(self.pullRequestReadMap.count - filteredPullRequestReadMap.count) pull requests read info"
+            )
             // swiftformat:enable redundantSelf
             await MainActor.run { [filteredPullRequestMap, filteredPullRequestReadMap] in
                 self.pullRequestMap = filteredPullRequestMap
                 self.pullRequestReadMap = filteredPullRequestReadMap
+                self.invalidationTrigger.send()
             }
         }
     }
