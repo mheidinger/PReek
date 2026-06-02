@@ -26,10 +26,8 @@ struct MainScreen: View {
         if !pullRequestsViewModel.pullRequests.isEmpty {
             #if os(macOS)
                 PullRequestsDisclosureGroupList(
-                    pullRequestsViewModel.pullRequests,
-                    setRead: pullRequestsViewModel.setRead,
-                    toBeFocusedPullRequestId: $pullRequestsViewModel.focusedPullRequestId,
-                    lastUIFocusedPullRequestId: $pullRequestsViewModel.lastUIFocusedPullRequestId
+                    pullRequests: pullRequestsViewModel.pullRequests,
+                    setRead: pullRequestsViewModel.setRead
                 )
             #else
                 PullRequestsList(pullRequestsViewModel: pullRequestsViewModel, footer: {

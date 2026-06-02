@@ -53,12 +53,4 @@ An additional PAT scope `read:org` is required to access the name of a team.
 
 ### Are there any keyboard shortcuts?
 
-There are basic VIM-like motions build in:
-
-| Key | Action |
-| --- | ------ |
-| j | Move down |
-| k | Move up |
-| g | Jump to top |
-| G | Jump to bottom |
-| \<Space\> | Open / Close focused PR |
+On macOS, the status bar supports **r** to refresh and **,** to open settings when the menu is focused.

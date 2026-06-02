@@ -8,13 +8,6 @@ class PullRequestsViewModel: ObservableObject {
     private var timer: Timer?
     private var viewer: Viewer?
 
-    enum SetFocusType {
-        case first
-        case last
-        case next
-        case previous
-    }
-
     init(initialPullRequests: [PullRequest] = []) {
         pullRequestMap = Dictionary(uniqueKeysWithValues: initialPullRequests.map { ($0.id, $0) })
 
@@ -24,8 +17,6 @@ class PullRequestsViewModel: ObservableObject {
         showClosedSubject = CurrentValueSubject<Bool, Never>(storedShowClosed)
         showReadSubject = CurrentValueSubject<Bool, Never>(storedShowRead)
         setupPullRequestsMemoization()
-        setupPullRequestFocus()
-        updatePullRequestIndexMap()
     }
 
     deinit {
@@ -53,8 +44,6 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
 
-    @Published var lastUIFocusedPullRequestId: PullRequest.ID?
-    @Published var focusedPullRequestId: PullRequest.ID?
     var pullRequests: [PullRequest] {
         memoizedPullRequests
     }
@@ -67,17 +56,7 @@ class PullRequestsViewModel: ObservableObject {
     private var unreadCache: [String: (unread: Bool, oldestEvent: Event?)] = [:]
     private var lastProcessedVersions: [String: TimeInterval] = [:]
 
-    private let setFocusTrigger = PassthroughSubject<SetFocusType, Never>()
-    private var pullRequestIndexMap: [String: Int] = [:]
-
     private let maxCacheSize = 500
-
-    private func updatePullRequestIndexMap() {
-        pullRequestIndexMap = Dictionary(
-            pullRequests.enumerated().map { index, pr in (pr.id, index) },
-            uniquingKeysWith: { first, _ in first }
-        )
-    }
 
     private func updateUnreadCacheIfNeeded() {
         for (id, pr) in pullRequestMap {
@@ -159,7 +138,6 @@ class PullRequestsViewModel: ObservableObject {
         .sink { [weak self] (pullRequests: [PullRequest], hasUnread: Bool) in
             self?.memoizedPullRequests = pullRequests
             self?.hasUnread = hasUnread
-            self?.updatePullRequestIndexMap()
         }
         .store(in: &cancellables)
     }
@@ -201,49 +179,6 @@ class PullRequestsViewModel: ObservableObject {
         // Clear unread cache as all items are now read
         unreadCache.removeAll()
         invalidationTrigger.send()
-    }
-
-    private func setupPullRequestFocus() {
-        setFocusTrigger
-            .throttle(for: .milliseconds(40), scheduler: DispatchQueue.main, latest: true)
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] type in
-                guard let self = self else { return }
-
-                let newFocusId: String?
-                switch type {
-                case .first:
-                    newFocusId = self.pullRequests.first?.id
-                case .last:
-                    newFocusId = self.pullRequests.last?.id
-                case .next:
-                    newFocusId = self.getNextFocusIdByOffset(by: 1)
-                case .previous:
-                    newFocusId = self.getNextFocusIdByOffset(by: -1)
-                }
-
-                // Update both focus IDs synchronously to avoid divergation
-                self.lastUIFocusedPullRequestId = newFocusId
-                self.focusedPullRequestId = newFocusId
-            }
-            .store(in: &cancellables)
-    }
-
-    func setFocus(_ type: SetFocusType) {
-        setFocusTrigger.send(type)
-    }
-
-    private func getNextFocusIdByOffset(by offset: Int) -> String? {
-        guard !pullRequests.isEmpty else { return nil }
-
-        let basePullRequestId = lastUIFocusedPullRequestId ?? focusedPullRequestId
-
-        let currentIndex = basePullRequestId.flatMap { focusedId in
-            pullRequestIndexMap[focusedId]
-        }
-        let newIndex = ((currentIndex ?? (offset < 0 ? pullRequests.count : -1)) + offset + pullRequests.count) % pullRequests.count
-
-        return pullRequests[safe: newIndex]?.id
     }
 
     private func handleReceivedNotifications(notifications: [Notification], viewer: Viewer) async throws -> [String] {

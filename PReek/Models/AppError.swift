@@ -50,7 +50,7 @@ enum AppError: LocalizedError {
     var recoverySuggestion: String? {
         switch self {
         case .rateLimited:
-            return String(localized: "GitHub limits API usage per hour. Wait a while before refreshing again; frequent manual refreshes also count toward the limit.")
+            return String(localized: "GitHub limits API usage per hour. Wait a while before refreshing again.")
         case .failedToImportShareData:
             return "Please verify you are using the latest version of the app on both devices. If the issue persists, please report the issue."
         default:
