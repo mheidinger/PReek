@@ -1,9 +1,9 @@
 import Foundation
-import MarkdownUI
 
 struct Comment: Identifiable, Equatable {
     let id: String
-    let content: MarkdownContent
+    /// Raw markdown body. Parsed into `MarkdownContent` lazily at display time.
+    let content: String
     let fileReference: String?
     let isReply: Bool
 

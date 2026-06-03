@@ -13,17 +13,17 @@ class GitHubService {
 
     private static let PUBLIC_GITHUB_BASE_URL = URL(string: "https://api.github.com")!
 
-    private static var decoder: JSONDecoder {
+    private static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
-    }
+    }()
 
-    private static var encoder: JSONEncoder {
+    private static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         return encoder
-    }
+    }()
 
     private static func restApiUrl() throws -> URL {
         if let gitHubEnterpriseUrl = ConfigService.gitHubEnterpriseUrl {

@@ -1,5 +1,4 @@
 import Foundation
-import MarkdownUI
 
 private let reviewStateMap = [
     PullRequestDto.ReviewState.COMMENTED: EventReviewData.State.comment,
@@ -49,7 +48,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
         // Don't merge here as these are top-level comments on the PR
         var comments: [Comment] = []
         if let body = timelineItem.body, !body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            comments.append(Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(body), fileReference: nil, isReply: false))
+            comments.append(Comment(id: toMainCommentId(timelineItem.id), content: body, fileReference: nil, isReply: false))
         }
         data = EventCommentData(url: toOptionalUrl(timelineItem.url), comments: comments)
     case .MergedEvent:
@@ -75,7 +74,7 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
 
         var comments: [Comment] = []
         if let mainCommentBody = timelineItem.body, !mainCommentBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            comments.append(Comment(id: toMainCommentId(timelineItem.id), content: MarkdownContent(mainCommentBody), fileReference: nil, isReply: false))
+            comments.append(Comment(id: toMainCommentId(timelineItem.id), content: mainCommentBody, fileReference: nil, isReply: false))
         }
         comments += (timelineItem.comments?.nodes?.compactMap(toComment) ?? [])
 

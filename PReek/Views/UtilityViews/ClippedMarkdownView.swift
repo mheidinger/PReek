@@ -18,12 +18,16 @@ private struct NoneInlineImageProvider: InlineImageProvider {
 }
 
 struct ClippedMarkdownView: View {
-    let content: MarkdownContent
+    let rawMarkdown: String
 
     @State private var contentHeight: CGFloat = 0
     @State private var isExpanded = false
 
     let maxHeight: CGFloat = 100
+
+    private var content: MarkdownContent {
+        MarkdownContentCache.content(rawMarkdown: rawMarkdown)
+    }
 
     var body: some View {
         GeometryReader { _ in
@@ -71,7 +75,7 @@ struct HeightPreferenceKey: PreferenceKey {
 
 #Preview {
     VStack {
-        ClippedMarkdownView(content: MarkdownContent("""
+        ClippedMarkdownView(rawMarkdown: """
         # Too Large
 
         > This is a quote
@@ -85,14 +89,14 @@ struct HeightPreferenceKey: PreferenceKey {
         *Bla.*
 
         *Bla.*
-        """))
-        ClippedMarkdownView(content: MarkdownContent("""
+        """)
+        ClippedMarkdownView(rawMarkdown: """
         # Fits
 
         > This is a quote
 
         *Bla.*
-        """))
+        """)
     }
     .frame(height: 300, alignment: .top)
     .padding()

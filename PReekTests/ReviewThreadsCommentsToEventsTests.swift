@@ -48,7 +48,7 @@ struct ReviewThreadsCommentsToEventsTests {
         let event0Data = try #require(events[0].data as? EventCommentData)
         try #require(event0Data.comments.count == 1)
         #expect(event0Data.comments[0].id == "comment-1")
-        #expect(event0Data.comments[0].content.renderPlainText() == "comment-1")
+        #expect(event0Data.comments[0].content == "comment-1")
 
         #expect(events[1].id == "comment-2-event")
         #expect(events[1].user.login == "user-2")
@@ -56,7 +56,7 @@ struct ReviewThreadsCommentsToEventsTests {
         let event1Data = try #require(events[1].data as? EventCommentData)
         try #require(event1Data.comments.count == 1)
         #expect(event1Data.comments[0].id == "comment-2")
-        #expect(event1Data.comments[0].content.renderPlainText() == "comment-2")
+        #expect(event1Data.comments[0].content == "comment-2")
     }
 
     @Test func mergeReviewThreadsComments() async throws {
@@ -89,7 +89,7 @@ struct ReviewThreadsCommentsToEventsTests {
         let event1Data = try #require(events[1].data as? EventCommentData)
         try #require(event1Data.comments.count == 1)
         #expect(event1Data.comments[0].id == "comment-3")
-        #expect(event1Data.comments[0].content.renderPlainText() == "comment-3")
+        #expect(event1Data.comments[0].content == "comment-3")
     }
 
     @Test func excludeReviewThreadsCommentsFromReviews() async throws {

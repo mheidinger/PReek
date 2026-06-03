@@ -1,5 +1,4 @@
 import Foundation
-import MarkdownUI
 
 protocol EventData {
     // Returning nil will default to the PR overview page
@@ -68,8 +67,8 @@ struct Event: Identifiable, Equatable {
             data: EventReviewData(
                 url: nil,
                 state: .changesRequested,
-                comments: comments ?? [
-                    Comment(id: UUID().uuidString, content: MarkdownContent("""
+                comments:                 comments ?? [
+                    Comment(id: UUID().uuidString, content: """
                     # Heading
 
                     > Some important comment that also is not too short as we'll get long comments and it won't stop and go on and on and on
@@ -77,8 +76,8 @@ struct Event: Identifiable, Equatable {
                     **Theres more to come.**
 
                     *The End!*
-                    """), fileReference: nil, isReply: false),
-                    Comment(id: UUID().uuidString, content: MarkdownContent("Some important comment that also is not too short as we'll get long comments"), fileReference: "MyComponent.tsx#L123", isReply: true),
+                    """, fileReference: nil, isReply: false),
+                    Comment(id: UUID().uuidString, content: "Some important comment that also is not too short as we'll get long comments", fileReference: "MyComponent.tsx#L123", isReply: true),
                 ]
             ),
             pullRequestUrl: URL(string: "https://example.com")!
@@ -89,7 +88,7 @@ struct Event: Identifiable, Equatable {
         id: UUID().uuidString,
         user: User.preview(login: "person-6"),
         time: Date().addingTimeInterval(-60),
-        data: EventCommentData(url: nil, comments: [Comment(id: UUID().uuidString, content: MarkdownContent("## Comment\n\nHello World, this is some really long comment which basically has no content but it has to be long"), fileReference: nil, isReply: false)]),
+        data: EventCommentData(url: nil, comments: [Comment(id: UUID().uuidString, content: "## Comment\n\nHello World, this is some really long comment which basically has no content but it has to be long", fileReference: nil, isReply: false)]),
         pullRequestUrl: URL(string: "https://example.com")!
     )
     static let previewReadyForReview = Event(id: UUID().uuidString, user: User.preview(login: "person-7"), time: Date().addingTimeInterval(-70), data: ReadyForReviewData(url: nil), pullRequestUrl: URL(string: "https://example.com")!)

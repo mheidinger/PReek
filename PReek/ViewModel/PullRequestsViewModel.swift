@@ -124,6 +124,9 @@ class PullRequestsViewModel: ObservableObject {
         .store(in: &cancellables)
     }
 
+    /// Single in-flight refresh shared by all callers (timer, pull-to-refresh, status bar, launch).
+    private var refreshTask: Task<Void, Never>?
+
     func triggerUpdatePullRequests() {
         Task {
             await updatePullRequests()
@@ -232,7 +235,28 @@ class PullRequestsViewModel: ObservableObject {
         }
     }
 
+    /// Coalesces overlapping refreshes: concurrent callers await the same in-flight refresh
+    /// instead of each spawning their own GitHub round-trips.
+    ///
+    /// Thread safety: `refreshTask` is only accessed here, on the main actor, so there is no data
+    /// race on it. Correctness relies on there being **no suspension point (`await`) between the
+    /// nil-check and the `refreshTask = task` assignment** — that keeps the check-and-set atomic
+    /// against `@MainActor` reentrancy, so two callers can never both start a refresh. Do not
+    /// insert an `await` in that span.
+    @MainActor
     func updatePullRequests() async {
+        if let refreshTask {
+            await refreshTask.value
+            return
+        }
+
+        let task = Task { await self.performUpdatePullRequests() }
+        refreshTask = task
+        await task.value
+        refreshTask = nil
+    }
+
+    private func performUpdatePullRequests() async {
         do {
             await MainActor.run {
                 self.isRefreshing = true

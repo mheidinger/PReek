@@ -22,23 +22,23 @@ private struct CommentView: View {
                 Text(setPrefix)
                     .foregroundStyle(.secondary)
             }
-            ClippedMarkdownView(content: comment.content)
+            ClippedMarkdownView(rawMarkdown: comment.content)
         }
     }
 }
 
 #Preview {
     let comments = [
-        Comment(id: UUID().uuidString, content: MarkdownContent("""
+        Comment(id: UUID().uuidString, content: """
         # Heading
 
         Some text
-        """), fileReference: "file.abc:L123", isReply: true),
-        Comment(id: UUID().uuidString, content: MarkdownContent("""
+        """, fileReference: "file.abc:L123", isReply: true),
+        Comment(id: UUID().uuidString, content: """
         # Heading
 
         Some other text
-        """), fileReference: nil, isReply: false),
+        """, fileReference: nil, isReply: false),
     ]
 
     return CommentsView(comments: comments)

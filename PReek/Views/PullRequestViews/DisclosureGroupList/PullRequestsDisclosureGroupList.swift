@@ -14,6 +14,10 @@ struct PullRequestsDisclosureGroupList: View {
                             setRead: setRead
                         )
                     }
+                    // Pin to the stable outer width (not the ScrollView's content width) so the
+                    // list doesn't shift when the vertical scroll bar appears.
+                    // 23 = 3pt leading padding (below) + ~20pt trailing margin to clear the scroll bar.
+                    .frame(width: geometry.size.width - 23)
                 }
                 .padding(.leading, 3)
                 .padding(.vertical, 5)
