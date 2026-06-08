@@ -7,7 +7,9 @@ import MarkdownUI
 enum MarkdownContentCache {
     private final class Box {
         let content: MarkdownContent
-        init(_ content: MarkdownContent) { self.content = content }
+        init(_ content: MarkdownContent) {
+            self.content = content
+        }
     }
 
     private static let cache: NSCache<NSString, Box> = {

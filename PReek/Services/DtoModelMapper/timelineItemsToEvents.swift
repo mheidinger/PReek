@@ -122,16 +122,23 @@ private func timelineItemToData(timelineItem: PullRequestDto.TimelineItem, prevP
     return TimelineItemEventDataPair(timelineItem: timelineItem, eventData: data, mergedFromOldest: merge ? prevPair?.baseTimelineItem : nil)
 }
 
-func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRequestUrl: URL) -> [Event] {
+func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRequestUrl: URL) -> (events: [Event], reviewCommentIds: Set<String>) {
     guard let timelineItems = timelineItems else {
-        return []
+        return ([], [])
     }
 
-    // Step 1: Convert timeline items to data and merge information
+    // Step 1: Convert timeline items to data and merge information. The set of review comment ids
+    // surfaced inline on timeline items is collected in the same walk so callers can skip
+    // re-emitting them from review threads (avoids a second pass over the timeline).
     var pairs: [TimelineItemEventDataPair] = []
     pairs.reserveCapacity(timelineItems.count)
+    var reviewCommentIds = Set<String>()
 
     for timelineItem in timelineItems {
+        for comment in timelineItem.comments?.nodes ?? [] {
+            reviewCommentIds.insert(comment.id)
+        }
+
         guard timelineItem.id != nil else {
             continue
         }
@@ -147,7 +154,7 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRe
     let mergedPairs = mergeArray(pairs, indicator: \.mergedFromOldest)
 
     // Step 3: Convert to Event objects
-    return mergedPairs.map { pair in
+    let events = mergedPairs.map { pair in
         let timelineItem = pair.timelineItem
         let baseTimelineItem = pair.baseTimelineItem
         let data = pair.eventData
@@ -159,4 +166,6 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRe
             pullRequestUrl: pullRequestUrl
         )
     }
+
+    return (events, reviewCommentIds)
 }

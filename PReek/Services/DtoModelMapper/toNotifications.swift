@@ -1,27 +1,18 @@
 import Foundation
 
 func toNotifications(dtos: [NotificationDto]) -> [Notification] {
-    return dtos.reduce([Notification]()) { notificationArray, notificationDto in
-        if notificationDto.subject.type != "PullRequest" {
-            return notificationArray
+    return dtos.reduce(into: [Notification]()) { notifications, notificationDto in
+        guard notificationDto.subject.type == "PullRequest",
+              let url = notificationDto.subject.url,
+              let prNumberStr = url.split(separator: "/").last,
+              let prNumber = Int(prNumberStr)
+        else {
+            return
         }
 
-        guard let url = notificationDto.subject.url else {
-            return notificationArray
-        }
-
-        let prNumberStr = url.split(separator: "/").last
-        if prNumberStr == nil {
-            return notificationArray
-        }
-        let prNumber = Int(String(prNumberStr!))
-        if prNumber == nil {
-            return notificationArray
-        }
-
-        return notificationArray + [Notification(
+        notifications.append(Notification(
             repo: "\(notificationDto.repository.owner.login)/\(notificationDto.repository.name)",
-            prNumber: prNumber!
-        )]
+            prNumber: prNumber
+        ))
     }
 }

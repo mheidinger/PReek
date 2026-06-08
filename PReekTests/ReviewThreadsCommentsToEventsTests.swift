@@ -27,7 +27,7 @@ let actor2 = PullRequestDto.Actor(login: "user-2", url: urlString, name: nil)
 let actor3 = PullRequestDto.Actor(login: "user-3", url: urlString, name: nil)
 
 struct ReviewThreadsCommentsToEventsTests {
-    @Test func mapSeparateReviewThreadsComments() async throws {
+    @Test func mapSeparateReviewThreadsComments() throws {
         let firstThreadCommentDtos = [
             createComment(id: "comment-2", author: actor2, body: "comment-2", minute: 5),
         ]
@@ -59,7 +59,7 @@ struct ReviewThreadsCommentsToEventsTests {
         #expect(event1Data.comments[0].content == "comment-2")
     }
 
-    @Test func mergeReviewThreadsComments() async throws {
+    @Test func mergeReviewThreadsComments() throws {
         let firstThreadCommentDtos = [
             createComment(id: "comment-1", author: actor1, body: "comment-1", minute: 0),
         ]
@@ -92,7 +92,7 @@ struct ReviewThreadsCommentsToEventsTests {
         #expect(event1Data.comments[0].content == "comment-3")
     }
 
-    @Test func excludeReviewThreadsCommentsFromReviews() async throws {
+    @Test func excludeReviewThreadsCommentsFromReviews() throws {
         let firstThreadCommentDtos = [
             createComment(id: "comment-1", author: actor1, body: "comment-1", minute: 0),
             createComment(id: "comment-2", author: actor1, body: "comment-2", minute: 1),

@@ -2,12 +2,7 @@ import SwiftUI
 
 struct HoverableLink<Label: View>: View {
     let destination: URL
-    let label: Label
-
-    init(destination: URL, @ViewBuilder label: () -> Label) {
-        self.destination = destination
-        self.label = label()
-    }
+    @ViewBuilder let label: Label
 
     var body: some View {
         Link(destination: destination) {

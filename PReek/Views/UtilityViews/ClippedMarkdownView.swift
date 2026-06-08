@@ -30,39 +30,44 @@ struct ClippedMarkdownView: View {
     }
 
     var body: some View {
-        GeometryReader { _ in
-            Markdown(content)
-                .markdownImageProvider(NoneImageProvider())
-                .markdownInlineImageProvider(NoneInlineImageProvider())
-                .frame(maxWidth: .infinity, alignment: .topLeading)
-                .background(
-                    GeometryReader { contentGeometry in
-                        Color.clear.preference(key: HeightPreferenceKey.self, value: contentGeometry.size.height)
+        Markdown(content)
+            .markdownImageProvider(NoneImageProvider())
+            .markdownInlineImageProvider(NoneInlineImageProvider())
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+            .background(
+                GeometryReader { contentGeometry in
+                    Color.clear.preference(
+                        key: HeightPreferenceKey.self, value: contentGeometry.size.height
+                    )
+                }
+            )
+            .onPreferenceChange(HeightPreferenceKey.self) { height in
+                contentHeight = height
+            }
+            .frame(height: isExpanded ? nil : min(contentHeight, maxHeight), alignment: .top)
+            .clipped()
+            .if(!isExpanded && contentHeight > maxHeight) { view in
+                view
+                    .mask {
+                        LinearGradient(
+                            colors: [.black, .clear], startPoint: .center, endPoint: .bottom
+                        )
                     }
-                )
-                .onPreferenceChange(HeightPreferenceKey.self) { height in
-                    contentHeight = height
-                }
-                .frame(height: isExpanded ? nil : min(contentHeight, maxHeight), alignment: .top)
-                .clipped()
-                .if(!isExpanded && contentHeight > maxHeight) { view in
-                    view
-                        .mask {
-                            LinearGradient(colors: [.black, .clear], startPoint: .center, endPoint: .bottom)
+            }
+            .if(contentHeight > maxHeight) { view in
+                view
+                    .overlay(alignment: .bottomTrailing) {
+                        Button(action: { isExpanded = !isExpanded }) {
+                            Image(
+                                systemName: isExpanded
+                                    ? "arrowtriangle.up.square" : "arrowtriangle.down.square"
+                            )
+                            .imageScale(.large)
                         }
-                }
-                .if(contentHeight > maxHeight) { view in
-                    view
-                        .overlay(alignment: .bottomTrailing) {
-                            Button(action: { isExpanded = !isExpanded }) {
-                                Image(systemName: isExpanded ? "arrowtriangle.up.square" : "arrowtriangle.down.square")
-                                    .imageScale(.large)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                        }
-                }
-        }
-        .frame(height: isExpanded || contentHeight <= maxHeight ? contentHeight : maxHeight)
+                        .buttonStyle(PlainButtonStyle())
+                    }
+            }
+            .frame(height: isExpanded || contentHeight <= maxHeight ? contentHeight : maxHeight)
     }
 }
 
@@ -75,28 +80,32 @@ struct HeightPreferenceKey: PreferenceKey {
 
 #Preview {
     VStack {
-        ClippedMarkdownView(rawMarkdown: """
-        # Too Large
+        ClippedMarkdownView(
+            rawMarkdown: """
+            # Too Large
 
-        > This is a quote
+            > This is a quote
 
-        *More to come.*
+            *More to come.*
 
-        ![Some Image](https://example.com/some/image)
+            ![Some Image](https://example.com/some/image)
 
-        Text with an inline ![Some Image](https://example.com/some/image) embedded.
+            Text with an inline ![Some Image](https://example.com/some/image) embedded.
 
-        *Bla.*
+            *Bla.*
 
-        *Bla.*
-        """)
-        ClippedMarkdownView(rawMarkdown: """
-        # Fits
+            *Bla.*
+            """
+        )
+        ClippedMarkdownView(
+            rawMarkdown: """
+            # Fits
 
-        > This is a quote
+            > This is a quote
 
-        *Bla.*
-        """)
+            *Bla.*
+            """
+        )
     }
     .frame(height: 300, alignment: .top)
     .padding()

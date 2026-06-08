@@ -62,33 +62,33 @@ struct ContentView: View {
         var navigationContent: some View {
             NavigationStack(path: $path) {
                 MainScreen(pullRequestsViewModel: pullRequestsViewModel)
-                .navigationDestination(for: Screen.self) { screen in
-                    Group {
-                        switch screen {
-                        case .settings:
-                            SettingsScreen(configViewModel: configViewModel)
-                        case .share:
-                            ShareScreen(configViewModel: configViewModel)
-                        default:
-                            EmptyView()
+                    .navigationDestination(for: Screen.self) { screen in
+                        Group {
+                            switch screen {
+                            case .settings:
+                                SettingsScreen(configViewModel: configViewModel)
+                            case .share:
+                                ShareScreen(configViewModel: configViewModel)
+                            default:
+                                EmptyView()
+                            }
                         }
                     }
-                }
-                .onChange(of: resetPath) {
-                    if resetPath {
-                        path = NavigationPath()
-                        resetPath = false
+                    .onChange(of: resetPath) {
+                        if resetPath {
+                            path = NavigationPath()
+                            resetPath = false
+                        }
                     }
-                }
             }
         }
     #else
         var navigationContent: some View {
             TabView {
                 MainScreen(pullRequestsViewModel: pullRequestsViewModel)
-                .tabItem {
-                    Label("Pull Requests", systemImage: "list.bullet")
-                }
+                    .tabItem {
+                        Label("Pull Requests", systemImage: "list.bullet")
+                    }
 
                 NavigationStack {
                     SettingsScreen(configViewModel: configViewModel)

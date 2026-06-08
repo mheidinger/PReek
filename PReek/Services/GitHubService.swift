@@ -86,7 +86,7 @@ class GitHubService {
         return toViewer(data.viewer, scopesHeader: scopesHeader)
     }
 
-    // returns IDs of all fetched PRs to update all that did not have new notifications
+    /// returns IDs of all fetched PRs to update all that did not have new notifications
     static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> Set<String>) async throws -> Set<String> {
         logger.info("Fetching notifications since \(since.formatted())")
         var url: URL? = try restApiUrl().appending(path: "notifications")

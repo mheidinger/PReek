@@ -50,21 +50,21 @@ private func makeInput(
 }
 
 struct PullRequestListFilterTests {
-    @Test func excludesPullRequestWhenAllParticipantsExcluded() async throws {
+    @Test func excludesPullRequestWhenAllParticipantsExcluded() {
         let pr = makePR(id: "1", participant: "bot")
         let output = PullRequestListFilter.compute(makeInput(pullRequests: [pr], excludedUsers: ["bot"]))
 
         #expect(output.pullRequests.isEmpty)
     }
 
-    @Test func keepsPullRequestWhenSomeParticipantNotExcluded() async throws {
+    @Test func keepsPullRequestWhenSomeParticipantNotExcluded() {
         let pr = makePR(id: "1", participant: "alice")
         let output = PullRequestListFilter.compute(makeInput(pullRequests: [pr], excludedUsers: ["bot"]))
 
         #expect(output.pullRequests.map(\.id) == ["1"])
     }
 
-    @Test func reFiltersWhenExcludedListChanges() async throws {
+    @Test func reFiltersWhenExcludedListChanges() {
         let pr = makePR(id: "1", participant: "bot")
 
         let visible = PullRequestListFilter.compute(makeInput(pullRequests: [pr], excludedUsers: []))
@@ -74,7 +74,7 @@ struct PullRequestListFilterTests {
         #expect(hidden.pullRequests.isEmpty)
     }
 
-    @Test func showClosedToggleFiltersClosedPullRequests() async throws {
+    @Test func showClosedToggleFiltersClosedPullRequests() {
         let pr = makePR(id: "1", status: .merged)
 
         let hidden = PullRequestListFilter.compute(makeInput(pullRequests: [pr], showClosed: false))
@@ -84,7 +84,7 @@ struct PullRequestListFilterTests {
         #expect(visible.pullRequests.map(\.id) == ["1"])
     }
 
-    @Test func showReadToggleFiltersReadPullRequests() async throws {
+    @Test func showReadToggleFiltersReadPullRequests() {
         let pr = makePR(id: "1")
         let version = pr.lastUpdated.timeIntervalSince1970
         // Force the PR to be considered read via a matching cache entry.
@@ -108,7 +108,7 @@ struct PullRequestListFilterTests {
         #expect(visible.pullRequests.map(\.id) == ["1"])
     }
 
-    @Test func reusesUnreadCacheWhenVersionMatches() async throws {
+    @Test func reusesUnreadCacheWhenVersionMatches() {
         let pr = makePR(id: "1")
         let version = pr.lastUpdated.timeIntervalSince1970
         // Cached value contradicts a fresh calculation (no readData would be unread == true).

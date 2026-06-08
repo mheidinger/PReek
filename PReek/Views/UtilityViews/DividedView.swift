@@ -6,13 +6,13 @@ struct DividedView<Content: View>: View {
     private let content: Content
     private let shouldHighlight: ShouldHighlightFunc<Int>
 
-    // Initializer for full content without data
+    /// Initializer for full content without data
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
         shouldHighlight = nil
     }
 
-    // Initializer for data-driven content with optional highlighting, without additional content
+    /// Initializer for data-driven content with optional highlighting, without additional content
     init<T: Identifiable, ItemContent: View, C: Collection>(
         _ data: C,
         @ViewBuilder content: @escaping (T) -> ItemContent,
@@ -26,7 +26,7 @@ struct DividedView<Content: View>: View {
         )
     }
 
-    // Initializer for data-driven content with optional highlighting and additional content
+    /// Initializer for data-driven content with optional highlighting and additional content
     init<T: Identifiable, ItemContent: View, AdditionalContent: View, C: Collection>(
         _ data: C,
         @ViewBuilder content: @escaping (T) -> ItemContent,

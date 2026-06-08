@@ -90,7 +90,8 @@ class PullRequestsViewModel: ObservableObject {
                 return Just(
                     PullRequestListFilter.Output(
                         pullRequests: [], hasUnread: false, unreadCache: [:],
-                        lastProcessedVersions: [:])
+                        lastProcessedVersions: [:]
+                    )
                 ).eraseToAnyPublisher()
             }
 
@@ -156,11 +157,15 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     func markAllAsRead() {
+        let readDate = lastUpdated ?? Date()
+        // Mutate a local copy and persist once, instead of encoding the whole map per PR.
+        var readMap = pullRequestReadMap
         for pullRequest in pullRequests {
-            let newestEventId = pullRequest.events.first?.id
-            pullRequestReadMap[pullRequest.id] = ReadData(
-                date: lastUpdated ?? Date(), eventId: newestEventId)
+            readMap[pullRequest.id] = ReadData(
+                date: readDate, eventId: pullRequest.events.first?.id
+            )
         }
+        pullRequestReadMap = readMap
 
         // Clear unread cache as all items are now read
         unreadCache.removeAll()
@@ -172,13 +177,8 @@ class PullRequestsViewModel: ObservableObject {
     {
         logger.info("Got \(notifications.count) notifications")
 
-        let repoMap = notifications.reduce([String: [Int]]()) { repoMap, notification in
-            var repoMapClone = repoMap
-
-            let existingPRs = repoMap[notification.repo]
-            repoMapClone[notification.repo] = (existingPRs ?? []) + [notification.prNumber]
-
-            return repoMapClone
+        let repoMap = notifications.reduce(into: [String: [Int]]()) { repoMap, notification in
+            repoMap[notification.repo, default: []].append(notification.prNumber)
         }
 
         return try await fetchPullRequestMap(repoMap: repoMap, viewer: viewer)
@@ -197,7 +197,8 @@ class PullRequestsViewModel: ObservableObject {
 
         if batches.count > 1 {
             logger.info(
-                "Fetching \(totalPullRequests) pull requests in \(batches.count) GraphQL batches")
+                "Fetching \(totalPullRequests) pull requests in \(batches.count) GraphQL batches"
+            )
         }
 
         var updatedPullRequestIds = Set<String>()
@@ -205,7 +206,8 @@ class PullRequestsViewModel: ObservableObject {
 
         for batch in batches {
             let pullRequests = try await GitHubService.fetchPullRequests(
-                repoMap: batch, viewer: viewer)
+                repoMap: batch, viewer: viewer
+            )
             logger.info("Got \(pullRequests.count) pull requests")
 
             updatedPullRequestIds.formUnion(pullRequests.map { $0.id })
@@ -270,36 +272,32 @@ class PullRequestsViewModel: ObservableObject {
             let since =
                 lastUpdated ?? Calendar.current.date(
                     byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1,
-                    to: newLastUpdated)!
+                    to: newLastUpdated
+                )!
             let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(
                 since: since,
                 onNotificationsReceived: {
                     try await handleReceivedNotifications(notifications: $0, viewer: viewer!)
-                })
+                }
+            )
 
             logger.info("Start fetching not updated pull requests")
             let staleThreshold = Date().addingTimeInterval(-staleRefreshInterval)
             let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
                 guard !updatedPullRequestIds.contains(pullRequest.id),
-                    pullRequest.status != .merged
+                      pullRequest.status != .merged
                 else {
                     return false
                 }
                 // Skip PRs we fetched recently; their cached copy is still fresh enough.
                 if let lastFetched = pullRequestLastFetched[pullRequest.id],
-                    lastFetched > staleThreshold
+                   lastFetched > staleThreshold
                 {
                     return false
                 }
                 return true
-            }.reduce([String: [Int]]()) { repoMap, pullRequest in
-                var repoMapClone = repoMap
-
-                let existingPRs = repoMap[pullRequest.repository.name]
-                repoMapClone[pullRequest.repository.name] =
-                    (existingPRs ?? []) + [pullRequest.number]
-
-                return repoMapClone
+            }.reduce(into: [String: [Int]]()) { repoMap, pullRequest in
+                repoMap[pullRequest.repository.name, default: []].append(pullRequest.number)
             }
             _ = try await fetchPullRequestMap(repoMap: notUpdatedRepoMap, viewer: viewer!)
 
@@ -323,7 +321,8 @@ class PullRequestsViewModel: ObservableObject {
     private func cleanupPullRequests() async {
         let daysToDeduct = (ConfigService.deleteAfterWeeks * 7) + 1
         let deleteFrom = Calendar.current.date(
-            byAdding: .day, value: daysToDeduct * -1, to: Date())!
+            byAdding: .day, value: daysToDeduct * -1, to: Date()
+        )!
 
         var filteredPullRequestMap = pullRequestMap.filter { _, pullRequest in
             pullRequest.lastUpdated > deleteFrom

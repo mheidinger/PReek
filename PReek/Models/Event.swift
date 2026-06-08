@@ -67,7 +67,7 @@ struct Event: Identifiable, Equatable {
             data: EventReviewData(
                 url: nil,
                 state: .changesRequested,
-                comments:                 comments ?? [
+                comments: comments ?? [
                     Comment(id: UUID().uuidString, content: """
                     # Heading
 

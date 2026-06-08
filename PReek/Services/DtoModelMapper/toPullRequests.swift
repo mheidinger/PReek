@@ -7,14 +7,6 @@ private let pullRequestStatusMap = [
     PullRequestDto.State.CLOSED: PullRequest.Status.closed,
 ]
 
-private func extractReviewCommentIds(timelineItems: [PullRequestDto.TimelineItem]?) -> [String] {
-    guard let timelineItems = timelineItems else {
-        return []
-    }
-
-    return timelineItems.flatMap { timelineItem in timelineItem.comments?.nodes ?? [] }.map { comment in comment.id }
-}
-
 private func extractReviewCount(opinionatedReviews: [PullRequestDto.LatestOpinionatedReview]?) -> ([User], [User]) {
     guard let opinionatedReviews = opinionatedReviews else {
         return ([], [])
@@ -49,8 +41,7 @@ private func toStatus(dto: PullRequestDto) -> PullRequest.Status {
 private func toPullRequest(dto: PullRequestDto) -> PullRequest {
     let pullRequestUrl = URL(string: dto.url) ?? URL(string: "https://invalid.data")!
 
-    let timelineEvents = timelineItemsToEvents(timelineItems: dto.timelineItems.nodes, pullRequestUrl: pullRequestUrl)
-    let reviewCommentIds = extractReviewCommentIds(timelineItems: dto.timelineItems.nodes)
+    let (timelineEvents, reviewCommentIds) = timelineItemsToEvents(timelineItems: dto.timelineItems.nodes, pullRequestUrl: pullRequestUrl)
     let reviewThreadsCommentsEvents = reviewThreadsCommentsToEvents(reviewThreads: dto.reviewThreads.nodes, reviewCommentIds: reviewCommentIds, pullRequestUrl: pullRequestUrl)
 
     let events = (timelineEvents + reviewThreadsCommentsEvents).sorted {

@@ -1,34 +1,17 @@
 import SwiftUI
 
-private class TimeSensitiveTextTimer: ObservableObject {
-    static let shared = TimeSensitiveTextTimer()
-
-    @Published private(set) var tick = Date()
-
-    private init() {
-        Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true) { _ in
-            self.tick = Date()
-        }
-    }
-}
-
+/// Displays a time-derived string (e.g. "5 minutes ago") that needs to refresh as time passes.
+///
+/// Each instance owns its own `TimelineView` clock instead of subscribing to a shared timer, so
+/// labels refresh independently while on screen (the timeline pauses when the view leaves the
+/// hierarchy) and the per-instance `from: .now` phase staggers the work instead of recomputing
+/// every label in one synchronized frame.
 struct TimeSensitiveText: View {
     let getText: () -> String
-    @State private var currentText: String
-    @ObservedObject private var timer = TimeSensitiveTextTimer.shared
-
-    init(getText: @escaping () -> String) {
-        self.getText = getText
-        _currentText = State(initialValue: getText())
-    }
 
     var body: some View {
-        Text(currentText)
-            .onReceive(timer.$tick) { _ in
-                let newText = getText()
-                if newText != currentText {
-                    currentText = newText
-                }
-            }
+        TimelineView(.periodic(from: .now, by: 60)) { _ in
+            Text(getText())
+        }
     }
 }

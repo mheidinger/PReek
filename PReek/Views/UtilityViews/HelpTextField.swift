@@ -11,7 +11,7 @@ struct HelpTextField<HelpContent: View>: View {
     @Binding var text: String
     let label: LocalizedStringKey
     let prompt: LocalizedStringKey
-    // Only available on macOS
+    /// Only available on macOS
     let helpContent: () -> HelpContent
 
     @State private var showPopover = false

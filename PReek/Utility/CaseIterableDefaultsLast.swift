@@ -1,6 +1,6 @@
 import Foundation
 
-// During JSON deserialize default to last enum value
+/// During JSON deserialize default to last enum value
 protocol CaseIterableDefaultsLast: Decodable & CaseIterable & RawRepresentable
     where RawValue: Decodable, AllCases: BidirectionalCollection {}
 

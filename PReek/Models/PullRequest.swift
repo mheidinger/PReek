@@ -22,11 +22,11 @@ struct PullRequest: Identifiable, Equatable {
     let approvalFrom: [User]
     let changesRequestedFrom: [User]
 
-    // Distinct logins of all event users, precomputed so list filtering avoids scanning events.
+    /// Distinct logins of all event users, precomputed so list filtering avoids scanning events.
     let participantLogins: Set<String>
 
     var unread = true
-    var oldestUnreadEvent: Event? = nil
+    var oldestUnreadEvent: Event?
 
     init(
         id: String,
