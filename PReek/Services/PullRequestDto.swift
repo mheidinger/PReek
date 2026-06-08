@@ -26,7 +26,7 @@ struct PullRequestDto: Decodable {
         let name: String?
     }
 
-    // This is an empty object if we don't fetch teams but have permission for it
+    /// This is an empty object if we don't fetch teams but have permission for it
     struct ActorOrTeam: Decodable {
         /// only on Actor
         let login: String?

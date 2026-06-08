@@ -1,6 +1,6 @@
 import SwiftUI
 
-// Allow `if` during string interpolation
+/// Allow `if` during string interpolation
 extension String.StringInterpolation {
     /// Provides Boolean-guided interpolation that succeeds only when the condition
     /// evaluates to true.

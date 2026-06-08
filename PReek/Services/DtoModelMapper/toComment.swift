@@ -1,5 +1,4 @@
 import Foundation
-import MarkdownUI
 
 func toComment(commentDto: PullRequestDto.ReviewComment) -> Comment? {
     if commentDto.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -8,7 +7,7 @@ func toComment(commentDto: PullRequestDto.ReviewComment) -> Comment? {
 
     return Comment(
         id: commentDto.id,
-        content: MarkdownContent(commentDto.body),
+        content: commentDto.body,
         fileReference: commentDto.path,
         isReply: commentDto.replyTo != nil
     )

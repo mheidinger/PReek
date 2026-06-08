@@ -22,8 +22,42 @@ struct PullRequest: Identifiable, Equatable {
     let approvalFrom: [User]
     let changesRequestedFrom: [User]
 
+    /// Distinct logins of all event users, precomputed so list filtering avoids scanning events.
+    let participantLogins: Set<String>
+
     var unread = true
-    var oldestUnreadEvent: Event? = nil
+    var oldestUnreadEvent: Event?
+
+    init(
+        id: String,
+        repository: Repository,
+        author: User,
+        title: String,
+        number: Int,
+        status: Status,
+        lastUpdated: Date,
+        events: [Event],
+        url: URL,
+        additions: Int,
+        deletions: Int,
+        approvalFrom: [User],
+        changesRequestedFrom: [User]
+    ) {
+        self.id = id
+        self.repository = repository
+        self.author = author
+        self.title = title
+        self.number = number
+        self.status = status
+        self.lastUpdated = lastUpdated
+        self.events = events
+        self.url = url
+        self.additions = additions
+        self.deletions = deletions
+        self.approvalFrom = approvalFrom
+        self.changesRequestedFrom = changesRequestedFrom
+        participantLogins = Set(events.map(\.user.login))
+    }
 
     var isClosed: Bool {
         return status == .closed || status == .merged

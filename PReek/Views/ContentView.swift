@@ -12,8 +12,6 @@ struct ContentView: View {
     var closeWindow: () -> Void
     @Binding var resetPath: Bool
 
-    @StateObject private var keyboardHandler: PullRequestsNavigationShortcutHandler
-
     @State private var showWelcomeScreen: Bool
     @Environment(\.openURL) private var openURL
 
@@ -22,7 +20,6 @@ struct ContentView: View {
         self.configViewModel = configViewModel
         self.closeWindow = closeWindow
         _resetPath = resetPath
-        _keyboardHandler = StateObject(wrappedValue: PullRequestsNavigationShortcutHandler(viewModel: pullRequestsViewModel))
 
         showWelcomeScreen = configViewModel.token.isEmpty
     }
@@ -64,51 +61,34 @@ struct ContentView: View {
         @State private var path = NavigationPath()
         var navigationContent: some View {
             NavigationStack(path: $path) {
-                Group {
-                    MainScreen(
-                        pullRequestsViewModel: pullRequestsViewModel,
-                        configViewModel: configViewModel
-                    )
-                    .onAppear {
-                        keyboardHandler.disabled = false
-                    }
-                }
-                .navigationDestination(for: Screen.self) { screen in
-                    Group {
-                        switch screen {
-                        case .settings:
-                            SettingsScreen(configViewModel: configViewModel)
-                        case .share:
-                            ShareScreen(configViewModel: configViewModel)
-                        default:
-                            EmptyView()
+                MainScreen(pullRequestsViewModel: pullRequestsViewModel)
+                    .navigationDestination(for: Screen.self) { screen in
+                        Group {
+                            switch screen {
+                            case .settings:
+                                SettingsScreen(configViewModel: configViewModel)
+                            case .share:
+                                ShareScreen(configViewModel: configViewModel)
+                            default:
+                                EmptyView()
+                            }
                         }
                     }
-                    .onAppear {
-                        keyboardHandler.disabled = true
+                    .onChange(of: resetPath) {
+                        if resetPath {
+                            path = NavigationPath()
+                            resetPath = false
+                        }
                     }
-                    .onDisappear {
-                        keyboardHandler.disabled = false
-                    }
-                }
-                .onChange(of: resetPath) {
-                    if resetPath {
-                        path = NavigationPath()
-                        resetPath = false
-                    }
-                }
             }
         }
     #else
         var navigationContent: some View {
             TabView {
-                MainScreen(
-                    pullRequestsViewModel: pullRequestsViewModel,
-                    configViewModel: configViewModel
-                )
-                .tabItem {
-                    Label("Pull Requests", systemImage: "list.bullet")
-                }
+                MainScreen(pullRequestsViewModel: pullRequestsViewModel)
+                    .tabItem {
+                        Label("Pull Requests", systemImage: "list.bullet")
+                    }
 
                 NavigationStack {
                     SettingsScreen(configViewModel: configViewModel)

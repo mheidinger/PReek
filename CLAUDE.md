@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PReek is a macOS/iOS SwiftUI application that brings GitHub Pull Request notifications directly into the macOS MenuBar. It fetches pull requests based on GitHub notifications and displays them in a clean, organized interface with vim-like keyboard shortcuts.
+PReek is a macOS/iOS SwiftUI application that brings GitHub Pull Request notifications directly into the macOS MenuBar. It fetches pull requests based on GitHub notifications and displays them in a clean, organized interface.
 
 ## Development Commands
 
@@ -93,7 +93,6 @@ open PReek.xcodeproj
 **Utility Components:**
 - `ResourceIcon.swift` - GitHub status icons (open, closed, merged, draft)
 - `TimeSensitiveText.swift` - Relative time display
-- Keyboard navigation handler for vim-like shortcuts (j/k/g/G/space)
 
 ## Testing
 
@@ -118,12 +117,8 @@ Key external dependencies managed via Swift Package Manager:
 
 **MenuBar Behavior:**
 - Dynamic icon changes based on unread status (`MenuBarIcon` vs `MenuBarIconUnread`)
-- Auto-focus and keyboard shortcut handling when menu opens
+- Auto-focus when menu opens (helps status bar shortcuts work)
 - 5-second delay before resetting navigation state when menu closes
-
-**Keyboard Navigation:**
-- Vim-like navigation: j (down), k (up), g (top), G (bottom), space (toggle)
-- Focus management across different UI states and screens
 
 **Release Process:**
 - Automated DMG creation with signing and notarization in Xcode scheme post-actions

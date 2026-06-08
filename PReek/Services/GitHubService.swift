@@ -13,17 +13,17 @@ class GitHubService {
 
     private static let PUBLIC_GITHUB_BASE_URL = URL(string: "https://api.github.com")!
 
-    private static var decoder: JSONDecoder {
+    private static let decoder: JSONDecoder = {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return decoder
-    }
+    }()
 
-    private static var encoder: JSONEncoder {
+    private static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         return encoder
-    }
+    }()
 
     private static func restApiUrl() throws -> URL {
         if let gitHubEnterpriseUrl = ConfigService.gitHubEnterpriseUrl {
@@ -51,6 +51,8 @@ class GitHubService {
         switch errors?.first?.type {
         case "INSUFFICIENT_SCOPES":
             return AppError.insufficientScopes(missingScope: nil)
+        case "RATE_LIMITED":
+            return AppError.rateLimited
         default:
             // If there are errors, then they should already be logged
             if errors?.first == nil {
@@ -84,8 +86,8 @@ class GitHubService {
         return toViewer(data.viewer, scopesHeader: scopesHeader)
     }
 
-    // returns IDs of all fetched PRs to update all that did not have new notifications
-    static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> [String]) async throws -> [String] {
+    /// returns IDs of all fetched PRs to update all that did not have new notifications
+    static func fetchUserNotifications(since: Date, onNotificationsReceived: ([Notification]) async throws -> Set<String>) async throws -> Set<String> {
         logger.info("Fetching notifications since \(since.formatted())")
         var url: URL? = try restApiUrl().appending(path: "notifications")
             .appending(queryItems: [
@@ -93,7 +95,7 @@ class GitHubService {
                 URLQueryItem(name: "since", value: since.formatted(.iso8601)),
             ])
 
-        var updatedPullRequestIds: [String] = []
+        var updatedPullRequestIds = Set<String>()
         repeat {
             var request = URLRequest(url: url!)
             request.httpMethod = "GET"
@@ -102,7 +104,7 @@ class GitHubService {
 
             let parsedData = try decoder.decode([NotificationDto].self, from: data)
             let batchUpdatedPullRequestIds = try await onNotificationsReceived(toNotifications(dtos: parsedData)) // TODO: Let this run async?
-            updatedPullRequestIds.append(contentsOf: batchUpdatedPullRequestIds)
+            updatedPullRequestIds.formUnion(batchUpdatedPullRequestIds)
 
             guard let linkHeader = response.value(forHTTPHeaderField: "Link") else {
                 break

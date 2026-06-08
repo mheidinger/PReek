@@ -27,7 +27,7 @@ let actor2 = PullRequestDto.Actor(login: "user-2", url: urlString, name: nil)
 let actor3 = PullRequestDto.Actor(login: "user-3", url: urlString, name: nil)
 
 struct ReviewThreadsCommentsToEventsTests {
-    @Test func mapSeparateReviewThreadsComments() async throws {
+    @Test func mapSeparateReviewThreadsComments() throws {
         let firstThreadCommentDtos = [
             createComment(id: "comment-2", author: actor2, body: "comment-2", minute: 5),
         ]
@@ -48,7 +48,7 @@ struct ReviewThreadsCommentsToEventsTests {
         let event0Data = try #require(events[0].data as? EventCommentData)
         try #require(event0Data.comments.count == 1)
         #expect(event0Data.comments[0].id == "comment-1")
-        #expect(event0Data.comments[0].content.renderPlainText() == "comment-1")
+        #expect(event0Data.comments[0].content == "comment-1")
 
         #expect(events[1].id == "comment-2-event")
         #expect(events[1].user.login == "user-2")
@@ -56,10 +56,10 @@ struct ReviewThreadsCommentsToEventsTests {
         let event1Data = try #require(events[1].data as? EventCommentData)
         try #require(event1Data.comments.count == 1)
         #expect(event1Data.comments[0].id == "comment-2")
-        #expect(event1Data.comments[0].content.renderPlainText() == "comment-2")
+        #expect(event1Data.comments[0].content == "comment-2")
     }
 
-    @Test func mergeReviewThreadsComments() async throws {
+    @Test func mergeReviewThreadsComments() throws {
         let firstThreadCommentDtos = [
             createComment(id: "comment-1", author: actor1, body: "comment-1", minute: 0),
         ]
@@ -89,10 +89,10 @@ struct ReviewThreadsCommentsToEventsTests {
         let event1Data = try #require(events[1].data as? EventCommentData)
         try #require(event1Data.comments.count == 1)
         #expect(event1Data.comments[0].id == "comment-3")
-        #expect(event1Data.comments[0].content.renderPlainText() == "comment-3")
+        #expect(event1Data.comments[0].content == "comment-3")
     }
 
-    @Test func excludeReviewThreadsCommentsFromReviews() async throws {
+    @Test func excludeReviewThreadsCommentsFromReviews() throws {
         let firstThreadCommentDtos = [
             createComment(id: "comment-1", author: actor1, body: "comment-1", minute: 0),
             createComment(id: "comment-2", author: actor1, body: "comment-2", minute: 1),

@@ -6,6 +6,7 @@ enum AppError: LocalizedError {
     case networkError
     case unauthorized
     case forbidden
+    case rateLimited
     case apiError
     case insufficientScopes(missingScope: Scope?)
     case missingConfigToShare
@@ -25,6 +26,8 @@ enum AppError: LocalizedError {
             return String(localized: "PAT is invalid")
         case .forbidden:
             return String(localized: "PAT is missing permissions, does it have the 'notifications' scope?")
+        case .rateLimited:
+            return String(localized: "GitHub API rate limit exceeded")
         case .apiError:
             return String(localized: "Unknown error happened when calling the GitHub API")
         case let .insufficientScopes(missingScope):
@@ -46,6 +49,8 @@ enum AppError: LocalizedError {
 
     var recoverySuggestion: String? {
         switch self {
+        case .rateLimited:
+            return String(localized: "GitHub limits API usage per hour. Wait a while before refreshing again.")
         case .failedToImportShareData:
             return "Please verify you are using the latest version of the app on both devices. If the issue persists, please report the issue."
         default:

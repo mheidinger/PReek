@@ -12,9 +12,9 @@ struct PullRequestContentView: View, Equatable {
 
     static func == (lhs: PullRequestContentView, rhs: PullRequestContentView) -> Bool {
         lhs.pullRequest.id == rhs.pullRequest.id &&
+            lhs.pullRequest.lastUpdated == rhs.pullRequest.lastUpdated &&
             lhs.pullRequest.events.count == rhs.pullRequest.events.count &&
-            lhs.pullRequest.events.first?.id == rhs.pullRequest.events.first?.id &&
-            lhs.pullRequest.events.last?.id == rhs.pullRequest.events.last?.id
+            lhs.eventLimit == rhs.eventLimit
     }
 
     func loadMore() {

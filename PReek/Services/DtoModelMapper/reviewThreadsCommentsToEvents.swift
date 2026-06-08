@@ -27,7 +27,7 @@ private func commentToEventDataPair(commentDto: PullRequestDto.ReviewComment, pr
     return CommentEventDataPair(comment: commentDto, eventData: data, mergedFromOldest: nil)
 }
 
-func reviewThreadsCommentsToEvents(reviewThreads: [PullRequestDto.ReviewThread]?, reviewCommentIds: [String], pullRequestUrl: URL) -> [Event] {
+func reviewThreadsCommentsToEvents(reviewThreads: [PullRequestDto.ReviewThread]?, reviewCommentIds: Set<String>, pullRequestUrl: URL) -> [Event] {
     guard let reviewThreads = reviewThreads else {
         return []
     }

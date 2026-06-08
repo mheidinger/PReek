@@ -1,6 +1,10 @@
+import Combine
 import SwiftUI
 
 class ConfigService {
+    /// Emits when the excluded users list changes so the pull request list can re-filter without refetching.
+    static let excludedUsersDidChange = PassthroughSubject<Void, Never>()
+
     @OptionalKeychainStorage("gitHubEnterpriseUrl") static var gitHubEnterpriseUrl: String? = nil
     @OptionalKeychainStorage("token") static var token: String? = nil
 
@@ -27,6 +31,7 @@ class ConfigService {
             excludedUsersStr = newValue.joined(separator: "|")
             // Invalidate cache when setting new value
             excludedUsersCache = nil
+            excludedUsersDidChange.send()
         }
         get {
             return Array(excludedUsersSet) // Use the cached Set, converted to Array
