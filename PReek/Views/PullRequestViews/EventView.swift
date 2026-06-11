@@ -62,7 +62,7 @@ struct EventView: View {
     }
 
     var eventHeader: some View {
-        HStack(alignment: .firstTextBaseline) {
+        HStack {
             Text(event.user.displayName)
             Spacer()
             Text(eventDataToActionLabel(data: event.data))

@@ -20,13 +20,17 @@ private struct NoneInlineImageProvider: InlineImageProvider {
 struct ClippedMarkdownView: View {
     let rawMarkdown: String
 
-    @State private var contentHeight: CGFloat = 0
     @State private var isExpanded = false
+    @State private var isOverflowing = false
 
     let maxHeight: CGFloat = 100
 
     private var content: MarkdownContent {
         MarkdownContentCache.content(rawMarkdown: rawMarkdown)
+    }
+
+    private var showClippedAffordances: Bool {
+        isOverflowing && !isExpanded
     }
 
     var body: some View {
@@ -42,32 +46,29 @@ struct ClippedMarkdownView: View {
                 }
             )
             .onPreferenceChange(HeightPreferenceKey.self) { height in
-                contentHeight = height
+                isOverflowing = height > maxHeight
             }
-            .frame(height: isExpanded ? nil : min(contentHeight, maxHeight), alignment: .top)
+            .frame(maxHeight: isExpanded ? nil : maxHeight, alignment: .top)
             .clipped()
-            .if(!isExpanded && contentHeight > maxHeight) { view in
-                view
-                    .mask {
-                        LinearGradient(
-                            colors: [.black, .clear], startPoint: .center, endPoint: .bottom
+            .mask(alignment: .top) {
+                LinearGradient(
+                    colors: [.black, showClippedAffordances ? .clear : .black],
+                    startPoint: .center,
+                    endPoint: .bottom
+                )
+            }
+            .overlay(alignment: .bottomTrailing) {
+                if isOverflowing {
+                    Button(action: { isExpanded.toggle() }) {
+                        Image(
+                            systemName: isExpanded
+                                ? "arrowtriangle.up.square" : "arrowtriangle.down.square"
                         )
+                        .imageScale(.large)
                     }
+                    .buttonStyle(PlainButtonStyle())
+                }
             }
-            .if(contentHeight > maxHeight) { view in
-                view
-                    .overlay(alignment: .bottomTrailing) {
-                        Button(action: { isExpanded = !isExpanded }) {
-                            Image(
-                                systemName: isExpanded
-                                    ? "arrowtriangle.up.square" : "arrowtriangle.down.square"
-                            )
-                            .imageScale(.large)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-            }
-            .frame(height: isExpanded || contentHeight <= maxHeight ? contentHeight : maxHeight)
     }
 }
 

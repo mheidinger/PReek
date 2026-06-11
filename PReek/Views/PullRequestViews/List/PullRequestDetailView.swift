@@ -24,7 +24,10 @@ struct PullRequestDetailView: View {
 
                     Divider()
 
-                    LazyVStack {
+                    // Plain VStack (not Lazy): the outer LazyVStack is the ScrollView's lazy child.
+                    // Nesting a second LazyVStack inside it causes expensive, conflicting size
+                    // negotiation with no laziness benefit.
+                    VStack {
                         DividedView(pullRequest.events) { event in
                             EventView(event)
                         } shouldHighlight: { event in
