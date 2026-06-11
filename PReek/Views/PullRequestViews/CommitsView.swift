@@ -4,7 +4,10 @@ struct CommitsView: View {
     let commits: [Commit]
 
     var body: some View {
-        LazyVStack(alignment: .leading) {
+        // Plain VStack (not Lazy): commits-per-push are few and this is already nested several
+        // lazy stacks deep. Nested LazyVStacks inside a ScrollView amplify layout cost without any
+        // laziness benefit for this bounded content.
+        VStack(alignment: .leading) {
             ForEach(commits) { commit in
                 if let url = commit.url {
                     HoverableLink(destination: url) {

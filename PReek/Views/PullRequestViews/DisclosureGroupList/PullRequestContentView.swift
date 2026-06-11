@@ -27,7 +27,10 @@ struct PullRequestContentView: View, Equatable {
     }
 
     var eventsBody: some View {
-        LazyVStack {
+        // Plain VStack (not Lazy): this is nested inside the list's outer LazyVStack and renders a
+        // bounded, small number of events (eventLimit is capped). Nesting LazyVStacks inside a
+        // ScrollView causes expensive, conflicting size negotiation without any laziness benefit.
+        VStack {
             DividedView(pullRequest.events[0 ..< eventLimit]) { event in
                 EventView(event)
             } shouldHighlight: { event in
