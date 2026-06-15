@@ -7,12 +7,20 @@ struct PullRequestsDisclosureGroupList: View {
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
+                // Inline ForEach + Divider (instead of DividedView) keeps the LazyVStack genuinely
+                // lazy: DividedView's _VariadicView reads all children up front, which forces every
+                // row to be realized on each list update (e.g. filter toggles).
                 LazyVStack(alignment: .leading, spacing: 4) {
-                    DividedView(pullRequests) { pullRequest in
+                    ForEach(pullRequests) { pullRequest in
                         PullRequestDisclosureGroup(
                             pullRequest,
                             setRead: setRead
                         )
+                        .equatable()
+
+                        if pullRequest.id != pullRequests.last?.id {
+                            Divider()
+                        }
                     }
                     // Pin to the stable outer width (not the ScrollView's content width) so the
                     // list doesn't shift when the vertical scroll bar appears.
