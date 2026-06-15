@@ -67,23 +67,25 @@ class PullRequestsViewModel: ObservableObject {
     private let staleRefreshInterval: TimeInterval = 3 * 60
 
     private func setupPullRequestsMemoization() {
-        // Each emission means the derived list may have changed. Excluded user changes are
-        // included so the list re-filters without refetching from GitHub.
-        let triggers = Publishers.CombineLatest(
+        // Data-change triggers are throttled together to coalesce bursts (e.g. a refresh that
+        // inserts many PRs at once). Excluded user changes are included so the list re-filters
+        // without refetching from GitHub.
+        let dataTriggers = Publishers.CombineLatest3(
+            $lastUpdated,
             invalidationTrigger.prepend(()),
             ConfigService.excludedUsersDidChange.prepend(())
         )
-        .setFailureType(to: Never.self)
+        .throttle(for: .milliseconds(100), scheduler: DispatchQueue.main, latest: true)
 
-        Publishers.CombineLatest4(
+        // User-driven filter toggles are kept out of the throttle so they apply on the next
+        // runloop and feel instant.
+        Publishers.CombineLatest3(
             showClosedSubject,
             showReadSubject,
-            $lastUpdated,
-            triggers
+            dataTriggers
         )
-        .throttle(for: .milliseconds(100), scheduler: DispatchQueue.main, latest: true)
         .map {
-            [weak self] showClosed, showRead, _, _ -> AnyPublisher<
+            [weak self] showClosed, showRead, _ -> AnyPublisher<
                 PullRequestListFilter.Output, Never
             > in
             guard let self = self else {
