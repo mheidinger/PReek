@@ -34,7 +34,7 @@ struct PullRequestHeaderView: View, Equatable {
                     HStack {
                         HoverableLink(pullRequest.repository.name, destination: pullRequest.repository.url)
                             .foregroundStyle(.primary)
-                        HoverableLink(pullRequest.numberFormatted, destination: pullRequest.url)
+                        Text(pullRequest.numberFormatted)
                             .foregroundColor(.secondary)
                     }
 
@@ -68,18 +68,10 @@ struct PullRequestHeaderView: View, Equatable {
 
     var details: some View {
         HStack(spacing: 5) {
-            Group {
-                if let authorUrl = pullRequest.author.url {
-                    HoverableLink(destination: authorUrl) {
-                        authorText
-                    }
-                } else {
-                    authorText
+            authorText
+                .if(pullRequest.author.login != pullRequest.author.displayName) { view in
+                    view.help(pullRequest.author.login)
                 }
-            }
-            .if(pullRequest.author.login != pullRequest.author.displayName) { view in
-                view.help(pullRequest.author.login)
-            }
 
             Text("·")
 
@@ -87,15 +79,13 @@ struct PullRequestHeaderView: View, Equatable {
 
             Text("·")
 
-            HoverableLink(destination: pullRequest.filesUrl) {
-                HStack(spacing: 2) {
-                    Text(pullRequest.additionsFormatted)
-                        .foregroundStyle(.success)
-                    Text(pullRequest.deletionsFormatted)
-                        .foregroundStyle(.failure)
-                }
-                .drawingGroup() // Prevent MacOS to randomly draw this upside down
+            HStack(spacing: 2) {
+                Text(pullRequest.additionsFormatted)
+                    .foregroundStyle(.success)
+                Text(pullRequest.deletionsFormatted)
+                    .foregroundStyle(.failure)
             }
+            .drawingGroup() // Prevent MacOS to randomly draw this upside down
 
             if !pullRequest.approvalFrom.isEmpty || !pullRequest.changesRequestedFrom.isEmpty {
                 Text("·")
