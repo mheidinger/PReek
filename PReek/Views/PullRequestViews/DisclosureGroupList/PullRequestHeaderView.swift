@@ -29,27 +29,25 @@ struct PullRequestHeaderView: View, Equatable {
         HStack(spacing: 10) {
             StatusIcon(pullRequest.status)
 
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack {
-                        HoverableLink(pullRequest.repository.name, destination: pullRequest.repository.url)
-                            .foregroundStyle(.primary)
-                        Text(pullRequest.numberFormatted)
-                            .foregroundColor(.secondary)
-                    }
-
-                    HoverableLink(destination: pullRequest.url) {
-                        Text(pullRequest.title)
-                            .font(.headline)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
-                    }
-                    .foregroundStyle(.primary)
-
-                    details
+            VStack(alignment: .leading, spacing: 3) {
+                HStack {
+                    HoverableLink(pullRequest.repository.name, destination: pullRequest.repository.url)
+                        .foregroundStyle(.primary)
+                    Text(pullRequest.numberFormatted)
+                        .foregroundColor(.secondary)
                 }
-                Spacer()
+
+                HoverableLink(destination: pullRequest.url) {
+                    Text(pullRequest.title)
+                        .font(.headline)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                }
+                .foregroundStyle(.primary)
+
+                details
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             Button(action: { setRead(pullRequest.id, pullRequest.unread) }) {
                 Image(systemName: pullRequest.unread ? "circle.fill" : "circle")
@@ -87,31 +85,31 @@ struct PullRequestHeaderView: View, Equatable {
             }
             .drawingGroup() // Prevent MacOS to randomly draw this upside down
 
-            if !pullRequest.approvalFrom.isEmpty || !pullRequest.changesRequestedFrom.isEmpty {
+            if !pullRequest.approvalFrom.isEmpty {
                 Text("·")
 
-                HStack(spacing: 5) {
-                    if !pullRequest.approvalFrom.isEmpty {
-                        HStack(spacing: 1) {
-                            Text("\(pullRequest.approvalFrom.count)")
-                            ResourceIcon(image: .check)
-                                .frame(width: 13)
-                                .foregroundColor(.success)
-                                .padding(.top, 1)
-                        }
-                        .help(usersToString(pullRequest.approvalFrom))
-                    }
-                    if !pullRequest.changesRequestedFrom.isEmpty {
-                        HStack(spacing: 2) {
-                            Text("\(pullRequest.changesRequestedFrom.count)")
-                            ResourceIcon(image: .fileDiff)
-                                .frame(width: 12)
-                                .foregroundColor(.failure)
-                                .padding(.top, 2)
-                        }
-                        .help(usersToString(pullRequest.changesRequestedFrom))
-                    }
+                HStack(spacing: 1) {
+                    Text("\(pullRequest.approvalFrom.count)")
+                    ResourceIcon(image: .check)
+                        .frame(width: 13)
+                        .foregroundColor(.success)
+                        .padding(.top, 1)
                 }
+                .help(usersToString(pullRequest.approvalFrom))
+            }
+            if !pullRequest.changesRequestedFrom.isEmpty {
+                if pullRequest.approvalFrom.isEmpty {
+                    Text("·")
+                }
+
+                HStack(spacing: 2) {
+                    Text("\(pullRequest.changesRequestedFrom.count)")
+                    ResourceIcon(image: .fileDiff)
+                        .frame(width: 12)
+                        .foregroundColor(.failure)
+                        .padding(.top, 2)
+                }
+                .help(usersToString(pullRequest.changesRequestedFrom))
             }
         }
         .foregroundStyle(.secondary)
