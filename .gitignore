@@ -50,3 +50,6 @@ xcuserdata/
 # End of https://www.toptal.com/developers/gitignore/api/macos,xcode
 
 build/
+
+# dSYM of the latest release build, preserved by build-dmg.sh for symbolicating release samples
+dSYMs/

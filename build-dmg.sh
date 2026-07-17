@@ -6,6 +6,11 @@ PROJECT_PATH="PReek.xcodeproj"
 EXPORT_OPTIONS_PLIST="./ExportOptions.plist"
 AC_PASSWORD="personal"  # Keychain item name for notarytool credentials created via `notarytool store-credentials`
 
+# Directory containing this script (the project root), resolved independently of the caller's CWD.
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Where the latest build's dSYM is kept (gitignored) so release samples can always be symbolicated.
+DSYM_DEST="$PROJECT_DIR/dSYMs"
+
 PRODUCT_NAME="PReek"
 MARKETING_VERSION=$(xcodebuild -showBuildSettings -scheme "$SCHEME_NAME" -project "$PROJECT_PATH" -destination "platform=macOS,arch=arm64" 2>&1 | grep MARKETING_VERSION | awk '{print $3}')
 
@@ -47,6 +52,19 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Archive created successfully"
+echo ""
+
+# Step 1b: Preserve this build's dSYM inside the project (gitignored)
+# Keeps only the latest build's dSYM so a release-build hang/crash sample can always be
+# symbolicated against the currently shipped binary (e.g. `atos -o dSYMs/PReek.app.dSYM/...`).
+echo "=== Preserving dSYM ==="
+rm -rf "$DSYM_DEST"
+mkdir -p "$DSYM_DEST"
+if cp -R "$ARCHIVE_PATH/dSYMs/." "$DSYM_DEST/" 2>/dev/null && [ -n "$(ls -A "$DSYM_DEST" 2>/dev/null)" ]; then
+  echo "dSYM(s) preserved to $DSYM_DEST"
+else
+  echo "Warning: no dSYM found in archive at $ARCHIVE_PATH/dSYMs"
+fi
 echo ""
 
 # Step 2: Export Archive
