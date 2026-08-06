@@ -8,8 +8,15 @@ private struct GraphQLQuery: Codable {
     var variables: [String: String]?
 }
 
+private struct GitHubErrorResponse: Decodable {
+    let message: String?
+}
+
 class GitHubService {
-    private static let logger = Logger()
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "de.max-heidinger.PReek",
+        category: "GitHubService"
+    )
 
     private static let PUBLIC_GITHUB_BASE_URL = URL(string: "https://api.github.com")!
 
@@ -62,9 +69,17 @@ class GitHubService {
         }
     }
 
-    private static func logGraphQlErrors(errors: [GitHubGraphQLError]?) {
+    private static func logGraphQlErrors(errors: [GitHubGraphQLError]?, operation: String) {
         errors?.forEach { error in
-            logger.error("Received error from GitHub API: \(error)")
+            logger.error(
+                """
+                GitHub GraphQL error \
+                operation=\(operation, privacy: .public) \
+                type=\(error.type ?? "unknown", privacy: .public) \
+                path=\(error.path?.joined(separator: ".") ?? "unknown", privacy: .public) \
+                message=\(error.message ?? "No message provided", privacy: .public)
+                """
+            )
         }
     }
 
@@ -75,9 +90,9 @@ class GitHubService {
         request.httpBody = try encoder.encode(query)
 
         let (data, response) = try await sendRequest(request: request)
-        let parsedData = try decoder.decode(ViewerResponse.self, from: data)
+        let parsedData = try decodeResponse(ViewerResponse.self, from: data, operation: "viewer")
 
-        logGraphQlErrors(errors: parsedData.errors)
+        logGraphQlErrors(errors: parsedData.errors, operation: "viewer")
         guard let data = parsedData.data else {
             throw graphQlErrorToError(errors: parsedData.errors)
         }
@@ -102,7 +117,11 @@ class GitHubService {
 
             let (data, response) = try await sendRequest(request: request)
 
-            let parsedData = try decoder.decode([NotificationDto].self, from: data)
+            let parsedData = try decodeResponse(
+                [NotificationDto].self,
+                from: data,
+                operation: "notifications"
+            )
             let batchUpdatedPullRequestIds = try await onNotificationsReceived(toNotifications(dtos: parsedData)) // TODO: Let this run async?
             updatedPullRequestIds.formUnion(batchUpdatedPullRequestIds)
 
@@ -133,9 +152,10 @@ class GitHubService {
         request.httpBody = try encoder.encode(query)
 
         let (data, _) = try await sendRequest(request: request)
-        let parsedData = try decoder.decode(PullRequestsResponse.self, from: data)
+        let operation = "pull-requests repos=\(repoMap.count) pullRequests=\(repoMap.values.flatMap { $0 }.count)"
+        let parsedData = try decodeResponse(PullRequestsResponse.self, from: data, operation: operation)
 
-        logGraphQlErrors(errors: parsedData.errors)
+        logGraphQlErrors(errors: parsedData.errors, operation: operation)
         guard let data = parsedData.data else {
             throw graphQlErrorToError(errors: parsedData.errors)
         }
@@ -146,6 +166,26 @@ class GitHubService {
             .flatMap { $0 } // [Dictionary<String, PullRequestDto?>.Element]
             .compactMap { $0.value } // [PullRequestDto]
         return toPullRequests(dtos: dtos)
+    }
+
+    private static func decodeResponse<T: Decodable>(
+        _ type: T.Type,
+        from data: Data,
+        operation: String
+    ) throws -> T {
+        do {
+            return try decoder.decode(type, from: data)
+        } catch {
+            logger.error(
+                """
+                Failed to decode GitHub response \
+                operation=\(operation, privacy: .public) \
+                responseBytes=\(data.count, privacy: .public) \
+                error=\(String(describing: error), privacy: .public)
+                """
+            )
+            throw error
+        }
     }
 
     private static func sendRequest(request: URLRequest) async throws -> (Data, HTTPURLResponse) {
@@ -163,6 +203,8 @@ class GitHubService {
                 throw AppError.unknown
             }
 
+            logHttpErrorIfNeeded(response: httpResponse, data: data, request: request)
+
             if httpResponse.statusCode == 401 {
                 throw AppError.unauthorized
             }
@@ -174,8 +216,46 @@ class GitHubService {
         } catch let error as AppError {
             throw error
         } catch {
-            logger.error("Failed to send request to GitHub, remapping to network error: \(error)")
+            let urlError = error as? URLError
+            logger.error(
+                """
+                GitHub request failed \
+                operation=\(requestOperation(request), privacy: .public) \
+                urlErrorCode=\(urlError?.code.rawValue ?? 0, privacy: .public) \
+                error=\(String(describing: error), privacy: .public)
+                """
+            )
             throw AppError.networkError
         }
+    }
+
+    private static func requestOperation(_ request: URLRequest) -> String {
+        "\(request.httpMethod ?? "GET") \(request.url?.path ?? "unknown")"
+    }
+
+    private static func logHttpErrorIfNeeded(
+        response: HTTPURLResponse,
+        data: Data,
+        request: URLRequest
+    ) {
+        guard !(200 ... 299).contains(response.statusCode) else {
+            return
+        }
+
+        let apiError = try? JSONDecoder().decode(GitHubErrorResponse.self, from: data)
+        let rateLimitRemaining = response.value(forHTTPHeaderField: "x-ratelimit-remaining") ?? "unknown"
+        let rateLimitReset = response.value(forHTTPHeaderField: "x-ratelimit-reset") ?? "unknown"
+        let retryAfter = response.value(forHTTPHeaderField: "retry-after") ?? "unknown"
+        logger.error(
+            """
+            GitHub HTTP error \
+            operation=\(requestOperation(request), privacy: .public) \
+            status=\(response.statusCode, privacy: .public) \
+            rateLimitRemaining=\(rateLimitRemaining, privacy: .public) \
+            rateLimitReset=\(rateLimitReset, privacy: .public) \
+            retryAfter=\(retryAfter, privacy: .public) \
+            message=\(apiError?.message ?? "No message provided", privacy: .public)
+            """
+        )
     }
 }
