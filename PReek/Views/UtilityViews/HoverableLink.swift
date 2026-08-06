@@ -9,13 +9,7 @@ struct HoverableLink<Label: View>: View {
             label
         }
         #if os(macOS)
-        .onHover { inside in
-            if inside {
-                NSCursor.pointingHand.push()
-            } else {
-                NSCursor.pop()
-            }
-        }
+        .pointerStyle(.link)
         #endif
     }
 }
