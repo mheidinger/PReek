@@ -45,9 +45,9 @@ struct PReekApp: App {
                     .frame(width: 600, height: 400)
                     .focused($isContentFocused)
             }
+            .menuBarExtraAccess(isPresented: $isMenuPresented)
             .menuBarExtraStyle(.window)
             .defaultSize(width: 600, height: 400)
-            .menuBarExtraAccess(isPresented: $isMenuPresented)
             .onChange(of: isMenuPresented) {
                 if isMenuPresented {
                     isContentFocused = true
