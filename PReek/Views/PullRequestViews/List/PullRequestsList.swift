@@ -39,7 +39,7 @@ struct PullRequestsList<Footer: View>: View {
                 }
             }
             .refreshable {
-                pullRequestsViewModel.triggerUpdatePullRequests()
+                await pullRequestsViewModel.updatePullRequestsAndApply()
             }
             .onChange(of: selectedPullRequestId) { oldValue, _ in
                 guard let oldValue else { return }

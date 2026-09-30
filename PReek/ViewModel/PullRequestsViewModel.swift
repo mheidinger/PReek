@@ -9,7 +9,7 @@ class PullRequestsViewModel: ObservableObject {
     private var viewer: Viewer?
 
     init(initialPullRequests: [PullRequest] = []) {
-        pullRequestMap = Dictionary(uniqueKeysWithValues: initialPullRequests.map { ($0.id, $0) })
+        presentationState = PullRequestPresentationState(initialPullRequests: initialPullRequests)
 
         // Directly access UserDefaults w/ same keys above for correct initial values in the subject
         let storedShowClosed = UserDefaults.standard.bool(forKey: "showClosed")
@@ -29,10 +29,12 @@ class PullRequestsViewModel: ObservableObject {
     @Published private(set) var isRefreshing = false
     @Published var error: Error? = nil
     @Published private(set) var hasUnread: Bool = false
+    @Published private(set) var hasPendingDisplayUpdates: Bool = false
 
     private var showClosedSubject: CurrentValueSubject<Bool, Never>
     @AppStorage("showClosed") var showClosed: Bool = true {
         didSet {
+            applyPendingDisplayUpdatesForFilterChange()
             showClosedSubject.send(showClosed)
         }
     }
@@ -40,6 +42,7 @@ class PullRequestsViewModel: ObservableObject {
     private var showReadSubject = CurrentValueSubject<Bool, Never>(false)
     @AppStorage("showRead") var showRead: Bool = true {
         didSet {
+            applyPendingDisplayUpdatesForFilterChange()
             showReadSubject.send(showRead)
         }
     }
@@ -50,10 +53,12 @@ class PullRequestsViewModel: ObservableObject {
 
     @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: ReadData] =
         [:]
-    private var pullRequestMap: [String: PullRequest] = [:]
+    private var presentationState: PullRequestPresentationState
     /// Wall-clock time each PR was last fetched from GitHub, used to skip refetching recently
     /// updated non-notified PRs (stale-while-revalidate).
     private var pullRequestLastFetched: [String: Date] = [:]
+    /// An initial refresh may publish while the menu is open because there is no list to disturb.
+    private var shouldApplyCurrentRefreshImmediately = false
     @Published private var memoizedPullRequests: [PullRequest] = []
     private let invalidationTrigger = PassthroughSubject<Void, Never>()
 
@@ -62,18 +67,31 @@ class PullRequestsViewModel: ObservableObject {
 
     private let maxCacheSize = 500
 
+    private struct MemoizedOutput {
+        let presented: PullRequestListFilter.Output
+        let hasPendingDisplayUpdates: Bool
+    }
+
     /// Non-notified PRs fetched within this window are skipped on refresh; they are only
     /// re-fetched once their cached copy is older than this interval.
     private let staleRefreshInterval: TimeInterval = 3 * 60
 
     private func setupPullRequestsMemoization() {
+        // Changing user exclusions is an intentional list update, so apply any pending remote
+        // data before evaluating the new filter.
+        ConfigService.excludedUsersDidChange
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                self?.applyPendingDisplayUpdatesForFilterChange()
+            }
+            .store(in: &cancellables)
+
         // Data-change triggers are throttled together to coalesce bursts (e.g. a refresh that
-        // inserts many PRs at once). Excluded user changes are included so the list re-filters
-        // without refetching from GitHub.
-        let dataTriggers = Publishers.CombineLatest3(
+        // inserts many PRs at once). Excluded-user changes apply pending data above and send an
+        // invalidation through the same path.
+        let dataTriggers = Publishers.CombineLatest(
             $lastUpdated,
-            invalidationTrigger.prepend(()),
-            ConfigService.excludedUsersDidChange.prepend(())
+            invalidationTrigger.prepend(())
         )
         .throttle(for: .milliseconds(100), scheduler: DispatchQueue.main, latest: true)
 
@@ -86,20 +104,23 @@ class PullRequestsViewModel: ObservableObject {
         )
         .map {
             [weak self] showClosed, showRead, _ -> AnyPublisher<
-                PullRequestListFilter.Output, Never
+                MemoizedOutput, Never
             > in
             guard let self = self else {
                 return Just(
-                    PullRequestListFilter.Output(
-                        pullRequests: [], hasUnread: false, unreadCache: [:],
-                        lastProcessedVersions: [:]
+                    MemoizedOutput(
+                        presented: PullRequestListFilter.Output(
+                            pullRequests: [], hasUnread: false, unreadCache: [:],
+                            lastProcessedVersions: [:]
+                        ),
+                        hasPendingDisplayUpdates: false
                     )
                 ).eraseToAnyPublisher()
             }
 
             // Snapshot mutable state on the main thread, then filter on a background queue.
-            let input = PullRequestListFilter.Input(
-                pullRequests: Array(self.pullRequestMap.values),
+            let presentedInput = PullRequestListFilter.Input(
+                pullRequests: Array(self.presentationState.presentedPullRequests.values),
                 readMap: self.pullRequestReadMap,
                 viewer: self.viewer,
                 excludedUsers: ConfigService.excludedUsersSet,
@@ -108,10 +129,35 @@ class PullRequestsViewModel: ObservableObject {
                 unreadCache: self.unreadCache,
                 lastProcessedVersions: self.lastProcessedVersions
             )
+            let latestInput = PullRequestListFilter.Input(
+                pullRequests: Array(self.presentationState.latestPullRequests.values),
+                readMap: self.pullRequestReadMap,
+                viewer: self.viewer,
+                excludedUsers: ConfigService.excludedUsersSet,
+                showClosed: showClosed,
+                showRead: showRead,
+                unreadCache: self.unreadCache,
+                lastProcessedVersions: self.lastProcessedVersions
+            )
+            let hasRawPendingUpdates = self.presentationState.hasPendingUpdates
 
-            return Future<PullRequestListFilter.Output, Never> { promise in
+            return Future<MemoizedOutput, Never> { promise in
                 DispatchQueue.global(qos: .userInitiated).async {
-                    promise(.success(PullRequestListFilter.compute(input)))
+                    let presented = PullRequestListFilter.compute(presentedInput)
+                    let hasPendingDisplayUpdates: Bool
+                    if hasRawPendingUpdates {
+                        let latest = PullRequestListFilter.compute(latestInput)
+                        hasPendingDisplayUpdates = PullRequestListFilter.hasVisibleChanges(
+                            from: presented,
+                            to: latest
+                        )
+                    } else {
+                        hasPendingDisplayUpdates = false
+                    }
+                    promise(.success(MemoizedOutput(
+                        presented: presented,
+                        hasPendingDisplayUpdates: hasPendingDisplayUpdates
+                    )))
                 }
             }.eraseToAnyPublisher()
         }
@@ -119,10 +165,11 @@ class PullRequestsViewModel: ObservableObject {
         .receive(on: DispatchQueue.main)
         .sink { [weak self] output in
             guard let self = self else { return }
-            self.unreadCache = output.unreadCache
-            self.lastProcessedVersions = output.lastProcessedVersions
-            self.memoizedPullRequests = output.pullRequests
-            self.hasUnread = output.hasUnread
+            self.unreadCache = output.presented.unreadCache
+            self.lastProcessedVersions = output.presented.lastProcessedVersions
+            self.memoizedPullRequests = output.presented.pullRequests
+            self.hasUnread = output.presented.hasUnread
+            self.hasPendingDisplayUpdates = output.hasPendingDisplayUpdates
         }
         .store(in: &cancellables)
     }
@@ -134,6 +181,43 @@ class PullRequestsViewModel: ObservableObject {
         Task {
             await updatePullRequests()
         }
+    }
+
+    func triggerManualUpdatePullRequests() {
+        Task {
+            await updatePullRequestsAndApply()
+        }
+    }
+
+    @MainActor
+    func updatePullRequestsAndApply() async {
+        await updatePullRequests()
+        applyPendingDisplayUpdates()
+    }
+
+    @MainActor
+    func setPresentationActive(_ isActive: Bool) {
+        presentationState.setPresentationActive(isActive)
+        presentationStateDidChange()
+    }
+
+    @MainActor
+    func applyPendingDisplayUpdates() {
+        applyPendingDisplayUpdatesForFilterChange()
+    }
+
+    private func applyPendingDisplayUpdatesForFilterChange() {
+        presentationState.applyLatest()
+        presentationStateDidChange()
+    }
+
+    private func presentationStateDidChange() {
+        if !presentationState.hasPendingUpdates {
+            hasPendingDisplayUpdates = false
+        }
+        // Recompute even when the presented snapshot is frozen: the filtered latest snapshot
+        // determines whether the pending-update indicator should be visible.
+        invalidationTrigger.send()
     }
 
     func startFetchTimer() {
@@ -217,11 +301,14 @@ class PullRequestsViewModel: ObservableObject {
             let fetchedAt = Date()
             await MainActor.run {
                 for pullRequest in pullRequests {
-                    self.pullRequestMap[pullRequest.id] = pullRequest
                     self.pullRequestLastFetched[pullRequest.id] = fetchedAt
                     self.unreadCache.removeValue(forKey: pullRequest.id)
                 }
-                self.invalidationTrigger.send()
+                self.presentationState.mergeLatest(
+                    pullRequests,
+                    applyingWhileActive: self.shouldApplyCurrentRefreshImmediately
+                )
+                self.presentationStateDidChange()
             }
         }
 
@@ -264,6 +351,7 @@ class PullRequestsViewModel: ObservableObject {
         do {
             await MainActor.run {
                 self.isRefreshing = true
+                self.shouldApplyCurrentRefreshImmediately = self.memoizedPullRequests.isEmpty
             }
 
             logger.info("Get current user")
@@ -285,7 +373,7 @@ class PullRequestsViewModel: ObservableObject {
 
             logger.info("Start fetching not updated pull requests")
             let staleThreshold = Date().addingTimeInterval(-staleRefreshInterval)
-            let notUpdatedRepoMap = pullRequestMap.values.filter { pullRequest in
+            let notUpdatedRepoMap = presentationState.latestPullRequests.values.filter { pullRequest in
                 guard !updatedPullRequestIds.contains(pullRequest.id),
                       pullRequest.status != .merged
                 else {
@@ -310,11 +398,15 @@ class PullRequestsViewModel: ObservableObject {
             }
 
             await cleanupPullRequests()
+            await MainActor.run {
+                self.shouldApplyCurrentRefreshImmediately = false
+            }
             logger.info("Finished fetching notifications")
         } catch {
             logger.error("Failed to get pull requests: \(error)")
             await MainActor.run {
                 self.isRefreshing = false
+                self.shouldApplyCurrentRefreshImmediately = false
                 self.error = error
             }
         }
@@ -326,7 +418,7 @@ class PullRequestsViewModel: ObservableObject {
             byAdding: .day, value: daysToDeduct * -1, to: Date()
         )!
 
-        var filteredPullRequestMap = pullRequestMap.filter { _, pullRequest in
+        var filteredPullRequestMap = presentationState.latestPullRequests.filter { _, pullRequest in
             pullRequest.lastUpdated > deleteFrom
                 || (ConfigService.deleteOnlyClosed && !pullRequest.isClosed)
         }
@@ -345,24 +437,27 @@ class PullRequestsViewModel: ObservableObject {
             filteredPullRequestMap.index(forKey: pullRequestId) != nil
         }
 
-        if filteredPullRequestMap.count != pullRequestMap.count
+        if filteredPullRequestMap.count != presentationState.latestPullRequests.count
             || filteredPullRequestReadMap.count != pullRequestReadMap.count
         {
             // swiftformat:disable redundantSelf
             logger.info(
-                "Removing \(self.pullRequestMap.count - filteredPullRequestMap.count) pull requests"
+                "Removing \(self.presentationState.latestPullRequests.count - filteredPullRequestMap.count) pull requests"
             )
             logger.info(
                 "Removing \(self.pullRequestReadMap.count - filteredPullRequestReadMap.count) pull requests read info"
             )
             // swiftformat:enable redundantSelf
             await MainActor.run { [filteredPullRequestMap, filteredPullRequestReadMap] in
-                self.pullRequestMap = filteredPullRequestMap
                 self.pullRequestReadMap = filteredPullRequestReadMap
                 self.pullRequestLastFetched = self.pullRequestLastFetched.filter {
                     filteredPullRequestMap.index(forKey: $0.key) != nil
                 }
-                self.invalidationTrigger.send()
+                self.presentationState.replaceLatest(
+                    with: filteredPullRequestMap,
+                    applyingWhileActive: self.shouldApplyCurrentRefreshImmediately
+                )
+                self.presentationStateDidChange()
             }
         }
     }

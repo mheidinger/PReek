@@ -104,6 +104,13 @@ struct StatusBarView: View {
                 Text("Failed to fetch notifications")
                     .foregroundStyle(.red)
                     .help(error.localizedDescription)
+            } else if pullRequestsViewModel.hasPendingDisplayUpdates {
+                Button(action: pullRequestsViewModel.applyPendingDisplayUpdates) {
+                    Label("Updates available", systemImage: "arrow.down.circle")
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.accent)
+                .help("Show updated pull requests")
             } else {
                 Text("Last updated at \(pullRequestsViewModel.lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "...")")
                     .foregroundStyle(.secondary)
@@ -114,7 +121,7 @@ struct StatusBarView: View {
                         .scaleEffect(0.6)
                         .padding(.leading, -4)
                 } else {
-                    StatusBarButton(imageSystemName: "arrow.clockwise.circle", action: pullRequestsViewModel.triggerUpdatePullRequests)
+                    StatusBarButton(imageSystemName: "arrow.clockwise.circle", action: pullRequestsViewModel.triggerManualUpdatePullRequests)
                         .help("Refresh")
                         .keyboardShortcut("r")
                 }

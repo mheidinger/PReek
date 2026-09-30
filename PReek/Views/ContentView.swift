@@ -41,7 +41,7 @@ struct ContentView: View {
                             pullRequestsViewModel.error = nil
                             showWelcomeScreen = false
                         }
-                        await pullRequestsViewModel.updatePullRequests()
+                        await pullRequestsViewModel.updatePullRequestsAndApply()
                     }
                 )
             } else {
