@@ -5,6 +5,7 @@ private let viewer = Viewer(login: "viewer", scopes: [])
 
 private func makePR(
     id: String,
+    title: String = "",
     status: PullRequest.Status = .open,
     participant: String = "alice",
     lastUpdated: Date = toDate(minute: 30)
@@ -13,7 +14,7 @@ private func makePR(
         id: id,
         repository: Repository(name: "", url: URL(string: "https://example.com")!),
         author: User.preview(login: participant),
-        title: "",
+        title: title,
         number: 1,
         status: status,
         lastUpdated: lastUpdated,
@@ -124,5 +125,31 @@ struct PullRequestListFilterTests {
         // Without matching versions the value is recomputed (no readData -> unread).
         let recomputed = PullRequestListFilter.compute(makeInput(pullRequests: [pr], unreadCache: cache))
         #expect(recomputed.pullRequests.first?.unread == true)
+    }
+
+    @Test func hiddenPullRequestUpdatesAreNotVisibleChanges() {
+        let original = makePR(id: "1", title: "Original", status: .closed)
+        let updated = makePR(id: "1", title: "Updated", status: .closed)
+
+        let presented = PullRequestListFilter.compute(makeInput(
+            pullRequests: [original],
+            showClosed: false
+        ))
+        let latest = PullRequestListFilter.compute(makeInput(
+            pullRequests: [updated],
+            showClosed: false
+        ))
+
+        #expect(!PullRequestListFilter.hasVisibleChanges(from: presented, to: latest))
+    }
+
+    @Test func visiblePullRequestUpdatesAreVisibleChanges() {
+        let original = makePR(id: "1", title: "Original")
+        let updated = makePR(id: "1", title: "Updated")
+
+        let presented = PullRequestListFilter.compute(makeInput(pullRequests: [original]))
+        let latest = PullRequestListFilter.compute(makeInput(pullRequests: [updated]))
+
+        #expect(PullRequestListFilter.hasVisibleChanges(from: presented, to: latest))
     }
 }

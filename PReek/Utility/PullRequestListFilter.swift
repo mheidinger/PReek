@@ -28,6 +28,10 @@ enum PullRequestListFilter {
         let lastProcessedVersions: [String: TimeInterval]
     }
 
+    static func hasVisibleChanges(from presented: Output, to latest: Output) -> Bool {
+        presented.pullRequests != latest.pullRequests
+    }
+
     static func compute(_ input: Input) -> Output {
         var unreadCache: [String: UnreadCacheEntry] = [:]
         var lastProcessedVersions: [String: TimeInterval] = [:]

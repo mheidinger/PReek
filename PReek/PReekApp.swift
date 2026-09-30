@@ -14,6 +14,7 @@ struct PReekApp: App {
 
     @FocusState private var isContentFocused: Bool
 
+    @State private var focusTask: Task<Void, Never>?
     @State private var resetTask: Task<Void, Never>?
     @State private var resetPath: Bool = false
 
@@ -49,8 +50,17 @@ struct PReekApp: App {
             .menuBarExtraStyle(.window)
             .defaultSize(width: 600, height: 400)
             .onChange(of: isMenuPresented) {
+                pullRequestsViewModel.setPresentationActive(isMenuPresented)
+
+                focusTask?.cancel()
                 if isMenuPresented {
-                    isContentFocused = true
+                    focusTask = Task {
+                        // Let AppKit finish its menu-opening navigation request before changing
+                        // focus, avoiding multiple NavigationRequestObserver updates in one frame.
+                        try? await Task.sleep(for: .milliseconds(100))
+                        guard !Task.isCancelled, isMenuPresented else { return }
+                        isContentFocused = true
+                    }
                 }
 
                 resetTask?.cancel()
