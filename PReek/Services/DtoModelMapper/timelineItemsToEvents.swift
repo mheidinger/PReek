@@ -139,11 +139,7 @@ func timelineItemsToEvents(timelineItems: [PullRequestDto.TimelineItem]?, pullRe
             reviewCommentIds.insert(comment.id)
         }
 
-        guard timelineItem.id != nil else {
-            continue
-        }
-
-        guard let pair = timelineItemToData(timelineItem: timelineItem, prevPair: pairs.last) else {
+        guard timelineItem.id != nil, let pair = timelineItemToData(timelineItem: timelineItem, prevPair: pairs.last) else {
             continue
         }
 

@@ -8,6 +8,10 @@ private struct GraphQLQuery: Codable {
     var variables: [String: String]?
 }
 
+enum GitHubServiceError: Error, Equatable {
+    case graphQLValidationTimeout
+}
+
 private struct GitHubErrorResponse: Decodable {
     let message: String?
 }
@@ -83,6 +87,12 @@ class GitHubService {
         }
     }
 
+    private static func isGraphQLValidationTimeout(_ errors: [GitHubGraphQLError]?) -> Bool {
+        errors?.contains { error in
+            error.message?.localizedCaseInsensitiveContains("timeout on validation of query") == true
+        } == true
+    }
+
     static func fetchViewer() async throws -> Viewer {
         let query = GraphQLQuery(query: ViewerQuery)
         var request = try URLRequest(url: graphUrl())
@@ -145,17 +155,31 @@ class GitHubService {
 
     static func fetchPullRequests(repoMap: [String: [Int]], viewer: Viewer) async throws -> [PullRequest] {
         let fetchRequestedTeamReview = viewer.scopes?.contains(.readOrg) ?? false
+        let pullRequestCount = repoMap.values.reduce(0) { $0 + $1.count }
+        let operation = "pull-requests repos=\(repoMap.count) pullRequests=\(pullRequestCount)"
 
         let query = GraphQLQuery(query: PullRequestsQueryBuilder.fetchPullRequestQuery(repoMap: repoMap, fetchRequestedTeamReview: fetchRequestedTeamReview))
         var request = try URLRequest(url: graphUrl())
         request.httpMethod = "POST"
         request.httpBody = try encoder.encode(query)
 
+        let queryBytes = request.httpBody?.count ?? 0
+        logger.info(
+            "GitHub GraphQL request operation=\(operation, privacy: .public) queryBytes=\(queryBytes, privacy: .public)"
+        )
+        let startedAt = Date()
         let (data, _) = try await sendRequest(request: request)
-        let operation = "pull-requests repos=\(repoMap.count) pullRequests=\(repoMap.values.flatMap { $0 }.count)"
+        let durationMs = Int(Date().timeIntervalSince(startedAt) * 1000)
+        logger.info(
+            "GitHub GraphQL response operation=\(operation, privacy: .public) durationMs=\(durationMs, privacy: .public) responseBytes=\(data.count, privacy: .public)"
+        )
+
         let parsedData = try decodeResponse(PullRequestsResponse.self, from: data, operation: operation)
 
         logGraphQlErrors(errors: parsedData.errors, operation: operation)
+        if isGraphQLValidationTimeout(parsedData.errors) {
+            throw GitHubServiceError.graphQLValidationTimeout
+        }
         guard let data = parsedData.data else {
             throw graphQlErrorToError(errors: parsedData.errors)
         }
