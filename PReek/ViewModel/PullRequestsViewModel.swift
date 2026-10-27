@@ -281,20 +281,28 @@ class PullRequestsViewModel: ObservableObject {
         let batches = PullRequestsQueryBuilder.chunkRepoMap(repoMap)
         let totalPullRequests = repoMap.values.reduce(0) { $0 + $1.count }
 
-        if batches.count > 1 {
-            logger.info(
-                "Fetching \(totalPullRequests) pull requests in \(batches.count) GraphQL batches"
-            )
-        }
+        logger.info(
+            "Fetching \(totalPullRequests) pull requests in \(batches.count) GraphQL batches"
+        )
 
         var updatedPullRequestIds = Set<String>()
         updatedPullRequestIds.reserveCapacity(totalPullRequests)
 
-        for batch in batches {
-            let pullRequests = try await GitHubService.fetchPullRequests(
-                repoMap: batch, viewer: viewer
+        for (index, batch) in batches.enumerated() {
+            let batchLabel = "\(index + 1)/\(batches.count)"
+            let batchPullRequestCount = batch.values.reduce(0) { $0 + $1.count }
+            logger.info(
+                "Fetching GraphQL batch=\(batchLabel) repos=\(batch.count) pullRequests=\(batchPullRequestCount)"
             )
-            logger.info("Got \(pullRequests.count) pull requests")
+
+            let pullRequests = try await fetchPullRequestBatch(
+                repoMap: batch,
+                viewer: viewer,
+                batchLabel: batchLabel
+            )
+            logger.info(
+                "Got \(pullRequests.count) pull requests from GraphQL batch=\(batchLabel)"
+            )
 
             updatedPullRequestIds.formUnion(pullRequests.map { $0.id })
 
@@ -313,6 +321,46 @@ class PullRequestsViewModel: ObservableObject {
         }
 
         return updatedPullRequestIds
+    }
+
+    private func fetchPullRequestBatch(
+        repoMap: [String: [Int]],
+        viewer: Viewer,
+        batchLabel: String,
+        splitDepth: Int = 0
+    ) async throws -> [PullRequest] {
+        do {
+            return try await GitHubService.fetchPullRequests(repoMap: repoMap, viewer: viewer)
+        } catch GitHubServiceError.graphQLValidationTimeout {
+            let splitBatches = PullRequestsQueryBuilder.splitRepoMap(repoMap)
+            guard splitBatches.count == 2 else {
+                logger.error(
+                    "GraphQL validation timeout batch=\(batchLabel) pullRequests=1 cannot split further"
+                )
+                throw AppError.apiError
+            }
+
+            let splitPullRequestCount = splitBatches.map { batch in
+                batch.values.reduce(0) { $0 + $1.count }
+            }
+            logger.warning(
+                "GraphQL validation timeout batch=\(batchLabel) pullRequests=\(repoMap.values.reduce(0) { $0 + $1.count }) splittingInto=\(splitPullRequestCount[0]),\(splitPullRequestCount[1]) splitDepth=\(splitDepth)"
+            )
+
+            let first = try await fetchPullRequestBatch(
+                repoMap: splitBatches[0],
+                viewer: viewer,
+                batchLabel: "\(batchLabel).1",
+                splitDepth: splitDepth + 1
+            )
+            let second = try await fetchPullRequestBatch(
+                repoMap: splitBatches[1],
+                viewer: viewer,
+                batchLabel: "\(batchLabel).2",
+                splitDepth: splitDepth + 1
+            )
+            return first + second
+        }
     }
 
     func testConnection() async -> Error? {
