@@ -20,7 +20,6 @@
 		6CDC9FAE2C75C8C5005FAFFD /* .swift-version in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FAB2C75C8C5005FAFFD /* .swift-version */; };
 		6CDC9FAF2C75C8C5005FAFFD /* renovate.json in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FAC2C75C8C5005FAFFD /* renovate.json */; };
 		6CDC9FB12C75C8FB005FAFFD /* .swiftformat in Resources */ = {isa = PBXBuildFile; fileRef = 6CDC9FB02C75C8FB005FAFFD /* .swiftformat */; };
-		6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */; };
 		6CFBFDBD2EA7A58400DAD857 /* build-dmg.sh in Resources */ = {isa = PBXBuildFile; fileRef = 6CFBFDBC2EA7A57800DAD857 /* build-dmg.sh */; };
 		6CFE0C732D86FD5C00985A1C /* CodeScanner in Frameworks */ = {isa = PBXBuildFile; platformFilter = ios; productRef = 6CFE0C722D86FD5C00985A1C /* CodeScanner */; };
 /* End PBXBuildFile section */
@@ -133,7 +132,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				6C232DE72C08C51D00C003B1 /* KeychainAccess in Frameworks */,
-				6CE0CE6C2C40FF5D00ECF4FA /* MenuBarExtraAccess in Frameworks */,
 				6CFE0C732D86FD5C00985A1C /* CodeScanner in Frameworks */,
 				6C7C4CA12C071A0400B9B4DA /* LinkHeaderParser in Frameworks */,
 				6C3F26B92CB47467007FFB25 /* LaunchAtLogin in Frameworks */,
@@ -217,7 +215,6 @@
 			packageProductDependencies = (
 				6C7C4CA02C071A0400B9B4DA /* LinkHeaderParser */,
 				6C232DE62C08C51D00C003B1 /* KeychainAccess */,
-				6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */,
 				6CB7203D2C70ED840067CA1D /* MarkdownUI */,
 				6C3F26B82CB47467007FFB25 /* LaunchAtLogin */,
 				6CFE0C722D86FD5C00985A1C /* CodeScanner */,
@@ -256,7 +253,6 @@
 			packageReferences = (
 				6C7C4C9F2C071A0400B9B4DA /* XCRemoteSwiftPackageReference "LinkHeaderParser" */,
 				6C232DE52C08C51D00C003B1 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */,
 				6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 				6C3F26B72CB47467007FFB25 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 				6CFE0C712D86FD5C00985A1C /* XCRemoteSwiftPackageReference "CodeScanner" */,
@@ -633,14 +629,6 @@
 				minimumVersion = 2.4.0;
 			};
 		};
-		6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/orchetect/MenuBarExtraAccess";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.5;
-			};
-		};
 		6CFE0C712D86FD5C00985A1C /* XCRemoteSwiftPackageReference "CodeScanner" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/twostraws/CodeScanner";
@@ -676,11 +664,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6CB7203C2C70ED840067CA1D /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
 			productName = MarkdownUI;
-		};
-		6CE0CE6B2C40FF5D00ECF4FA /* MenuBarExtraAccess */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6CE0CE6A2C40FF5D00ECF4FA /* XCRemoteSwiftPackageReference "MenuBarExtraAccess" */;
-			productName = MenuBarExtraAccess;
 		};
 		6CFE0C722D86FD5C00985A1C /* CodeScanner */ = {
 			isa = XCSwiftPackageProductDependency;
