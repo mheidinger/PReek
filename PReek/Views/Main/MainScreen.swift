@@ -26,7 +26,8 @@ struct MainScreen: View {
             #if os(macOS)
                 PullRequestsDisclosureGroupList(
                     pullRequests: pullRequestsViewModel.pullRequests,
-                    setRead: pullRequestsViewModel.setRead
+                    setRead: pullRequestsViewModel.setRead,
+                    viewerLogin: pullRequestsViewModel.viewer?.login
                 )
             #else
                 PullRequestsList(pullRequestsViewModel: pullRequestsViewModel, footer: {

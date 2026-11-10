@@ -27,9 +27,17 @@ brew install mheidinger/tap/preek
 
 To make it possible for PReek to be available from the official tap, some [popularity is required](https://docs.brew.sh/Acceptable-Casks#rejected-casks). So feel free to ⭐ this repository!
 
-### App Store - Maybe Coming Soon
+## Local actions (macOS)
 
-Depending on the success of the project I'll decide whether it is worth the effort to publish to the App Store or not.
+On an open pull request, use the editor button, agent button, or agent dropdown to prepare its Git workspace and open it in your editor or launch an agent. The agent menu includes **Address comments** for your PRs, **Review PR** for others, and saved custom prompts.
+
+### Get started
+
+1. Sign in to GitHub in PReek and configure Git authentication for that host.
+2. In **Settings → Local actions**, choose an installed editor and a workspace folder (default `~/.preek`). The first time you use an action for a repository, select an existing local clone; PReek does not clone repositories.
+3. For agent actions, install OMP and Ghostty 1.3 or newer, set the OMP executable under **Saved local agent actions**, and allow PReek to control Ghostty in **System Settings → Privacy & Security → Automation**.
+
+If PReek finds local changes in a workspace, **Open Unchanged** keeps them; **Force Update** deletes uncommitted data. Agents can access and modify workspace files; they are not sandboxed, so review their changes.
 
 ## FAQ
 

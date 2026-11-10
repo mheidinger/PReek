@@ -69,6 +69,8 @@ struct SettingsScreen: View {
                 pullRequestSettings
 
                 #if os(macOS)
+                    LocalActionsSettingsView()
+
                     Section("Additional Settings") {
                         LaunchAtLogin.Toggle()
                         Toggle(isOn: $configViewModel.closeWindowOnLinkClick) {
