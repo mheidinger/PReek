@@ -6,6 +6,18 @@ enum Screen: String, CaseIterable, Hashable {
     case share
 }
 
+private struct ExternalActionCompletedKey: EnvironmentKey {
+    static let defaultValue: (Bool) -> Void = { _ in }
+}
+
+extension EnvironmentValues {
+    /// Receives the Command-key state captured when an external action was requested.
+    var externalActionCompleted: (Bool) -> Void {
+        get { self[ExternalActionCompletedKey.self] }
+        set { self[ExternalActionCompletedKey.self] = newValue }
+    }
+}
+
 struct ContentView: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     @ObservedObject var configViewModel: ConfigViewModel
@@ -48,6 +60,7 @@ struct ContentView: View {
                 navigationContent
             }
         }
+        .environment(\.externalActionCompleted, openURLAdditionalAction)
         .environment(\.openURL, OpenURLAction { destination in
             openURL(destination)
             #if os(macOS)

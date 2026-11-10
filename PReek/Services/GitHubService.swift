@@ -135,18 +135,9 @@ class GitHubService {
             let batchUpdatedPullRequestIds = try await onNotificationsReceived(toNotifications(dtos: parsedData)) // TODO: Let this run async?
             updatedPullRequestIds.formUnion(batchUpdatedPullRequestIds)
 
-            guard let linkHeader = response.value(forHTTPHeaderField: "Link") else {
-                break
-            }
-            let nextLink = LinkHeaderParser.parseLinkHeader(linkHeader, defaultContext: nil, contentLanguageHeader: nil)?.first { link in
-                link.rel.first { rel in rel == "next" } != nil
-            }
-
-            if let nextLink = nextLink {
-                url = nextLink.link
+            url = localActionNextPage(response)
+            if url != nil {
                 logger.debug("Next page available")
-            } else {
-                url = nil
             }
         } while url != nil
 
@@ -282,4 +273,42 @@ class GitHubService {
             """
         )
     }
+
+    static func localActionNextPage(_ response: HTTPURLResponse) -> URL? {
+        guard let header = response.value(forHTTPHeaderField: "Link") else { return nil }
+        return LinkHeaderParser.parseLinkHeader(header, defaultContext: nil, contentLanguageHeader: nil)?
+            .first { $0.rel.contains("next") }?.link
+    }
+
+    #if os(macOS)
+        /// Local actions use the configured account, never credentials exported to a shell.
+        static func localActionRequest(
+            pullRequestURL: URL,
+            path: String,
+            graphQL: Bool = false,
+            body: Data? = nil,
+            pageURL: URL? = nil
+        ) async throws -> (Data, HTTPURLResponse) {
+            let base = try graphQL ? graphUrl() : restApiUrl()
+            let configuredHost = ConfigService.gitHubEnterpriseUrl.flatMap(URL.init(string:))
+                ?? URL(string: "https://github.com")!
+            guard pullRequestURL.scheme == "https",
+                  pullRequestURL.host?.lowercased() == configuredHost.host?.lowercased(),
+                  pullRequestURL.port == configuredHost.port
+            else {
+                throw LocalActionError(message: "This PR does not belong to the configured GitHub account's host.")
+            }
+            let url = try LocalActionURL.resolve(base: base, path: path, pageURL: pageURL)
+            var request = URLRequest(url: url)
+            request.httpMethod = body == nil ? "GET" : "POST"
+            request.httpBody = body
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            let (data, response) = try await sendRequest(request: request)
+            guard (200 ... 299).contains(response.statusCode) else {
+                let message = (try? JSONDecoder().decode(GitHubErrorResponse.self, from: data))?.message
+                throw LocalActionError(message: message ?? "GitHub returned HTTP \(response.statusCode).")
+            }
+            return (data, response)
+        }
+    #endif
 }

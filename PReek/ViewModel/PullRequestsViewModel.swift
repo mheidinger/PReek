@@ -6,7 +6,7 @@ class PullRequestsViewModel: ObservableObject {
     private let logger = Logger()
     private var cancellables = Set<AnyCancellable>()
     private var timer: Timer?
-    private var viewer: Viewer?
+    @Published private(set) var viewer: Viewer?
 
     init(initialPullRequests: [PullRequest] = []) {
         presentationState = PullRequestPresentationState(initialPullRequests: initialPullRequests)
@@ -403,7 +403,8 @@ class PullRequestsViewModel: ObservableObject {
             }
 
             logger.info("Get current user")
-            viewer = try await GitHubService.fetchViewer()
+            let fetchedViewer = try await GitHubService.fetchViewer()
+            await MainActor.run { self.viewer = fetchedViewer }
 
             logger.info("Start fetching notifications")
             let newLastUpdated = Date()
@@ -447,6 +448,10 @@ class PullRequestsViewModel: ObservableObject {
 
             await cleanupPullRequests()
             await MainActor.run {
+                #if os(macOS)
+                    LocalActionsCleanup.shared.updateTrackedPullRequests(Array(self.presentationState.latestPullRequests.values))
+                    LocalActionsCleanup.shared.runIfNeeded()
+                #endif
                 self.shouldApplyCurrentRefreshImmediately = false
             }
             logger.info("Finished fetching notifications")

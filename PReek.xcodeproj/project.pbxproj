@@ -82,6 +82,19 @@
 				Services/DtoModelMapper/toUser.swift,
 				Services/DtoModelMapper/toViewer.swift,
 				Services/GitHubGraphQLError.swift,
+				Services/LocalActionError.swift,
+				Services/LocalActionsCleanup.swift,
+				Services/LocalActionsController.swift,
+				Services/LocalActionURL.swift,
+				Services/LocalAgentAction.swift,
+				Services/LocalAgentCommand.swift,
+				Services/LocalAgentSession.swift,
+				Services/LocalCommand.swift,
+				Services/LocalEditor.swift,
+				Services/LocalWorkspaceLock.swift,
+				Services/LocalWorkspaceRegistry.swift,
+				Services/LocalWorkspaceSafety.swift,
+				Services/LocalWorkspaceService.swift,
 				Services/NotificationDto.swift,
 				Services/PullRequestDto.swift,
 				Services/PullRequestsQuery.swift,
@@ -484,6 +497,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PReek/PReek.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = PReek/macOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -492,6 +506,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_APP_SANDBOX = YES;
+				"ENABLE_APP_SANDBOX[sdk=macosx*]" = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
@@ -527,6 +542,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PReek/PReek.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = PReek/macOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -535,6 +551,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_APP_SANDBOX = YES;
+				"ENABLE_APP_SANDBOX[sdk=macosx*]" = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;

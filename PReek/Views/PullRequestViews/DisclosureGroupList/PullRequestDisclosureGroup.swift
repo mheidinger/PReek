@@ -3,12 +3,14 @@ import SwiftUI
 struct PullRequestDisclosureGroup: View, Equatable {
     var pullRequest: PullRequest
     var setRead: (PullRequest.ID, Bool) -> Void
+    var viewerLogin: String?
 
     @State var sectionExpanded: Bool = false
 
-    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, sectionExpanded: Bool = false) {
+    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, viewerLogin: String? = nil, sectionExpanded: Bool = false) {
         self.pullRequest = pullRequest
         self.setRead = setRead
+        self.viewerLogin = viewerLogin
         self.sectionExpanded = sectionExpanded
     }
 
@@ -17,7 +19,9 @@ struct PullRequestDisclosureGroup: View, Equatable {
             lhs.pullRequest.unread == rhs.pullRequest.unread &&
             lhs.pullRequest.title == rhs.pullRequest.title &&
             lhs.pullRequest.lastUpdated == rhs.pullRequest.lastUpdated &&
-            lhs.pullRequest.status == rhs.pullRequest.status
+            lhs.pullRequest.status == rhs.pullRequest.status &&
+            lhs.pullRequest.author.login == rhs.pullRequest.author.login &&
+            lhs.viewerLogin == rhs.viewerLogin
     }
 
     var body: some View {
@@ -29,7 +33,7 @@ struct PullRequestDisclosureGroup: View, Equatable {
                         .equatable()
                 }
             } label: {
-                PullRequestHeaderView(pullRequest, setRead: setRead)
+                PullRequestHeaderView(pullRequest, setRead: setRead, viewerLogin: viewerLogin)
                     .equatable()
                     .padding(.leading, 10)
                     .padding(.trailing, 5)

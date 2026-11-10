@@ -9,12 +9,14 @@ private func usersToString(_ users: [User]) -> String {
 struct PullRequestHeaderView: View, Equatable {
     var pullRequest: PullRequest
     var setRead: (PullRequest.ID, Bool) -> Void
+    var viewerLogin: String?
 
     @Environment(\.colorScheme) var colorScheme
 
-    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void) {
+    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, viewerLogin: String? = nil) {
         self.pullRequest = pullRequest
         self.setRead = setRead
+        self.viewerLogin = viewerLogin
     }
 
     static func == (lhs: PullRequestHeaderView, rhs: PullRequestHeaderView) -> Bool {
@@ -22,7 +24,9 @@ struct PullRequestHeaderView: View, Equatable {
             lhs.pullRequest.unread == rhs.pullRequest.unread &&
             lhs.pullRequest.title == rhs.pullRequest.title &&
             lhs.pullRequest.lastUpdated == rhs.pullRequest.lastUpdated &&
-            lhs.pullRequest.status == rhs.pullRequest.status
+            lhs.pullRequest.status == rhs.pullRequest.status &&
+            lhs.pullRequest.author.login == rhs.pullRequest.author.login &&
+            lhs.viewerLogin == rhs.viewerLogin
     }
 
     var body: some View {
@@ -48,6 +52,10 @@ struct PullRequestHeaderView: View, Equatable {
                 details
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+
+            #if os(macOS)
+                LocalActionsMenu(pullRequest: pullRequest, viewerLogin: viewerLogin)
+            #endif
 
             Button(action: { setRead(pullRequest.id, pullRequest.unread) }) {
                 Image(systemName: pullRequest.unread ? "circle.fill" : "circle")

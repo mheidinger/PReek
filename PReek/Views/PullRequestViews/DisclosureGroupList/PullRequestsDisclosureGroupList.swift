@@ -3,6 +3,7 @@ import SwiftUI
 struct PullRequestsDisclosureGroupList: View {
     var pullRequests: [PullRequest]
     var setRead: (PullRequest.ID, Bool) -> Void
+    var viewerLogin: String? = nil
 
     var body: some View {
         GeometryReader { geometry in
@@ -14,7 +15,8 @@ struct PullRequestsDisclosureGroupList: View {
                     ForEach(pullRequests) { pullRequest in
                         PullRequestDisclosureGroup(
                             pullRequest,
-                            setRead: setRead
+                            setRead: setRead,
+                            viewerLogin: viewerLogin
                         )
                         .equatable()
 
