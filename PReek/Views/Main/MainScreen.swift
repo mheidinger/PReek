@@ -12,7 +12,6 @@ struct MainScreen: View {
                 StatusBarView(pullRequestsViewModel: pullRequestsViewModel)
                     .background(.background.opacity(0.7))
             }
-            .background(.background.opacity(0.5))
         #else
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

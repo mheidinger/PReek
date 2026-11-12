@@ -68,6 +68,7 @@
 				Models/ReadData.swift,
 				Models/Repository.swift,
 				Models/Scope.swift,
+				Models/SettingsSection.swift,
 				Models/ShareConfig.swift,
 				Models/User.swift,
 				Models/Viewer.swift,
@@ -109,6 +110,7 @@
 				Utility/PullRequestPresentationState.swift,
 				Utility/PullRequestUnreadCalculator.swift,
 				Utility/systemColors.swift,
+				Utility/UIRenderOptions.swift,
 			);
 			target = 6C1CB6CD2C920E2E00305288 /* PReekTests */;
 		};

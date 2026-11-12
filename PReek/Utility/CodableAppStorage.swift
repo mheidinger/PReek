@@ -10,15 +10,17 @@ import Foundation
 struct CodableAppStorage<T: Codable> {
     private let key: String
     private let defaultValue: T
+    private let store: UserDefaults
     private let cache = Cache()
 
     private final class Cache {
         var value: T?
     }
 
-    init(wrappedValue: T, _ key: String) {
+    init(wrappedValue: T, _ key: String, store: UserDefaults = .standard) {
         self.key = key
         defaultValue = wrappedValue
+        self.store = store
     }
 
     var wrappedValue: T {
@@ -28,7 +30,7 @@ struct CodableAppStorage<T: Codable> {
             }
 
             let value: T
-            if let data = UserDefaults.standard.data(forKey: key) {
+            if let data = store.data(forKey: key) {
                 value = (try? JSONDecoder().decode(T.self, from: data)) ?? defaultValue
             } else {
                 value = defaultValue
@@ -39,7 +41,7 @@ struct CodableAppStorage<T: Codable> {
         nonmutating set {
             cache.value = newValue
             if let encoded = try? JSONEncoder().encode(newValue) {
-                UserDefaults.standard.set(encoded, forKey: key)
+                store.set(encoded, forKey: key)
             }
         }
     }

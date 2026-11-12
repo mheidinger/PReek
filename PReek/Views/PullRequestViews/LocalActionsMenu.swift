@@ -2,13 +2,30 @@
     import AppKit
     import SwiftUI
 
+    private struct LocalActionsControllerKey: EnvironmentKey {
+        static let defaultValue: LocalActionsController? = nil
+    }
+
+    extension EnvironmentValues {
+        var localActionsController: LocalActionsController? {
+            get { self[LocalActionsControllerKey.self] }
+            set { self[LocalActionsControllerKey.self] = newValue }
+        }
+    }
+
     @MainActor
     struct LocalActionsMenu: View {
         let pullRequest: PullRequest
         var viewerLogin: String?
 
-        @ObservedObject private var localActions = LocalActionsController.shared
+        @ObservedObject private var localActions: LocalActionsController
         @Environment(\.externalActionCompleted) private var externalActionCompleted
+
+        init(pullRequest: PullRequest, viewerLogin: String? = nil, localActions: LocalActionsController) {
+            self.pullRequest = pullRequest
+            self.viewerLogin = viewerLogin
+            self.localActions = localActions
+        }
 
         private var defaultAgentAction: LocalAgentAction? {
             let isOwnPullRequest = viewerLogin.map {

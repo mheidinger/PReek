@@ -30,6 +30,7 @@ import SwiftUI
                     .alignment(.trailing)
                 }
                 .tableColumnHeaders(.hidden)
+                .frame(height: 200)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
                     VStack(spacing: 0) {
                         Divider()

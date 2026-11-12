@@ -1,10 +1,10 @@
 import SwiftUI
 
-enum Screen: String, CaseIterable, Hashable {
-    case settings
-    case excludedUsers
-    case share
-}
+#if os(iOS)
+    enum Screen: String, CaseIterable, Hashable {
+        case excludedUsers
+    }
+#endif
 
 private struct ExternalActionCompletedKey: EnvironmentKey {
     static let defaultValue: (Bool) -> Void = { _ in }
@@ -22,16 +22,14 @@ struct ContentView: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     @ObservedObject var configViewModel: ConfigViewModel
     var closeWindow: () -> Void
-    @Binding var resetPath: Bool
 
     @State private var showWelcomeScreen: Bool
     @Environment(\.openURL) private var openURL
 
-    init(pullRequestsViewModel: PullRequestsViewModel, configViewModel: ConfigViewModel, closeWindow: @escaping () -> Void, resetPath: Binding<Bool>) {
+    init(pullRequestsViewModel: PullRequestsViewModel, configViewModel: ConfigViewModel, closeWindow: @escaping () -> Void) {
         self.pullRequestsViewModel = pullRequestsViewModel
         self.configViewModel = configViewModel
         self.closeWindow = closeWindow
-        _resetPath = resetPath
 
         showWelcomeScreen = configViewModel.token.isEmpty
     }
@@ -60,6 +58,7 @@ struct ContentView: View {
                 navigationContent
             }
         }
+        .environmentObject(configViewModel)
         .environment(\.externalActionCompleted, openURLAdditionalAction)
         .environment(\.openURL, OpenURLAction { destination in
             openURL(destination)
@@ -71,29 +70,8 @@ struct ContentView: View {
     }
 
     #if os(macOS)
-        @State private var path = NavigationPath()
         var navigationContent: some View {
-            NavigationStack(path: $path) {
-                MainScreen(pullRequestsViewModel: pullRequestsViewModel)
-                    .navigationDestination(for: Screen.self) { screen in
-                        Group {
-                            switch screen {
-                            case .settings:
-                                SettingsScreen(configViewModel: configViewModel)
-                            case .share:
-                                ShareScreen(configViewModel: configViewModel)
-                            default:
-                                EmptyView()
-                            }
-                        }
-                    }
-                    .onChange(of: resetPath) {
-                        if resetPath {
-                            path = NavigationPath()
-                            resetPath = false
-                        }
-                    }
-            }
+            MainScreen(pullRequestsViewModel: pullRequestsViewModel)
         }
     #else
         var navigationContent: some View {
@@ -105,15 +83,8 @@ struct ContentView: View {
 
                 NavigationStack {
                     SettingsScreen(configViewModel: configViewModel)
-                        .navigationDestination(for: Screen.self) { screen in
-                            Group {
-                                switch screen {
-                                case .excludedUsers:
-                                    ExcludedUsersScreen(configViewModel: configViewModel)
-                                default:
-                                    EmptyView()
-                                }
-                            }
+                        .navigationDestination(for: Screen.self) { _ in
+                            ExcludedUsersScreen(configViewModel: configViewModel)
                         }
                 }
                 .tabItem {
@@ -127,5 +98,5 @@ struct ContentView: View {
 #Preview {
     @ObservedObject var pullRequestViewModel = PullRequestsViewModel()
     pullRequestViewModel.triggerUpdatePullRequests()
-    return ContentView(pullRequestsViewModel: pullRequestViewModel, configViewModel: ConfigViewModel(), closeWindow: {}, resetPath: .constant(true))
+    return ContentView(pullRequestsViewModel: pullRequestViewModel, configViewModel: ConfigViewModel(), closeWindow: {})
 }

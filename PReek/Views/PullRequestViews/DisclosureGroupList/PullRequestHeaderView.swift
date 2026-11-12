@@ -12,6 +12,9 @@ struct PullRequestHeaderView: View, Equatable {
     var viewerLogin: String?
 
     @Environment(\.colorScheme) var colorScheme
+    #if os(macOS)
+        @Environment(\.localActionsController) private var localActionsController
+    #endif
 
     init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, viewerLogin: String? = nil) {
         self.pullRequest = pullRequest
@@ -54,7 +57,11 @@ struct PullRequestHeaderView: View, Equatable {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             #if os(macOS)
-                LocalActionsMenu(pullRequest: pullRequest, viewerLogin: viewerLogin)
+                LocalActionsMenu(
+                    pullRequest: pullRequest,
+                    viewerLogin: viewerLogin,
+                    localActions: localActionsController ?? .shared
+                )
             #endif
 
             Button(action: { setRead(pullRequest.id, pullRequest.unread) }) {
