@@ -3,8 +3,13 @@
 
     @MainActor
     struct LocalActionsSettingsView: View {
-        @ObservedObject private var localActions = LocalActionsController.shared
-        @ObservedObject private var cleanup = LocalActionsCleanup.shared
+        @ObservedObject private var localActions: LocalActionsController
+        @ObservedObject private var cleanup: LocalActionsCleanup
+
+        init(localActions: LocalActionsController, cleanup: LocalActionsCleanup) {
+            self.localActions = localActions
+            self.cleanup = cleanup
+        }
 
         var body: some View {
             workspaceSettings
@@ -60,21 +65,8 @@
                 TextField("OMP executable", text: $localActions.ompPath)
                     .help("The OMP executable path, normally /opt/homebrew/bin/omp, or a command on your login shell's PATH.")
                 ForEach($localActions.agentActions) { $action in
-                    DisclosureGroup(action.displayName) {
-                        TextField("Action name", text: $action.name)
-                        Text("Prompt")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        TextEditor(text: $action.prompt)
-                            .font(.system(.body, design: .monospaced))
-                            .frame(minHeight: 120)
-                            .border(.secondary.opacity(0.3))
-                            .accessibilityLabel("Prompt for \(action.name)")
-                        if action.kind == .custom {
-                            Button("Delete action", role: .destructive) {
-                                localActions.removeAgentAction(id: action.id)
-                            }
-                        }
+                    LocalAgentActionSettingsRow(action: $action) {
+                        localActions.removeAgentAction(id: action.id)
                     }
                 }
                 Button("Add action", systemImage: "plus") {
@@ -118,6 +110,50 @@
                     }
                 }
             }
+        }
+    }
+
+    private struct LocalAgentActionSettingsRow: View {
+        @Binding var action: LocalAgentAction
+        var delete: () -> Void
+        @State private var isPromptExpanded = false
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                TextField("Action name", text: $action.name, prompt: Text("Untitled action"))
+                    .labelsHidden()
+                    .font(.headline)
+                    .accessibilityLabel("Action name")
+
+                Button {
+                    isPromptExpanded.toggle()
+                } label: {
+                    HStack {
+                        Image(systemName: isPromptExpanded ? "chevron.down" : "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        Text("Prompt")
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Prompt for \(action.displayName)")
+                .accessibilityValue(isPromptExpanded ? Text("Expanded") : Text("Collapsed"))
+
+                if isPromptExpanded {
+                    TextEditor(text: $action.prompt)
+                        .font(.system(.body, design: .monospaced))
+                        .frame(height: 160)
+                        .border(.secondary.opacity(0.3))
+                        .accessibilityLabel("Prompt text for \(action.displayName)")
+                    if action.kind == .custom {
+                        Button("Delete action", role: .destructive, action: delete)
+                    }
+                }
+            }
+            .padding(.vertical, 4)
         }
     }
 #endif

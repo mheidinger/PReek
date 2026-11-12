@@ -99,9 +99,9 @@ struct ShareView: View {
         }
         .presentationDetents([.medium])
         .toolbar {
-            Button(action: onDismiss) {
-                Image(systemName: "xmark.circle.fill")
-                    .imageScale(.large)
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done", action: onDismiss)
+                    .keyboardShortcut(.cancelAction)
             }
         }
     }

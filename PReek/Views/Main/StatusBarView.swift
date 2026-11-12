@@ -36,20 +36,6 @@ private struct StatusBarButton: View {
     }
 }
 
-private struct StatusBarNavigationLink<Destination: Hashable>: View {
-    var imageSystemName: String
-    var destination: Destination
-
-    var body: some View {
-        NavigationLink(value: destination) {
-            Image(systemName: imageSystemName)
-                .font(.title)
-        }
-        .buttonStyle(BorderlessButtonStyle())
-        .padding(.vertical, 3)
-    }
-}
-
 struct StatusBarView: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
 
@@ -127,10 +113,6 @@ struct StatusBarView: View {
                 }
             }
             .frame(width: 25, alignment: .leading)
-
-            StatusBarNavigationLink(imageSystemName: "gear", destination: Screen.settings)
-                .help("Settings")
-                .keyboardShortcut(",")
         }
         .padding(.horizontal)
     }
@@ -151,6 +133,7 @@ struct StatusBarView: View {
 
 #Preview {
     StatusBarView(pullRequestsViewModel: PullRequestsViewModel())
+        .environmentObject(ConfigViewModel())
         .onAppear {
             try? Tips.resetDatastore()
             try? Tips.configure()

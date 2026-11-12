@@ -4,6 +4,7 @@ import OSLog
 
 class ConfigViewModel: ObservableObject {
     private let logger = Logger()
+    private let store: any ConfigStore
     private let decoder = JSONDecoder()
     private var cancellables = Set<AnyCancellable>()
     private let saveUpdateTrigger = PassthroughSubject<Void, Never>()
@@ -13,61 +14,72 @@ class ConfigViewModel: ObservableObject {
         var username: String
     }
 
-    @Published var currentUser: String? = nil {
+    @Published var currentUser: String? {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    @Published var useGitHubEnterprise: Bool = ConfigService.gitHubEnterpriseUrl != nil {
+    @Published var useGitHubEnterprise: Bool {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    @Published var gitHubEnterpriseUrl: String = ConfigService.gitHubEnterpriseUrl ?? "" {
+    @Published var gitHubEnterpriseUrl: String {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    @Published var token: String = ConfigService.token ?? "" {
+    @Published var token: String {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    @Published var onStartFetchWeeks: Int = ConfigService.onStartFetchWeeks {
+    @Published var onStartFetchWeeks: Int {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    @Published var deleteAfterWeeks: Int = ConfigService.deleteAfterWeeks {
+    @Published var deleteAfterWeeks: Int {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    @Published var deleteOnlyClosed: Bool = ConfigService.deleteOnlyClosed {
+    @Published var deleteOnlyClosed: Bool {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    @Published var excludedUsers: [ExcludedUser] = ConfigService.excludedUsers.map { ExcludedUser(username: $0) } {
+    @Published var excludedUsers: [ExcludedUser] {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    @Published var closeWindowOnLinkClick: Bool = ConfigService.closeWindowOnLinkClick {
+    @Published var closeWindowOnLinkClick: Bool {
         didSet {
             saveUpdateTrigger.send()
         }
     }
 
-    init() {
+    init(store: any ConfigStore = PersistentConfigStore()) {
+        self.store = store
+        let values = store.values
+        currentUser = nil
+        useGitHubEnterprise = values.gitHubEnterpriseUrl != nil
+        gitHubEnterpriseUrl = values.gitHubEnterpriseUrl ?? ""
+        token = values.token ?? ""
+        onStartFetchWeeks = values.onStartFetchWeeks
+        deleteAfterWeeks = values.deleteAfterWeeks
+        deleteOnlyClosed = values.deleteOnlyClosed
+        excludedUsers = values.excludedUsers.map { ExcludedUser(username: $0) }
+        closeWindowOnLinkClick = values.closeWindowOnLinkClick
         setupSaveUpdate()
     }
 
@@ -97,19 +109,15 @@ class ConfigViewModel: ObservableObject {
 
     func saveSettings() {
         logger.info("Saving settings...")
-        ConfigService.token = token
-        if useGitHubEnterprise {
-            ConfigService.gitHubEnterpriseUrl = gitHubEnterpriseUrl
-        } else {
-            ConfigService.gitHubEnterpriseUrl = nil
-        }
-
-        ConfigService.onStartFetchWeeks = onStartFetchWeeks
-        ConfigService.deleteAfterWeeks = deleteAfterWeeks
-        ConfigService.deleteOnlyClosed = deleteOnlyClosed
-        ConfigService.excludedUsers = excludedUsers.map { $0.username }
-
-        ConfigService.closeWindowOnLinkClick = closeWindowOnLinkClick
+        store.values = ConfigValues(
+            token: token,
+            gitHubEnterpriseUrl: useGitHubEnterprise ? gitHubEnterpriseUrl : nil,
+            onStartFetchWeeks: onStartFetchWeeks,
+            deleteAfterWeeks: deleteAfterWeeks,
+            deleteOnlyClosed: deleteOnlyClosed,
+            excludedUsers: excludedUsers.map { $0.username },
+            closeWindowOnLinkClick: closeWindowOnLinkClick
+        )
     }
 
     func getShareData() -> ShareConfig? {

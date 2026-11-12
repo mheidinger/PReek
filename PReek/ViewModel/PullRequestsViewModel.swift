@@ -4,18 +4,71 @@ import SwiftUI
 
 class PullRequestsViewModel: ObservableObject {
     private let logger = Logger()
+    private let configStore: any ConfigStore
     private var cancellables = Set<AnyCancellable>()
     private var timer: Timer?
     @Published private(set) var viewer: Viewer?
 
-    init(initialPullRequests: [PullRequest] = []) {
+    struct InitialState {
+        var lastUpdated: Date?
+        var isRefreshing: Bool
+        var error: Error?
+        var viewer: Viewer?
+
+        init(
+            lastUpdated: Date? = nil,
+            isRefreshing: Bool = false,
+            error: Error? = nil,
+            viewer: Viewer? = nil
+        ) {
+            self.lastUpdated = lastUpdated
+            self.isRefreshing = isRefreshing
+            self.error = error
+            self.viewer = viewer
+        }
+    }
+
+    init(
+        initialPullRequests: [PullRequest] = [],
+        defaults: UserDefaults = .standard,
+        configStore: any ConfigStore = PersistentConfigStore(),
+        initialState: InitialState = InitialState()
+    ) {
+        self.configStore = configStore
+        _showClosed = AppStorage(wrappedValue: true, "showClosed", store: defaults)
+        _showRead = AppStorage(wrappedValue: true, "showRead", store: defaults)
+        _pullRequestReadMap = CodableAppStorage(
+            wrappedValue: [:], "pullRequestReadMap", store: defaults
+        )
+        viewer = initialState.viewer
+        lastUpdated = initialState.lastUpdated
+        isRefreshing = initialState.isRefreshing
+        error = initialState.error
         presentationState = PullRequestPresentationState(initialPullRequests: initialPullRequests)
 
-        // Directly access UserDefaults w/ same keys above for correct initial values in the subject
-        let storedShowClosed = UserDefaults.standard.bool(forKey: "showClosed")
-        let storedShowRead = UserDefaults.standard.bool(forKey: "showRead")
+        // Use the injected preference domain for both filters and their initial subjects.
+        let storedShowClosed = defaults.bool(forKey: "showClosed")
+        let storedShowRead = defaults.bool(forKey: "showRead")
         showClosedSubject = CurrentValueSubject<Bool, Never>(storedShowClosed)
         showReadSubject = CurrentValueSubject<Bool, Never>(storedShowRead)
+
+        // Fixture data is ready synchronously; later changes use the normal memoization pipeline.
+        if !initialPullRequests.isEmpty {
+            let output = PullRequestListFilter.compute(PullRequestListFilter.Input(
+                pullRequests: initialPullRequests,
+                readMap: pullRequestReadMap,
+                viewer: viewer,
+                excludedUsers: configStore.excludedUsersSet,
+                showClosed: storedShowClosed,
+                showRead: storedShowRead,
+                unreadCache: [:],
+                lastProcessedVersions: [:]
+            ))
+            memoizedPullRequests = output.pullRequests
+            hasUnread = output.hasUnread
+            unreadCache = output.unreadCache
+            lastProcessedVersions = output.lastProcessedVersions
+        }
         setupPullRequestsMemoization()
     }
 
@@ -25,22 +78,22 @@ class PullRequestsViewModel: ObservableObject {
         cancellables.removeAll()
     }
 
-    @Published private(set) var lastUpdated: Date? = nil
-    @Published private(set) var isRefreshing = false
-    @Published var error: Error? = nil
+    @Published private(set) var lastUpdated: Date?
+    @Published private(set) var isRefreshing: Bool
+    @Published var error: Error?
     @Published private(set) var hasUnread: Bool = false
     @Published private(set) var hasPendingDisplayUpdates: Bool = false
 
     private var showClosedSubject: CurrentValueSubject<Bool, Never>
-    @AppStorage("showClosed") var showClosed: Bool = true {
+    @AppStorage var showClosed: Bool {
         didSet {
             applyPendingDisplayUpdatesForFilterChange()
             showClosedSubject.send(showClosed)
         }
     }
 
-    private var showReadSubject = CurrentValueSubject<Bool, Never>(false)
-    @AppStorage("showRead") var showRead: Bool = true {
+    private var showReadSubject: CurrentValueSubject<Bool, Never>
+    @AppStorage var showRead: Bool {
         didSet {
             applyPendingDisplayUpdatesForFilterChange()
             showReadSubject.send(showRead)
@@ -51,8 +104,7 @@ class PullRequestsViewModel: ObservableObject {
         memoizedPullRequests
     }
 
-    @CodableAppStorage("pullRequestReadMap") private var pullRequestReadMap: [String: ReadData] =
-        [:]
+    @CodableAppStorage private var pullRequestReadMap: [String: ReadData]
     private var presentationState: PullRequestPresentationState
     /// Wall-clock time each PR was last fetched from GitHub, used to skip refetching recently
     /// updated non-notified PRs (stale-while-revalidate).
@@ -79,7 +131,7 @@ class PullRequestsViewModel: ObservableObject {
     private func setupPullRequestsMemoization() {
         // Changing user exclusions is an intentional list update, so apply any pending remote
         // data before evaluating the new filter.
-        ConfigService.excludedUsersDidChange
+        configStore.excludedUsersDidChange
             .receive(on: DispatchQueue.main)
             .sink { [weak self] in
                 self?.applyPendingDisplayUpdatesForFilterChange()
@@ -123,7 +175,7 @@ class PullRequestsViewModel: ObservableObject {
                 pullRequests: Array(self.presentationState.presentedPullRequests.values),
                 readMap: self.pullRequestReadMap,
                 viewer: self.viewer,
-                excludedUsers: ConfigService.excludedUsersSet,
+                excludedUsers: self.configStore.excludedUsersSet,
                 showClosed: showClosed,
                 showRead: showRead,
                 unreadCache: self.unreadCache,
@@ -133,7 +185,7 @@ class PullRequestsViewModel: ObservableObject {
                 pullRequests: Array(self.presentationState.latestPullRequests.values),
                 readMap: self.pullRequestReadMap,
                 viewer: self.viewer,
-                excludedUsers: ConfigService.excludedUsersSet,
+                excludedUsers: self.configStore.excludedUsersSet,
                 showClosed: showClosed,
                 showRead: showRead,
                 unreadCache: self.unreadCache,
@@ -410,7 +462,7 @@ class PullRequestsViewModel: ObservableObject {
             let newLastUpdated = Date()
             let since =
                 lastUpdated ?? Calendar.current.date(
-                    byAdding: .day, value: ConfigService.onStartFetchWeeks * 7 * -1,
+                    byAdding: .day, value: configStore.onStartFetchWeeks * 7 * -1,
                     to: newLastUpdated
                 )!
             let updatedPullRequestIds = try await GitHubService.fetchUserNotifications(
@@ -466,14 +518,15 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     private func cleanupPullRequests() async {
-        let daysToDeduct = (ConfigService.deleteAfterWeeks * 7) + 1
+        let daysToDeduct = (configStore.deleteAfterWeeks * 7) + 1
+        let deleteOnlyClosed = configStore.deleteOnlyClosed
         let deleteFrom = Calendar.current.date(
             byAdding: .day, value: daysToDeduct * -1, to: Date()
         )!
 
         var filteredPullRequestMap = presentationState.latestPullRequests.filter { _, pullRequest in
             pullRequest.lastUpdated > deleteFrom
-                || (ConfigService.deleteOnlyClosed && !pullRequest.isClosed)
+                || (deleteOnlyClosed && !pullRequest.isClosed)
         }
 
         // Enforce maximum cache size to prevent unbounded memory growth
