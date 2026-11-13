@@ -40,8 +40,12 @@ struct PullRequestHeaderView: View, Equatable {
                 HStack {
                     HoverableLink(pullRequest.repository.name, destination: pullRequest.repository.url)
                         .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .help(pullRequest.repository.name)
                     Text(pullRequest.numberFormatted)
                         .foregroundColor(.secondary)
+                        .fixedSize()
                 }
 
                 HoverableLink(destination: pullRequest.url) {
@@ -51,6 +55,7 @@ struct PullRequestHeaderView: View, Equatable {
                         .multilineTextAlignment(.leading)
                 }
                 .foregroundStyle(.primary)
+                .help(pullRequest.title)
 
                 details
             }
@@ -62,6 +67,7 @@ struct PullRequestHeaderView: View, Equatable {
                     viewerLogin: viewerLogin,
                     localActions: localActionsController ?? .shared
                 )
+                .fixedSize(horizontal: true, vertical: false)
             #endif
 
             Button(action: { setRead(pullRequest.id, pullRequest.unread) }) {
@@ -70,6 +76,7 @@ struct PullRequestHeaderView: View, Equatable {
                     .foregroundStyle(pullRequest.unread ? .accent : .gray)
             }
             .buttonStyle(.borderless)
+            .fixedSize()
         }
     }
 
@@ -77,21 +84,38 @@ struct PullRequestHeaderView: View, Equatable {
         Text("by \(pullRequest.author.displayName)")
             .lineLimit(1)
             .truncationMode(.tail)
+            .help("\(pullRequest.author.displayName) (@\(pullRequest.author.login))")
     }
 
     var details: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 5) {
+                authorAndTime
+                Text("·")
+                statistics
+            }
+            VStack(alignment: .leading, spacing: 3) {
+                authorAndTime
+                statistics
+            }
+        }
+        .foregroundStyle(.secondary)
+        .textScale(.secondary)
+    }
+
+    private var authorAndTime: some View {
         HStack(spacing: 5) {
             authorText
-                .if(pullRequest.author.login != pullRequest.author.displayName) { view in
-                    view.help(pullRequest.author.login)
-                }
-
             Text("·")
+            TimeSensitiveText(getText: { pullRequest.lastUpdatedFormattedShort })
+                .lineLimit(1)
+                .fixedSize()
+                .help(pullRequest.lastUpdated.formatted(date: .complete, time: .standard))
+        }
+    }
 
-            TimeSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
-
-            Text("·")
-
+    private var statistics: some View {
+        HStack(spacing: 5) {
             HStack(spacing: 2) {
                 Text(pullRequest.additionsFormatted)
                     .foregroundStyle(.success)
@@ -127,9 +151,7 @@ struct PullRequestHeaderView: View, Equatable {
                 .help(usersToString(pullRequest.changesRequestedFrom))
             }
         }
-        .foregroundStyle(.secondary)
-        .textScale(.secondary)
-        .padding(.top, -3)
+        .fixedSize()
     }
 }
 
