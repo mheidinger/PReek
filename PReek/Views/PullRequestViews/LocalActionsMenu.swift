@@ -20,6 +20,7 @@
 
         @ObservedObject private var localActions: LocalActionsController
         @Environment(\.externalActionCompleted) private var externalActionCompleted
+        @Environment(\.externalActionsAllowed) private var externalActionsAllowed
 
         init(pullRequest: PullRequest, viewerLogin: String? = nil, localActions: LocalActionsController) {
             self.pullRequest = pullRequest
@@ -57,7 +58,7 @@
                         .allowsHitTesting(false)
                 }
                 .fixedSize()
-                .disabled(localActions.isPreparing(pullRequest))
+                .disabled(!externalActionsAllowed || localActions.isPreparing(pullRequest))
             }
         }
 

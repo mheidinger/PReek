@@ -3,8 +3,25 @@ import OSLog
 import SwiftUI
 
 class PullRequestsViewModel: ObservableObject {
+    enum DataSource {
+        case live
+        #if DEBUG
+            case offline(OfflineSnapshot)
+        #endif
+    }
+
+    #if DEBUG
+        struct OfflineSnapshot {
+            let pullRequests: [PullRequest]
+            let viewer: Viewer
+            let lastUpdated: Date
+            let error: Error?
+        }
+    #endif
+
     private let logger = Logger()
     private let configStore: any ConfigStore
+    private let dataSource: DataSource
     private var cancellables = Set<AnyCancellable>()
     private var timer: Timer?
     @Published private(set) var viewer: Viewer?
@@ -32,9 +49,11 @@ class PullRequestsViewModel: ObservableObject {
         initialPullRequests: [PullRequest] = [],
         defaults: UserDefaults = .standard,
         configStore: any ConfigStore = PersistentConfigStore(),
-        initialState: InitialState = InitialState()
+        initialState: InitialState = InitialState(),
+        dataSource: DataSource = .live
     ) {
         self.configStore = configStore
+        self.dataSource = dataSource
         _showClosed = AppStorage(wrappedValue: true, "showClosed", store: defaults)
         _showRead = AppStorage(wrappedValue: true, "showRead", store: defaults)
         _pullRequestReadMap = CodableAppStorage(
@@ -273,6 +292,12 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     func startFetchTimer() {
+        #if DEBUG
+            if case .offline = dataSource {
+                return
+            }
+        #endif
+
         if timer != nil {
             return
         }
@@ -416,6 +441,12 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     func testConnection() async -> Error? {
+        #if DEBUG
+            if case let .offline(snapshot) = dataSource {
+                return snapshot.error
+            }
+        #endif
+
         do {
             _ = try await GitHubService.fetchViewer()
             logger.info("Connection successful")
@@ -436,6 +467,23 @@ class PullRequestsViewModel: ObservableObject {
     /// insert an `await` in that span.
     @MainActor
     func updatePullRequests() async {
+        #if DEBUG
+            if case let .offline(snapshot) = dataSource {
+                viewer = snapshot.viewer
+                unreadCache.removeAll()
+                lastProcessedVersions.removeAll()
+                presentationState.replaceLatest(
+                    with: Dictionary(uniqueKeysWithValues: snapshot.pullRequests.map { ($0.id, $0) }),
+                    applyingWhileActive: memoizedPullRequests.isEmpty
+                )
+                lastUpdated = snapshot.lastUpdated
+                error = snapshot.error
+                isRefreshing = false
+                presentationStateDidChange()
+                return
+            }
+        #endif
+
         if let refreshTask {
             await refreshTask.value
             return
