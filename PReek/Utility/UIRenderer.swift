@@ -44,75 +44,17 @@
             }
             app.appearance = NSAppearance(named: options.appearance == .light ? .aqua : .darkAqua)
             NSTimeZone.default = TimeZone(secondsFromGMT: 0)!
-
-            let domain = "de.max-heidinger.PReek.UIRender.\(UUID().uuidString)"
-            guard let defaults = UserDefaults(suiteName: domain) else {
-                throw Failure(message: "Could not create an isolated preference domain.")
-            }
-            let scratch = FileManager.default.temporaryDirectory.appendingPathComponent(domain, isDirectory: true)
-            defer {
-                defaults.removePersistentDomain(forName: domain)
-                try? FileManager.default.removeItem(at: scratch)
-            }
-            try FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
-            defaults.set(true, forKey: "showClosed")
-            defaults.set(true, forKey: "showRead")
-
-            let store = MemoryConfigStore(values: ConfigValues(
-                token: "synthetic-render-token",
-                gitHubEnterpriseUrl: "https://github.example.invalid",
-                onStartFetchWeeks: 4,
-                deleteAfterWeeks: 12,
-                excludedUsers: ["build-bot", "dependency-bot"]
+            let session = try DebugOfflineSession(options: .init(
+                state: DebugOfflineSession.State(rawValue: options.state.rawValue)!,
+                screen: options.screen == .settings ? .settings : .main
             ))
-            let localActions = LocalActionsController.rendering(defaults: defaults)
-            switch options.screen {
-            case .settings:
-                let config = ConfigViewModel(store: store)
-                let cleanup = LocalActionsCleanup(registry: LocalWorkspaceRegistry(directory: scratch), defaults: defaults)
-                try render(SettingsRenderScene(
-                    config: config, section: options.section, localActions: localActions, cleanup: cleanup
-                ), options: options, foregroundBefore: foregroundBefore)
-            case .main:
-                let requests = options.state == .loaded ? pullRequests : []
-                let model = PullRequestsViewModel(
-                    initialPullRequests: requests,
-                    defaults: defaults,
-                    configStore: store,
-                    initialState: .init(
-                        lastUpdated: referenceDate,
-                        isRefreshing: options.state == .loading,
-                        error: options.state == .error ? Failure(message: "Synthetic connection failure") : nil,
-                        viewer: Viewer(login: "reviewer", scopes: nil)
-                    )
-                )
-                guard model.pullRequests.count == requests.count,
-                      zip(model.pullRequests, requests).allSatisfy({ $0.id == $1.id })
-                else {
-                    throw Failure(message: "The requested pull request fixture was unexpectedly filtered out.")
-                }
-                try render(MainScreen(pullRequestsViewModel: model)
-                    .environment(\.localActionsController, localActions),
-                    options: options, foregroundBefore: foregroundBefore)
+            defer { session.removeDisposablePreferences() }
+            let expectedCount = options.state == .loaded ? DebugOfflineSession.pullRequests.count : 0
+            guard session.model.pullRequests.count == expectedCount else {
+                throw Failure(message: "The requested pull request fixture was unexpectedly filtered out.")
             }
-        }
-
-        private struct SettingsRenderScene: View {
-            let config: ConfigViewModel
-            let section: SettingsSection
-            let localActions: LocalActionsController
-            let cleanup: LocalActionsCleanup
-            @State private var launchAtLogin = false
-
-            var body: some View {
-                SettingsScreen(
-                    configViewModel: config,
-                    initialSection: section,
-                    localActions: localActions,
-                    cleanup: cleanup,
-                    launchAtLogin: $launchAtLogin
-                )
-            }
+            try render(DebugOfflineRoot(session: session, section: options.section),
+                       options: options, foregroundBefore: foregroundBefore)
         }
 
         private static func render<Content: View>(
@@ -179,36 +121,6 @@
             try print(String(decoding: encoder.encode(report), as: UTF8.self))
             // The window was never ordered, made key, or shown. Process exit releases the host.
             withExtendedLifetime(window) {}
-        }
-
-        // Historical timestamps avoid relative-time drift; no live or random PR data is used.
-        private static let referenceDate = Date(timeIntervalSince1970: 1_577_880_000)
-        private static var pullRequests: [PullRequest] {
-            let repository = Repository(name: "example/PReek", url: URL(string: "https://github.example.invalid/example/PReek")!)
-            let author = User(login: "contributor", displayName: "Example Contributor")
-            let reviewer = User(login: "reviewer")
-            let titles = [
-                "Make pull request notifications easier to review",
-                "A deliberately long pull request title to exercise wrapping and truncation at narrow menu widths",
-                "Ship the new settings navigation",
-            ]
-            let statuses: [PullRequest.Status] = [.open, .draft, .merged]
-            return titles.enumerated().map { index, title in
-                let requestURL = repository.url.appendingPathComponent("pull/\(101 + index)")
-                let updated = referenceDate.addingTimeInterval(Double(-index * 3600))
-                let event = Event(
-                    id: "render-event-\(index)", user: author, time: updated,
-                    data: EventClosedData(url: nil), pullRequestUrl: requestURL
-                )
-                return PullRequest(
-                    id: "render-pr-\(index)", repository: repository, author: author,
-                    title: title, number: 101 + index, status: statuses[index],
-                    lastUpdated: updated, events: [event],
-                    url: requestURL,
-                    additions: 120 + index, deletions: 18 + index,
-                    approvalFrom: [reviewer], changesRequestedFrom: index == 1 ? [User(login: "another-reviewer")] : []
-                )
-            }
         }
     }
 #endif

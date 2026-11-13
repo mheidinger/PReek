@@ -10,7 +10,25 @@ private struct ExternalActionCompletedKey: EnvironmentKey {
     static let defaultValue: (Bool) -> Void = { _ in }
 }
 
+private struct ExternalActionsAllowedKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+private struct OfflineImportDataKey: EnvironmentKey {
+    static let defaultValue: Data? = nil
+}
+
 extension EnvironmentValues {
+    var externalActionsAllowed: Bool {
+        get { self[ExternalActionsAllowedKey.self] }
+        set { self[ExternalActionsAllowedKey.self] = newValue }
+    }
+
+    var offlineImportData: Data? {
+        get { self[OfflineImportDataKey.self] }
+        set { self[OfflineImportDataKey.self] = newValue }
+    }
+
     /// Receives the Command-key state captured when an external action was requested.
     var externalActionCompleted: (Bool) -> Void {
         get { self[ExternalActionCompletedKey.self] }
@@ -35,7 +53,7 @@ struct ContentView: View {
     }
 
     private func openURLAdditionalAction(modifierPressed: Bool) {
-        if ConfigService.closeWindowOnLinkClick != modifierPressed {
+        if configViewModel.closeWindowOnLinkClick != modifierPressed {
             closeWindow()
         }
     }

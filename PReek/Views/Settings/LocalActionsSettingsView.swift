@@ -5,6 +5,7 @@
     struct LocalActionsSettingsView: View {
         @ObservedObject private var localActions: LocalActionsController
         @ObservedObject private var cleanup: LocalActionsCleanup
+        @Environment(\.externalActionsAllowed) private var externalActionsAllowed
 
         init(localActions: LocalActionsController, cleanup: LocalActionsCleanup) {
             self.localActions = localActions
@@ -105,6 +106,7 @@
                     Button("Change folder…") {
                         localActions.changeRepositoryMapping(id: mapping.id)
                     }
+                    .disabled(!externalActionsAllowed)
                     Button("Forget mapping", role: .destructive) {
                         localActions.removeRepositoryMapping(id: mapping.id)
                     }

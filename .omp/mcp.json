@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/can1357/oh-my-pi/main/packages/coding-agent/src/config/mcp-schema.json",
+  "mcpServers": {
+    "MobileBuildMCP": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "mobilebuildmcp@2.7.1", "mcp"],
+      "timeout": 600000,
+      "env": {
+        "MOBILEBUILDMCP_HEADLESS_LAUNCH": "1",
+        "MOBILEBUILDMCP_SENTRY_DISABLED": "true"
+      }
+    }
+  }
+}

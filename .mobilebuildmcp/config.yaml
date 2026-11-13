@@ -1,0 +1,13 @@
+schemaVersion: 1
+enabledWorkflows:
+  - simulator
+  - ui-automation
+  - debugging
+
+sentryDisabled: true
+axePath: ./.local-tools/axe-2.0.4/axe
+
+sessionDefaults:
+  projectPath: ./PReek.xcodeproj
+  scheme: PReek
+  configuration: Debug

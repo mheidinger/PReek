@@ -11,6 +11,7 @@ private let simulatorQrCodeData = """
 struct ImportSheetModifier: ViewModifier {
     @ObservedObject var configViewModel: ConfigViewModel
     @Binding var isPresented: Bool
+    @Environment(\.offlineImportData) private var offlineImportData
 
     #if os(iOS)
         @State private var showImportErrorAlert: Bool = false
@@ -22,11 +23,22 @@ struct ImportSheetModifier: ViewModifier {
                     NavigationStack {
                         VStack(alignment: .leading) {
                             Text("Open PReek on another device and click on \"Share\" in the settings.")
-                            CodeScannerView(
-                                codeTypes: [.qr],
-                                simulatedData: simulatorQrCodeData,
-                                completion: handleScan
-                            )
+                            if let offlineImportData {
+                                Button("Import Configuration") {
+                                    do {
+                                        try configViewModel.importShareData(offlineImportData)
+                                    } catch {
+                                        importError = error
+                                    }
+                                    isPresented = false
+                                }
+                            } else {
+                                CodeScannerView(
+                                    codeTypes: [.qr],
+                                    simulatedData: simulatorQrCodeData,
+                                    completion: handleScan
+                                )
+                            }
                         }
                         .padding(.horizontal)
                         .navigationTitle("Import Configuration")
