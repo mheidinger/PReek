@@ -37,7 +37,7 @@ struct PullRequestHeaderView: View, Equatable {
             StatusIcon(pullRequest.status)
 
             VStack(alignment: .leading, spacing: 3) {
-                HStack {
+                HStack(spacing: 10) {
                     HoverableLink(pullRequest.repository.name, destination: pullRequest.repository.url)
                         .foregroundStyle(.primary)
                         .lineLimit(1)
@@ -46,6 +46,25 @@ struct PullRequestHeaderView: View, Equatable {
                     Text(pullRequest.numberFormatted)
                         .foregroundColor(.secondary)
                         .fixedSize()
+
+                    Spacer(minLength: 0)
+
+                    #if os(macOS)
+                        LocalActionsMenu(
+                            pullRequest: pullRequest,
+                            viewerLogin: viewerLogin,
+                            localActions: localActionsController ?? .shared
+                        )
+                        .fixedSize(horizontal: true, vertical: false)
+                    #endif
+
+                    Button(action: { setRead(pullRequest.id, pullRequest.unread) }) {
+                        Image(systemName: pullRequest.unread ? "circle.fill" : "circle")
+                            .imageScale(.medium)
+                            .foregroundStyle(pullRequest.unread ? .accent : .gray)
+                    }
+                    .buttonStyle(.borderless)
+                    .fixedSize()
                 }
 
                 HoverableLink(destination: pullRequest.url) {
@@ -60,23 +79,6 @@ struct PullRequestHeaderView: View, Equatable {
                 details
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            #if os(macOS)
-                LocalActionsMenu(
-                    pullRequest: pullRequest,
-                    viewerLogin: viewerLogin,
-                    localActions: localActionsController ?? .shared
-                )
-                .fixedSize(horizontal: true, vertical: false)
-            #endif
-
-            Button(action: { setRead(pullRequest.id, pullRequest.unread) }) {
-                Image(systemName: pullRequest.unread ? "circle.fill" : "circle")
-                    .imageScale(.medium)
-                    .foregroundStyle(pullRequest.unread ? .accent : .gray)
-            }
-            .buttonStyle(.borderless)
-            .fixedSize()
         }
     }
 
