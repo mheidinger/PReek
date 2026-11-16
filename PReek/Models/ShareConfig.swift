@@ -37,12 +37,24 @@ struct ShareConfigDataV1: Codable {
     let deleteAfterWeeks: Int
     let deleteOnlyClosed: Bool
     let excludedUsers: [String]
+    let markApprovedPullRequestsAsRead: Bool
+    let markMergedPullRequestsAsRead: Bool
 
     private enum CodingKeys: String, CodingKey {
         case version, token, gitHubEnterpriseUrl, onStartFetchWeeks, deleteAfterWeeks, deleteOnlyClosed, excludedUsers
+        case markApprovedPullRequestsAsRead, markMergedPullRequestsAsRead
     }
 
-    init(token: String, gitHubEnterpriseUrl: String?, onStartFetchWeeks: Int, deleteAfterWeeks: Int, deleteOnlyClosed: Bool, excludedUsers: [String]) {
+    init(
+        token: String,
+        gitHubEnterpriseUrl: String?,
+        onStartFetchWeeks: Int,
+        deleteAfterWeeks: Int,
+        deleteOnlyClosed: Bool,
+        excludedUsers: [String],
+        markApprovedPullRequestsAsRead: Bool = true,
+        markMergedPullRequestsAsRead: Bool = true
+    ) {
         version = 1
         self.token = token
         self.gitHubEnterpriseUrl = gitHubEnterpriseUrl
@@ -50,6 +62,8 @@ struct ShareConfigDataV1: Codable {
         self.deleteAfterWeeks = deleteAfterWeeks
         self.deleteOnlyClosed = deleteOnlyClosed
         self.excludedUsers = excludedUsers
+        self.markApprovedPullRequestsAsRead = markApprovedPullRequestsAsRead
+        self.markMergedPullRequestsAsRead = markMergedPullRequestsAsRead
     }
 
     init(from decoder: Decoder) throws {
@@ -71,5 +85,7 @@ struct ShareConfigDataV1: Codable {
         deleteAfterWeeks = try container.decode(Int.self, forKey: .deleteAfterWeeks)
         deleteOnlyClosed = try container.decode(Bool.self, forKey: .deleteOnlyClosed)
         excludedUsers = try container.decode([String].self, forKey: .excludedUsers)
+        markApprovedPullRequestsAsRead = try container.decodeIfPresent(Bool.self, forKey: .markApprovedPullRequestsAsRead) ?? true
+        markMergedPullRequestsAsRead = try container.decodeIfPresent(Bool.self, forKey: .markMergedPullRequestsAsRead) ?? true
     }
 }

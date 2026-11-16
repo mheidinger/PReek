@@ -58,6 +58,7 @@ xcodebuild test -scheme PReek -project PReek.xcodeproj \
   -derivedDataPath "$TEST_BUILD_DIR" CODE_SIGNING_ALLOWED=NO
 ```
 
+- After finishing an implementation, run the applicable linter on touched files; for Swift, run `swiftformat --lint` on the touched Swift files. Fix all reported issues and rerun the linter.
 When piping output through `xcpretty`, preserve the `xcodebuild` exit status (for example, with `set -o pipefail`). CI builds/analyzes macOS and iOS, runs macOS tests, and separately runs `swiftformat --lint . --reporter github-actions-log`. For local formatting checks, scope `swiftformat --lint` to touched Swift files.
 
 ### UI Verification (Agents)

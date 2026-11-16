@@ -11,6 +11,8 @@ class ConfigService {
     @AppStorage("onStartFetchWeeks") static var onStartFetchWeeks: Int = 1
     @AppStorage("deleteAfterWeeks") static var deleteAfterWeeks: Int = 1
     @AppStorage("deleteOnlyClosed") static var deleteOnlyClosed: Bool = true
+    @AppStorage("markApprovedPullRequestsAsRead") static var markApprovedPullRequestsAsRead: Bool = true
+    @AppStorage("markMergedPullRequestsAsRead") static var markMergedPullRequestsAsRead: Bool = true
 
     @AppStorage("excludedUsers") private static var excludedUsersStr: String = ""
 

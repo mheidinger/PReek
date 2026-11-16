@@ -10,6 +10,8 @@ struct ConfigValues {
     var deleteOnlyClosed: Bool
     var excludedUsers: [String]
     var closeWindowOnLinkClick: Bool
+    var markApprovedPullRequestsAsRead: Bool
+    var markMergedPullRequestsAsRead: Bool
 
     init(
         token: String? = nil,
@@ -18,7 +20,9 @@ struct ConfigValues {
         deleteAfterWeeks: Int = 1,
         deleteOnlyClosed: Bool = true,
         excludedUsers: [String] = [],
-        closeWindowOnLinkClick: Bool = true
+        closeWindowOnLinkClick: Bool = true,
+        markApprovedPullRequestsAsRead: Bool = true,
+        markMergedPullRequestsAsRead: Bool = true
     ) {
         self.token = token
         self.gitHubEnterpriseUrl = gitHubEnterpriseUrl
@@ -27,6 +31,8 @@ struct ConfigValues {
         self.deleteOnlyClosed = deleteOnlyClosed
         self.excludedUsers = excludedUsers
         self.closeWindowOnLinkClick = closeWindowOnLinkClick
+        self.markApprovedPullRequestsAsRead = markApprovedPullRequestsAsRead
+        self.markMergedPullRequestsAsRead = markMergedPullRequestsAsRead
     }
 }
 
@@ -35,6 +41,8 @@ protocol ConfigStore: AnyObject {
     var onStartFetchWeeks: Int { get }
     var deleteAfterWeeks: Int { get }
     var deleteOnlyClosed: Bool { get }
+    var markApprovedPullRequestsAsRead: Bool { get }
+    var markMergedPullRequestsAsRead: Bool { get }
     var excludedUsersSet: Set<String> { get }
     var excludedUsersDidChange: AnyPublisher<Void, Never> { get }
 }
@@ -50,7 +58,9 @@ final class PersistentConfigStore: ConfigStore {
                 deleteAfterWeeks: ConfigService.deleteAfterWeeks,
                 deleteOnlyClosed: ConfigService.deleteOnlyClosed,
                 excludedUsers: ConfigService.excludedUsers,
-                closeWindowOnLinkClick: ConfigService.closeWindowOnLinkClick
+                closeWindowOnLinkClick: ConfigService.closeWindowOnLinkClick,
+                markApprovedPullRequestsAsRead: ConfigService.markApprovedPullRequestsAsRead,
+                markMergedPullRequestsAsRead: ConfigService.markMergedPullRequestsAsRead
             )
         }
         set {
@@ -61,6 +71,8 @@ final class PersistentConfigStore: ConfigStore {
             ConfigService.deleteOnlyClosed = newValue.deleteOnlyClosed
             ConfigService.excludedUsers = newValue.excludedUsers
             ConfigService.closeWindowOnLinkClick = newValue.closeWindowOnLinkClick
+            ConfigService.markApprovedPullRequestsAsRead = newValue.markApprovedPullRequestsAsRead
+            ConfigService.markMergedPullRequestsAsRead = newValue.markMergedPullRequestsAsRead
         }
     }
 
@@ -75,6 +87,14 @@ final class PersistentConfigStore: ConfigStore {
 
     var deleteOnlyClosed: Bool {
         ConfigService.deleteOnlyClosed
+    }
+
+    var markApprovedPullRequestsAsRead: Bool {
+        ConfigService.markApprovedPullRequestsAsRead
+    }
+
+    var markMergedPullRequestsAsRead: Bool {
+        ConfigService.markMergedPullRequestsAsRead
     }
 
     var excludedUsersSet: Set<String> {
@@ -110,6 +130,14 @@ final class MemoryConfigStore: ConfigStore {
 
     var deleteOnlyClosed: Bool {
         values.deleteOnlyClosed
+    }
+
+    var markApprovedPullRequestsAsRead: Bool {
+        values.markApprovedPullRequestsAsRead
+    }
+
+    var markMergedPullRequestsAsRead: Bool {
+        values.markMergedPullRequestsAsRead
     }
 
     var excludedUsersDidChange: AnyPublisher<Void, Never> {

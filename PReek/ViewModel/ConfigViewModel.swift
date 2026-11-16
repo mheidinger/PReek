@@ -56,6 +56,18 @@ class ConfigViewModel: ObservableObject {
         }
     }
 
+    @Published var markApprovedPullRequestsAsRead: Bool {
+        didSet {
+            saveUpdateTrigger.send()
+        }
+    }
+
+    @Published var markMergedPullRequestsAsRead: Bool {
+        didSet {
+            saveUpdateTrigger.send()
+        }
+    }
+
     @Published var excludedUsers: [ExcludedUser] {
         didSet {
             saveUpdateTrigger.send()
@@ -78,6 +90,8 @@ class ConfigViewModel: ObservableObject {
         onStartFetchWeeks = values.onStartFetchWeeks
         deleteAfterWeeks = values.deleteAfterWeeks
         deleteOnlyClosed = values.deleteOnlyClosed
+        markApprovedPullRequestsAsRead = values.markApprovedPullRequestsAsRead
+        markMergedPullRequestsAsRead = values.markMergedPullRequestsAsRead
         excludedUsers = values.excludedUsers.map { ExcludedUser(username: $0) }
         closeWindowOnLinkClick = values.closeWindowOnLinkClick
         setupSaveUpdate()
@@ -116,7 +130,9 @@ class ConfigViewModel: ObservableObject {
             deleteAfterWeeks: deleteAfterWeeks,
             deleteOnlyClosed: deleteOnlyClosed,
             excludedUsers: excludedUsers.map { $0.username },
-            closeWindowOnLinkClick: closeWindowOnLinkClick
+            closeWindowOnLinkClick: closeWindowOnLinkClick,
+            markApprovedPullRequestsAsRead: markApprovedPullRequestsAsRead,
+            markMergedPullRequestsAsRead: markMergedPullRequestsAsRead
         )
     }
 
@@ -131,7 +147,9 @@ class ConfigViewModel: ObservableObject {
             onStartFetchWeeks: onStartFetchWeeks,
             deleteAfterWeeks: deleteAfterWeeks,
             deleteOnlyClosed: deleteOnlyClosed,
-            excludedUsers: excludedUsers.map { $0.username }
+            excludedUsers: excludedUsers.map { $0.username },
+            markApprovedPullRequestsAsRead: markApprovedPullRequestsAsRead,
+            markMergedPullRequestsAsRead: markMergedPullRequestsAsRead
         ))
     }
 
@@ -152,6 +170,8 @@ class ConfigViewModel: ObservableObject {
                 deleteAfterWeeks = parsedData.deleteAfterWeeks
                 deleteOnlyClosed = parsedData.deleteOnlyClosed
                 excludedUsers = parsedData.excludedUsers.map { ExcludedUser(username: $0) }
+                markApprovedPullRequestsAsRead = parsedData.markApprovedPullRequestsAsRead
+                markMergedPullRequestsAsRead = parsedData.markMergedPullRequestsAsRead
             }
         } catch {
             logger.error("Failed to decode imported share data: \(error)")

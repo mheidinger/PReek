@@ -254,6 +254,15 @@ struct SettingsScreen: View {
                 Text("Only remove closed PRs")
             }
 
+            Section {
+                Toggle("When I approve a PR", isOn: $configViewModel.markApprovedPullRequestsAsRead)
+                Toggle("When I merge a PR", isOn: $configViewModel.markMergedPullRequestsAsRead)
+            } header: {
+                Text("Automatically mark as read")
+            } footer: {
+                Text("Mark a pull request as read through my approval or merge. Later activity remains unread.")
+            }
+
             #if os(iOS)
                 NavigationLink(value: Screen.excludedUsers) {
                     Text("Excluded Users")
