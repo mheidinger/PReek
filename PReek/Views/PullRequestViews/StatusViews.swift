@@ -23,16 +23,19 @@ private let statusToColor: [PullRequest.Status: Color] = [
 
 struct StatusIcon: View {
     var status: PullRequest.Status
+    var size: CGFloat = 32
 
-    init(_ status: PullRequest.Status) {
+    init(_ status: PullRequest.Status, size: CGFloat = 32) {
         self.status = status
+        self.size = size
     }
 
     var body: some View {
         Image(statusToImageResource[status] ?? .prOpen)
             .resizable()
             .aspectRatio(contentMode: .fit)
-            .frame(width: 32, height: 32)
+            .frame(width: size, height: size)
+            .accessibilityLabel(Text(statusToText[status] ?? "Unknown"))
     }
 }
 

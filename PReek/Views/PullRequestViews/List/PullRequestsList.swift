@@ -4,101 +4,210 @@ struct PullRequestsList<Footer: View>: View {
     @ObservedObject var pullRequestsViewModel: PullRequestsViewModel
     @ViewBuilder let footer: () -> Footer
 
+    #if os(iOS)
+        @EnvironmentObject private var configViewModel: ConfigViewModel
+        @State private var showSettings = false
+    #endif
+
     var pullRequests: [PullRequest] {
         pullRequestsViewModel.pullRequests
     }
 
-    @State private var selectedPullRequestId: PullRequest.ID?
-    @State private var showFilterSheet: Bool = false
-    @State private var showMarkAllAsReadConfirm: Bool = false
-    @State private var setUnreadOnChange: Bool = false
+    // Retain the displayed snapshot if a filter or refresh removes its row.
+    @State private var selectedPullRequest: PullRequest?
+    @State private var preferredCompactColumn: NavigationSplitViewColumn = .sidebar
+    @State private var explicitlyUnreadID: PullRequest.ID?
+    @State private var showFilterSheet = false
 
     init(pullRequestsViewModel: PullRequestsViewModel, @ViewBuilder footer: @escaping () -> Footer) {
         self.pullRequestsViewModel = pullRequestsViewModel
         self.footer = footer
     }
 
-    private var selectedPullRequest: PullRequest? {
-        guard let selectedPullRequestId else { return nil }
-        return pullRequests.first(where: { $0.id == selectedPullRequestId })
+    private var selection: Binding<PullRequest.ID?> {
+        Binding(
+            get: { selectedPullRequest?.id },
+            set: { id in
+                selectedPullRequest = pullRequests.first { $0.id == id }
+            }
+        )
     }
 
     var body: some View {
-        NavigationSplitView {
-            List(selection: $selectedPullRequestId) {
+        NavigationSplitView(preferredCompactColumn: $preferredCompactColumn) {
+            List(selection: selection) {
+                if let error = pullRequestsViewModel.error, !pullRequests.isEmpty {
+                    Section {
+                        Label("No Connection", systemImage: "icloud.slash")
+                        Text(error.localizedDescription)
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
                 Section {
                     ForEach(pullRequests) { pullRequest in
-                        PullRequestListItem(pullRequest)
-                            .equatable()
-                            .contextMenu {
-                                Button(pullRequest.unread ? "Mark read" : "Mark unread", action: { pullRequestsViewModel.setRead(pullRequest.id, read: pullRequest.unread) })
-                            }
+                        NavigationLink(value: pullRequest.id) {
+                            PullRequestListItem(pullRequest)
+                                .equatable()
+                        }
+                        .contextMenu {
+                            readButton(for: pullRequest)
+                        }
+                        .swipeActions {
+                            readButton(for: pullRequest)
+                                .tint(.accentColor)
+                        }
                     }
                 } footer: {
+                    if !pullRequests.isEmpty {
+                        footer()
+                    }
+                }
+            }
+            #if os(iOS)
+            .listStyle(.insetGrouped)
+            #endif
+            .overlay {
+                if pullRequests.isEmpty {
+                    emptyContent
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if pullRequests.isEmpty {
                     footer()
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
                 }
             }
-            .refreshable {
-                await pullRequestsViewModel.updatePullRequestsAndApply()
-            }
-            .onChange(of: selectedPullRequestId) { oldValue, _ in
-                guard let oldValue else { return }
-
-                if setUnreadOnChange {
-                    pullRequestsViewModel.setRead(oldValue, read: false)
-                    setUnreadOnChange = false
-                } else {
-                    pullRequestsViewModel.setRead(oldValue, read: true)
+            .navigationTitle("Pull Requests")
+            #if os(iOS)
+                .toolbarTitleDisplayMode(.inlineLarge)
+                .navigationDestination(isPresented: $showSettings) {
+                    SettingsScreen(configViewModel: configViewModel)
                 }
-            }
-            .toolbar {
-                ToolbarItem {
-                    HStack(spacing: 4) {
-                        Button(action: { showFilterSheet = true }) {
-                            Image(systemName: "line.3.horizontal.decrease.circle")
-                                .font(.title)
-                        }
+                .navigationDestination(for: Screen.self) { _ in
+                    ExcludedUsersScreen(configViewModel: configViewModel)
+                }
+            #endif
+                .refreshable {
+                    await pullRequestsViewModel.updatePullRequestsAndApply()
+                }
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Menu {
+                            Button("Filters", systemImage: "line.3.horizontal.decrease.circle") {
+                                showFilterSheet = true
+                            }
 
-                        Button(action: { showMarkAllAsReadConfirm = true }) {
-                            Image(systemName: "eye.circle")
-                                .font(.title)
-                        }
-                        .confirmationDialog("Are you sure?", isPresented: $showMarkAllAsReadConfirm) {
-                            Button("Mark all as read") {
+                            Button("Mark all as read", systemImage: "checkmark.circle") {
                                 pullRequestsViewModel.markAllAsRead()
+                            }
+                            .disabled(!pullRequestsViewModel.hasUnread)
+
+                            #if os(iOS)
+                                Divider()
+                                Button("Settings", systemImage: "gear") {
+                                    showSettings = true
+                                }
+                            #endif
+                        } label: {
+                            Label("More", systemImage: "ellipsis.circle")
+                        }
+                    }
+                }
+                .sheet(isPresented: $showFilterSheet) {
+                    NavigationStack {
+                        Form {
+                            Toggle("Show closed", isOn: $pullRequestsViewModel.showClosed)
+                            Toggle("Show read", isOn: $pullRequestsViewModel.showRead)
+                        }
+                        #if os(iOS)
+                        .navigationBarTitleDisplayMode(.inline)
+                        #endif
+                        .navigationTitle("Filters")
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("Done") { showFilterSheet = false }
                             }
                         }
                     }
+                    .presentationDetents([.medium, .large])
                 }
-            }
-            .sheet(isPresented: $showFilterSheet) {
-                NavigationStack {
-                    Form {
-                        Toggle(isOn: $pullRequestsViewModel.showClosed) {
-                            Text("Show closed")
-                        }
-                        Toggle(isOn: $pullRequestsViewModel.showRead) {
-                            Text("Show read")
-                        }
-                    }
-                    #if os(iOS)
-                    .navigationBarTitleDisplayMode(.inline)
-                    #endif
-                    .navigationTitle("Filters")
-                    .toolbar {
-                        Button(action: { showFilterSheet = false }) {
-                            Image(systemName: "xmark.circle.fill")
-                                .imageScale(.large)
-                        }
-                    }
-                }
-                .presentationDetents([.fraction(0.3)])
-            }
         } detail: {
             if let selectedPullRequest {
-                PullRequestDetailView(selectedPullRequest, setRead: pullRequestsViewModel.setRead, setUnreadOnChange: $setUnreadOnChange)
+                PullRequestDetailView(
+                    selectedPullRequest,
+                    onMarkUnread: {
+                        markUnread(selectedPullRequest.id)
+                    }
+                )
+                .id(selectedPullRequest.id)
+                .onDisappear {
+                    // Compact Back and tab changes can hide detail without changing selection.
+                    if self.selectedPullRequest?.id == selectedPullRequest.id,
+                       explicitlyUnreadID != selectedPullRequest.id
+                    {
+                        pullRequestsViewModel.setRead(selectedPullRequest.id, read: true)
+                    }
+                }
             } else {
-                Text("Select a pull request")
+                ContentUnavailableView("Select a pull request", systemImage: "arrow.triangle.pull")
+            }
+        }
+        .onChange(of: selectedPullRequest?.id) { previousID, _ in
+            // A regular-width split updates detail in place; it need not disappear.
+            guard let previousID else { return }
+            if explicitlyUnreadID != previousID {
+                pullRequestsViewModel.setRead(previousID, read: true)
+            }
+            explicitlyUnreadID = nil
+        }
+    }
+
+    private func readButton(for pullRequest: PullRequest) -> some View {
+        Button(pullRequest.unread ? "Mark read" : "Mark unread", systemImage: pullRequest.unread ? "envelope.open" : "envelope.badge") {
+            if selectedPullRequest?.id == pullRequest.id, !pullRequest.unread {
+                markUnread(pullRequest.id)
+            } else {
+                pullRequestsViewModel.setRead(pullRequest.id, read: pullRequest.unread)
+            }
+        }
+    }
+
+    private func markUnread(_ id: PullRequest.ID) {
+        explicitlyUnreadID = id
+        pullRequestsViewModel.setRead(id, read: false)
+        selectedPullRequest = nil
+        preferredCompactColumn = .sidebar
+    }
+
+    @ViewBuilder
+    private var emptyContent: some View {
+        if let error = pullRequestsViewModel.error {
+            ContentUnavailableView {
+                Label("No Connection", systemImage: "icloud.slash")
+            } description: {
+                Text(error.localizedDescription)
+            } actions: {
+                Button("Refresh") {
+                    pullRequestsViewModel.triggerManualUpdatePullRequests()
+                }
+                .disabled(pullRequestsViewModel.isRefreshing)
+            }
+        } else if pullRequestsViewModel.isRefreshing {
+            VStack(spacing: 12) {
+                ProgressView()
+                Text("Loading Pull Requests...")
+                    .foregroundStyle(.secondary)
+            }
+        } else {
+            ContentUnavailableView {
+                Label("You are done for today! 🎉", systemImage: "checkmark.circle")
+            } description: {
+                Text("No pull requests match your filters.")
             }
         }
     }
@@ -126,4 +235,5 @@ struct PullRequestsList<Footer: View>: View {
         PullRequest.preview(id: "18"),
     ])
     return PullRequestsList(pullRequestsViewModel: pullRequestsViewModel, footer: { Text("Footer") })
+        .environmentObject(ConfigViewModel())
 }

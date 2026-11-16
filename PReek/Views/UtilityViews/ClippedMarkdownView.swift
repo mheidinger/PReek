@@ -34,41 +34,52 @@ struct ClippedMarkdownView: View {
     }
 
     var body: some View {
-        Markdown(content)
-            .markdownImageProvider(NoneImageProvider())
-            .markdownInlineImageProvider(NoneInlineImageProvider())
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .background(
-                GeometryReader { contentGeometry in
-                    Color.clear.preference(
-                        key: HeightPreferenceKey.self, value: contentGeometry.size.height
+        #if os(iOS)
+            // Keep the full comment in the detail's vertical scroll view. MarkdownUI's
+            // native code-block scrollers preserve long lines without clipping text.
+            Markdown(content)
+                .markdownImageProvider(NoneImageProvider())
+                .markdownInlineImageProvider(NoneInlineImageProvider())
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .fixedSize(horizontal: false, vertical: true)
+        #else
+            Markdown(content)
+                .markdownImageProvider(NoneImageProvider())
+                .markdownInlineImageProvider(NoneInlineImageProvider())
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .background(
+                    GeometryReader { contentGeometry in
+                        Color.clear.preference(
+                            key: HeightPreferenceKey.self, value: contentGeometry.size.height
+                        )
+                    }
+                )
+                .onPreferenceChange(HeightPreferenceKey.self) { height in
+                    isOverflowing = height > maxHeight
+                }
+                .frame(maxHeight: isExpanded ? nil : maxHeight, alignment: .top)
+                .clipped()
+                .mask(alignment: .top) {
+                    LinearGradient(
+                        colors: [.black, showClippedAffordances ? .clear : .black],
+                        startPoint: .center,
+                        endPoint: .bottom
                     )
                 }
-            )
-            .onPreferenceChange(HeightPreferenceKey.self) { height in
-                isOverflowing = height > maxHeight
-            }
-            .frame(maxHeight: isExpanded ? nil : maxHeight, alignment: .top)
-            .clipped()
-            .mask(alignment: .top) {
-                LinearGradient(
-                    colors: [.black, showClippedAffordances ? .clear : .black],
-                    startPoint: .center,
-                    endPoint: .bottom
-                )
-            }
-            .overlay(alignment: .bottomTrailing) {
-                if isOverflowing {
-                    Button(action: { isExpanded.toggle() }) {
-                        Image(
-                            systemName: isExpanded
-                                ? "arrowtriangle.up.square" : "arrowtriangle.down.square"
-                        )
-                        .imageScale(.large)
+                .overlay(alignment: .bottomTrailing) {
+                    if isOverflowing {
+                        Button(action: { isExpanded.toggle() }) {
+                            Image(
+                                systemName: isExpanded
+                                    ? "arrowtriangle.up.square" : "arrowtriangle.down.square"
+                            )
+                            .imageScale(.large)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .buttonStyle(PlainButtonStyle())
                 }
-            }
+        #endif
     }
 }
 

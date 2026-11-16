@@ -1,118 +1,34 @@
-import OSLog
-import SwiftUI
-import TipKit
 #if os(macOS)
     import AppKit
     import Combine
-#endif
+    import SwiftUI
 
-/// Render requests must be dispatched before SwiftUI constructs the app and its live services.
-@main
-enum PReekEntryPoint {
-    @MainActor
-    static func main() {
-        let launchArguments = Array(CommandLine.arguments.dropFirst())
-        if launchArguments.contains(where: { $0.hasPrefix("--debug-offline") }) {
-            #if DEBUG
-                if launchArguments == ["--debug-offline", "--help"] {
-                    print(DebugOfflineSession.Options.usage)
-                    exit(EXIT_SUCCESS)
-                }
-                do {
-                    let options = try DebugOfflineSession.Options.parse(launchArguments)
-                    try DebugOfflineApp.launch(options: options)
-                    exit(EXIT_SUCCESS)
-                } catch {
-                    FileHandle.standardError.write(Data("Offline debug launch failed: \(error.localizedDescription)\n".utf8))
-                    exit(EXIT_FAILURE)
-                }
-            #else
-                FileHandle.standardError.write(Data("Offline debug mode is available only in Debug builds.\n".utf8))
-                exit(EXIT_FAILURE)
-            #endif
-        }
-        #if os(macOS)
-            let arguments = Array(CommandLine.arguments.dropFirst())
-            if arguments.contains(where: { $0.hasPrefix("--render-ui") }) {
-                #if DEBUG
-                    do {
-                        try UIRenderer.run(arguments: arguments)
-                        exit(EXIT_SUCCESS)
-                    } catch {
-                        FileHandle.standardError.write(Data("UI rendering failed: \(error.localizedDescription)\n".utf8))
-                        exit(EXIT_FAILURE)
-                    }
-                #else
-                    FileHandle.standardError.write(Data("UI rendering is available only in Debug builds.\n".utf8))
-                    exit(EXIT_FAILURE)
-                #endif
-            }
-        #else
-            if launchArguments.contains(where: { $0.hasPrefix("--render-ui") }) {
-                FileHandle.standardError.write(Data("Off-screen rendering is available only on macOS.\n".utf8))
-                exit(EXIT_FAILURE)
-            }
-        #endif
-        PReekApp.main()
-    }
-}
-
-struct PReekApp: App {
-    private let logger = Logger()
-
-    @StateObject private var pullRequestsViewModel: PullRequestsViewModel
-    @StateObject private var configViewModel: ConfigViewModel
-
-    #if os(macOS)
+    struct PReekMacOSApp: App {
+        @StateObject private var state: PReekAppState
         @NSApplicationDelegateAdaptor(MenuBarAppDelegate.self) private var appDelegate
-    #endif
 
-    init() {
-        let pullRequestsViewModel = PullRequestsViewModel()
-        let configViewModel = ConfigViewModel()
-        _pullRequestsViewModel = StateObject(wrappedValue: pullRequestsViewModel)
-        _configViewModel = StateObject(wrappedValue: configViewModel)
-
-        #if os(macOS)
-            appDelegate.configure(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel)
-        #endif
-
-        #if DEBUG
-            // Don't fetch real data for previews
-            guard ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1" else {
-                return
-            }
-        #endif
-
-        do {
-            try Tips.configure()
-        } catch {
-            logger.error("Error initializing tips: \(error)")
+        init() {
+            let state = PReekAppState()
+            _state = StateObject(wrappedValue: state)
+            appDelegate.configure(
+                pullRequestsViewModel: state.pullRequestsViewModel,
+                configViewModel: state.configViewModel
+            )
+            state.start()
         }
 
-        pullRequestsViewModel.triggerUpdatePullRequests()
-        pullRequestsViewModel.startFetchTimer()
-    }
-
-    var body: some Scene {
-        #if os(macOS)
+        var body: some Scene {
             Settings {
-                SettingsScreen(configViewModel: configViewModel)
+                SettingsScreen(configViewModel: state.configViewModel)
             }
             .commands {
-                SettingsWindowCommands(configViewModel: configViewModel)
+                SettingsWindowCommands(configViewModel: state.configViewModel)
             }
-        #else
-            WindowGroup {
-                ContentView(pullRequestsViewModel: pullRequestsViewModel, configViewModel: configViewModel, closeWindow: {})
-            }
-        #endif
+        }
     }
-}
 
-#if os(macOS)
     @MainActor
-    private final class MenuBarAppDelegate: NSObject, NSApplicationDelegate {
+    final class MenuBarAppDelegate: NSObject, NSApplicationDelegate {
         private var statusItem: NSStatusItem?
         private let popover = NSPopover()
         private var unreadSubscription: AnyCancellable?
@@ -198,7 +114,7 @@ struct PReekApp: App {
         }
     }
 
-    private struct SettingsWindowCommands: Commands {
+    struct SettingsWindowCommands: Commands {
         var configViewModel: ConfigViewModel
 
         var body: some Commands {

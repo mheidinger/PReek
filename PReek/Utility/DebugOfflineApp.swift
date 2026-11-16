@@ -4,7 +4,7 @@
         import AppKit
     #endif
 
-    /// Separate app entry point: never constructs PReekApp, its menu bar delegate, or live services.
+    /// Separate app entry point: never constructs the live platform app, its menu bar delegate, or live services.
     @MainActor
     struct DebugOfflineApp: App {
         private static var session: DebugOfflineSession?

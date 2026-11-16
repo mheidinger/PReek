@@ -19,11 +19,16 @@ struct WelcomeScreen: View {
 
     @State private var error: Error?
     @State private var showImportSheet: Bool = false
+    @State private var isSaving = false
 
     var importTip = ImportTip()
 
     private func doSave() {
+        guard !isSaving, !configViewModel.token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        isSaving = true
+        error = nil
         Task {
+            defer { isSaving = false }
             configViewModel.saveSettings()
             error = await testConnection()
             if error == nil {
@@ -34,27 +39,32 @@ struct WelcomeScreen: View {
 
     var body: some View {
         NavigationStack {
-            VStack {
-                headerView
-
-                formView
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0) {
-                HoverableLink("Made by Max Heidinger", destination: URL(string: "https://github.com/mheidinger/PReek")!)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
-                    .padding(.bottom)
+            Group {
+                #if os(macOS)
+                    VStack {
+                        headerView
+                        formView
+                    }
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        HoverableLink("Made by Max Heidinger", destination: URL(string: "https://github.com/mheidinger/PReek")!)
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                            .padding(.bottom)
+                    }
+                #else
+                    formView
+                        .scrollDismissesKeyboard(.interactively)
+                #endif
             }
             .background(.windowBackground)
             #if os(iOS)
                 // Not shown on macOS - https://stackoverflow.com/questions/77647716/macos-swiftui-using-navigationstack-toolbar-button-not-showing-in-menubarextra-a
                 .toolbar {
-                    Button(action: {
+                    Button("Import Configuration", systemImage: "qrcode.viewfinder") {
                         showImportSheet = true
                         importTip.invalidate(reason: .actionPerformed)
-                    }) {
-                        Image(systemName: "qrcode.viewfinder")
                     }
+                    .disabled(isSaving)
                     .popoverTip(importTip)
                 }
                 .importSheet(configViewModel: configViewModel, isPresented: $showImportSheet)
@@ -69,12 +79,7 @@ struct WelcomeScreen: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 60)
-                VStack {
-                    Text("welcome.title")
-                        .font(.largeTitle)
-                    Text("welcome.subtitle")
-                        .font(.title)
-                }
+                titleAndSubtitle
             }
             .padding(.top, 25)
         }
@@ -85,26 +90,48 @@ struct WelcomeScreen: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120)
-                VStack {
-                    Text("welcome.title")
-                        .font(.largeTitle)
-                    Text("welcome.subtitle")
-                        .font(.title)
-                }
+                    .accessibilityHidden(true)
+                titleAndSubtitle
             }
             .padding(.top, 25)
+            .multilineTextAlignment(.center)
         }
     #endif
 
+    private var titleAndSubtitle: some View {
+        VStack {
+            Text("welcome.title")
+                .font(.largeTitle)
+            Text("welcome.subtitle")
+                .font(.title)
+        }
+    }
+
     private var formView: some View {
         Form {
-            ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "Required Settings") {
-                HStack {
-                    Spacer()
-                    Button("Continue", action: doSave)
-                        .buttonStyle(.borderedProminent)
+            #if os(iOS)
+                Section {
+                    headerView
+                        .frame(maxWidth: .infinity)
                 }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            #endif
+            ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "Required Settings") {
+                #if os(macOS)
+                    HStack {
+                        Spacer()
+                        continueButton
+                    }
+                #endif
             }
+            .disabled(isSaving)
+
+            #if os(iOS)
+                Section {
+                    continueButton
+                }
+            #endif
 
             if let error = error {
                 VStack {
@@ -112,8 +139,35 @@ struct WelcomeScreen: View {
                         .foregroundStyle(.red)
                 }
             }
+
+            #if os(iOS)
+                Section {
+                    HoverableLink("Made by Max Heidinger", destination: URL(string: "https://github.com/mheidinger/PReek")!)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                }
+                .listRowBackground(Color.clear)
+            #endif
         }
         .formStyle(.grouped)
+    }
+
+    private var continueButton: some View {
+        Button(action: doSave) {
+            HStack {
+                Text("Continue")
+                if isSaving {
+                    ProgressView()
+                        .accessibilityLabel("Testing connection")
+                }
+            }
+            #if os(iOS)
+            .frame(maxWidth: .infinity)
+            #endif
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(isSaving || configViewModel.token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
     }
 }
 

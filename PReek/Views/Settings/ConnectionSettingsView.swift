@@ -29,41 +29,44 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
         var sectionHeader: some View {
             HStack {
                 Text(headerLabel)
-                Button(action: { showPopover.toggle() }) {
+                Button {
+                    showPopover = true
+                } label: {
                     Image(systemName: "questionmark.circle.fill")
+                        .frame(minWidth: 44, minHeight: 44)
                 }
+                .buttonStyle(.borderless)
+                .accessibilityLabel("Quick help")
             }
         }
 
         var helpSheet: some View {
             NavigationStack {
-                VStack(alignment: .leading) {
-                    Text("connection-settings.pat.label")
-                        .font(.title3)
-                    Text("connection-settings.pat.explanation")
-                        .font(.footnote)
-                        .padding(.bottom)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("connection-settings.pat.label")
+                            .font(.headline)
+                        Text("connection-settings.pat.explanation")
+                            .padding(.bottom)
 
-                    Text("connection-settings.enterprise-url.label")
-                        .font(.title3)
-                    Group {
+                        Text("connection-settings.enterprise-url.label")
+                            .font(.headline)
                         Text("connection-settings.enterprise-url.explanation")
                     }
-                    .font(.footnote)
-
-                    Spacer()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
                 }
-                .padding()
-                .presentationDetents([.medium])
                 .navigationTitle(headerLabel)
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    Button(action: { showPopover.toggle() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .imageScale(.large)
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") {
+                            showPopover = false
+                        }
                     }
                 }
             }
+            .presentationDetents([.large])
         }
     #endif
 
@@ -76,6 +79,11 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
                 .padding()
                 .frame(width: 300)
             }
+            .disableAutoCapitalization()
+            .autocorrectionDisabled()
+            #if os(iOS)
+                .keyboardType(.asciiCapable)
+            #endif
 
             Toggle(isOn: $configViewModel.useGitHubEnterprise) {
                 Text("Use GitHub Enterprise")
@@ -91,6 +99,9 @@ struct ConnectionSettingsView<AdditionalContent: View>: View {
                 }
                 .disableAutoCapitalization()
                 .disableAutocorrection(true)
+                #if os(iOS)
+                    .keyboardType(.URL)
+                #endif
             }
 
             additionalContent

@@ -73,7 +73,7 @@ struct ContentView: View {
                     }
                 )
             } else {
-                navigationContent
+                MainScreen(pullRequestsViewModel: pullRequestsViewModel)
             }
         }
         .environmentObject(configViewModel)
@@ -86,31 +86,6 @@ struct ContentView: View {
             return .handled
         })
     }
-
-    #if os(macOS)
-        var navigationContent: some View {
-            MainScreen(pullRequestsViewModel: pullRequestsViewModel)
-        }
-    #else
-        var navigationContent: some View {
-            TabView {
-                MainScreen(pullRequestsViewModel: pullRequestsViewModel)
-                    .tabItem {
-                        Label("Pull Requests", systemImage: "list.bullet")
-                    }
-
-                NavigationStack {
-                    SettingsScreen(configViewModel: configViewModel)
-                        .navigationDestination(for: Screen.self) { _ in
-                            ExcludedUsersScreen(configViewModel: configViewModel)
-                        }
-                }
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
-                }
-            }
-        }
-    #endif
 }
 
 #Preview {

@@ -283,9 +283,8 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     private func presentationStateDidChange() {
-        if !presentationState.hasPendingUpdates {
-            hasPendingDisplayUpdates = false
-        }
+        // Appearance callbacks can run during SwiftUI updates. Publish the pending flag only
+        // through the memoization pipeline's main-queue delivery, alongside the displayed list.
         // Recompute even when the presented snapshot is frozen: the filtered latest snapshot
         // determines whether the pending-update indicator should be visible.
         invalidationTrigger.send()

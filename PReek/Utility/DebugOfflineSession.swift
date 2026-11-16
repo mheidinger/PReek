@@ -132,7 +132,7 @@
             let author = User(login: "contributor", displayName: "Example Contributor")
             let titles = [
                 "Make pull request notifications easier to review",
-                "A deliberately long pull request title to exercise wrapping and truncation at narrow menu widths",
+                "A deliberately long pull request title to exercise wrapping and truncation at narrow widths, keeping the list compact while the full title remains available in the detail view",
                 "Ship the new settings navigation",
             ]
             let statuses: [PullRequest.Status] = [.open, .draft, .merged]
@@ -142,13 +142,41 @@
                 let event = Event(
                     id: "offline-event-\(index)", user: author, time: updated,
                     data: EventCommentData(url: nil, comments: [
-                        Comment(id: "offline-comment-\(index)", content: "## Offline review\n\nSynthetic pull request content for **layout and navigation** checks. No GitHub connection is used.", fileReference: nil, isReply: false),
+                        Comment(id: "offline-comment-\(index)", content: """
+                        ## Offline review
+
+                        Synthetic pull request content for **layout and navigation** checks. No GitHub connection is used.
+
+                        A longer comment should remain readable in the detail view, including when larger accessibility text is enabled. The content below also exercises horizontal scrolling without widening the entire screen.
+
+                        ```swift
+                        let pullRequest = PullRequest(title: "A deliberately long line that must scroll horizontally instead of clipping the detail or its navigation controls", repository: "example/PReek")
+                        ```
+
+                        **End of offline review.**
+                        """, fileReference: nil, isReply: false),
                     ]), pullRequestUrl: requestURL
                 )
+                var events = [event]
+                if index == 1 {
+                    events.append(Event(
+                        id: "offline-rename", user: author, time: updated.addingTimeInterval(-60),
+                        data: EventRenamedTitleData(
+                            currentTitle: title,
+                            previousTitle: "A previous pull request title that is long enough to require multiple lines on an iPhone"
+                        ), pullRequestUrl: requestURL
+                    ))
+                    events.append(Event(
+                        id: "offline-review-request", user: author, time: updated.addingTimeInterval(-120),
+                        data: EventReviewRequestedData(requestedReviewers: [
+                            "example-reviewer-with-a-long-login", "another-reviewer",
+                        ]), pullRequestUrl: requestURL
+                    ))
+                }
                 return PullRequest(
                     id: "offline-pr-\(index)", repository: repository, author: author,
                     title: title, number: 101 + index, status: statuses[index],
-                    lastUpdated: updated, events: [event], url: requestURL,
+                    lastUpdated: updated, events: events, url: requestURL,
                     additions: 120 + index, deletions: 18 + index,
                     approvalFrom: [User(login: "reviewer")],
                     changesRequestedFrom: index == 1 ? [User(login: "another-reviewer")] : []
