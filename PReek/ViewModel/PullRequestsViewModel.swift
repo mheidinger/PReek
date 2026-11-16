@@ -283,11 +283,38 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     private func presentationStateDidChange() {
+        markViewerActionsAsRead()
         // Appearance callbacks can run during SwiftUI updates. Publish the pending flag only
         // through the memoization pipeline's main-queue delivery, alongside the displayed list.
         // Recompute even when the presented snapshot is frozen: the filtered latest snapshot
         // determines whether the pending-update indicator should be visible.
         invalidationTrigger.send()
+    }
+
+    private func markViewerActionsAsRead() {
+        guard let viewer else { return }
+        let markApprovedPullRequestsAsRead = configStore.markApprovedPullRequestsAsRead
+        let markMergedPullRequestsAsRead = configStore.markMergedPullRequestsAsRead
+
+        // Pending refreshes must not change the currently presented read state.
+        var readMap = pullRequestReadMap
+        var changed = false
+        for pullRequest in presentationState.presentedPullRequests.values {
+            var readData = readMap[pullRequest.id] ?? ReadData()
+            if readData.processReadEvents(
+                in: pullRequest,
+                viewer: viewer,
+                markApprovedPullRequestsAsRead: markApprovedPullRequestsAsRead,
+                markMergedPullRequestsAsRead: markMergedPullRequestsAsRead
+            ) {
+                readMap[pullRequest.id] = readData
+                changed = true
+                unreadCache.removeValue(forKey: pullRequest.id)
+            }
+        }
+        if changed {
+            pullRequestReadMap = readMap
+        }
     }
 
     func startFetchTimer() {
@@ -306,12 +333,16 @@ class PullRequestsViewModel: ObservableObject {
     }
 
     func setRead(_ id: PullRequest.ID, read: Bool) {
+        var readData = pullRequestReadMap[id] ?? ReadData()
         if read {
-            let newestEventId = pullRequests.first(where: { $0.id == id })?.events.first?.id
-            pullRequestReadMap[id] = ReadData(date: lastUpdated ?? Date(), eventId: newestEventId)
+            readData.date = lastUpdated ?? Date()
+            readData.eventId = pullRequests.first(where: { $0.id == id })?.events.first?.id
         } else {
-            pullRequestReadMap.removeValue(forKey: id)
+            // Keep the processed action ID so refresh cannot undo manual "Mark unread".
+            readData.date = .distantPast
+            readData.eventId = nil
         }
+        pullRequestReadMap[id] = readData
 
         // Invalidate cache for this specific PR
         unreadCache.removeValue(forKey: id)
@@ -323,9 +354,10 @@ class PullRequestsViewModel: ObservableObject {
         // Mutate a local copy and persist once, instead of encoding the whole map per PR.
         var readMap = pullRequestReadMap
         for pullRequest in pullRequests {
-            readMap[pullRequest.id] = ReadData(
-                date: readDate, eventId: pullRequest.events.first?.id
-            )
+            var readData = readMap[pullRequest.id] ?? ReadData()
+            readData.date = readDate
+            readData.eventId = pullRequest.events.first?.id
+            readMap[pullRequest.id] = readData
         }
         pullRequestReadMap = readMap
 

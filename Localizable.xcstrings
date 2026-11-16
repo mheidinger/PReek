@@ -1,6 +1,46 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Automatically mark as read" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch als gelesen markieren"
+          }
+        }
+      }
+    },
+    "Mark a pull request as read through my approval or merge. Later activity remains unread." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einen Pull Request bis zu meiner Genehmigung oder meinem Merge als gelesen markieren. Spätere Aktivitäten bleiben ungelesen."
+          }
+        }
+      }
+    },
+    "When I approve a PR" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn ich einen PR genehmige"
+          }
+        }
+      }
+    },
+    "When I merge a PR" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn ich einen PR merge"
+          }
+        }
+      }
+    },
     "-%lld" : {
       "localizations" : {
         "de" : {
