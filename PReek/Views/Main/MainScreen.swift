@@ -13,48 +13,43 @@ struct MainScreen: View {
                     .background(.background.opacity(0.7))
             }
         #else
-            content
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.systemGroupedBackground)
+            PullRequestsList(pullRequestsViewModel: pullRequestsViewModel) {
+                if let lastUpdated = pullRequestsViewModel.lastUpdated {
+                    Text("Last updated at \(lastUpdated.formatted(date: .omitted, time: .shortened))")
+                        .frame(maxWidth: .infinity)
+                }
+            }
         #endif
     }
 
-    @ViewBuilder
-    var content: some View {
-        if !pullRequestsViewModel.pullRequests.isEmpty {
-            #if os(macOS)
+    #if os(macOS)
+        @ViewBuilder
+        var content: some View {
+            if !pullRequestsViewModel.pullRequests.isEmpty {
                 PullRequestsDisclosureGroupList(
                     pullRequests: pullRequestsViewModel.pullRequests,
                     setRead: pullRequestsViewModel.setRead,
                     viewerLogin: pullRequestsViewModel.viewer?.login
                 )
-            #else
-                PullRequestsList(pullRequestsViewModel: pullRequestsViewModel, footer: {
-                    HStack {
-                        Spacer()
-                        Text("Last updated at \(pullRequestsViewModel.lastUpdated?.formatted(date: .omitted, time: .shortened) ?? "...")")
-                        Spacer()
-                    }
-                })
-            #endif
-        } else if pullRequestsViewModel.error != nil {
-            VStack {
-                Image(systemName: "icloud.slash")
-                    .font(.largeTitle)
-                Text("No Connection")
-                    .foregroundStyle(.secondary)
+            } else if pullRequestsViewModel.error != nil {
+                VStack {
+                    Image(systemName: "icloud.slash")
+                        .font(.largeTitle)
+                    Text("No Connection")
+                        .foregroundStyle(.secondary)
+                }
+            } else if pullRequestsViewModel.isRefreshing {
+                VStack {
+                    ProgressView()
+                    Text("Loading Pull Requests...")
+                        .foregroundStyle(.secondary)
+                }
+            } else {
+                Text("You are done for today! 🎉")
+                    .font(.title2)
             }
-        } else if pullRequestsViewModel.isRefreshing {
-            VStack {
-                ProgressView()
-                Text("Loading Pull Requests...")
-                    .foregroundStyle(.secondary)
-            }
-        } else {
-            Text("You are done for today! 🎉")
-                .font(.title2)
         }
-    }
+    #endif
 }
 
 #Preview {
@@ -66,4 +61,5 @@ struct MainScreen: View {
         PullRequest.preview(id: "5"),
     ])
     return MainScreen(pullRequestsViewModel: pullRequestsViewModel)
+        .environmentObject(ConfigViewModel())
 }

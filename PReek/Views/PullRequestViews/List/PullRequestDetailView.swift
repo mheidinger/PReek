@@ -2,131 +2,173 @@ import SwiftUI
 
 struct PullRequestDetailView: View {
     var pullRequest: PullRequest
-    var setRead: (PullRequest.ID, Bool) -> Void
 
-    @Binding private var setUnreadOnChange: Bool
+    private var onMarkUnread: () -> Void
 
-    @Environment(\.dismiss) private var dismiss
-
-    @State var showNavigationHeader: Bool = false
-
-    init(_ pullRequest: PullRequest, setRead: @escaping (PullRequest.ID, Bool) -> Void, setUnreadOnChange: Binding<Bool>) {
+    init(_ pullRequest: PullRequest, onMarkUnread: @escaping () -> Void) {
         self.pullRequest = pullRequest
-        self.setRead = setRead
-        _setUnreadOnChange = setUnreadOnChange
+        self.onMarkUnread = onMarkUnread
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView {
-                LazyVStack {
-                    header
-
-                    Divider()
-
-                    // Plain VStack (not Lazy): the outer LazyVStack is the ScrollView's lazy child.
-                    // Nesting a second LazyVStack inside it causes expensive, conflicting size
-                    // negotiation with no laziness benefit.
-                    VStack {
-                        DividedView(pullRequest.events) { event in
-                            EventView(event)
-                        } shouldHighlight: { event in
-                            event.id == pullRequest.oldestUnreadEvent?.id ? String(localized: "New") : nil
+        #if os(iOS)
+            scrollContent
+                .navigationTitle(pullRequest.repository.name)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Menu {
+                            Button("Mark unread", systemImage: "envelope.badge", action: onMarkUnread)
+                            Link(destination: pullRequest.url) {
+                                Label("Open on GitHub", systemImage: "arrow.up.forward.square")
+                            }
+                        } label: {
+                            Label("Actions", systemImage: "ellipsis.circle")
                         }
                     }
-                    .padding([.leading, .trailing, .bottom])
                 }
+        #else
+            GeometryReader { _ in
+                scrollContent
             }
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden()
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    VStack(alignment: .leading) {
-                        Text(pullRequest.repository.name)
-                            .font(.subheadline)
-                            .lineLimit(1)
-                        Text(pullRequest.title)
-                            .font(.headline)
-                            .lineLimit(1)
-                    }
-                    .opacity(showNavigationHeader ? 1 : 0)
-                    .frame(maxWidth: geometry.size.width * 0.5)
-                }
+        #endif
+    }
 
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Mark unread") {
-                        setUnreadOnChange = true
-                        dismiss()
+    private var scrollContent: some View {
+        ScrollView {
+            LazyVStack {
+                header
+
+                Divider()
+
+                // Only the outer stack is lazy; nested lazy stacks conflict during sizing.
+                VStack {
+                    DividedView(pullRequest.events) { event in
+                        EventView(event)
+                    } shouldHighlight: { event in
+                        event.id == pullRequest.oldestUnreadEvent?.id ? String(localized: "New") : nil
                     }
                 }
+                .padding([.leading, .trailing, .bottom])
             }
-            #endif
         }
     }
 
     var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(pullRequest.repository.name)
-                    .font(.headline)
-                    .foregroundColor(.primary)
+        #if os(iOS)
+            iOSHeader
+        #else
+            macOSHeader
+        #endif
+    }
 
-                Text(pullRequest.numberFormatted)
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-
-                Spacer()
-
-                StatusLabel(pullRequest.status)
-            }
-
-            Text(pullRequest.title)
-                .font(.title3)
-                .lineLimit(3)
-                .fixedSize(horizontal: false, vertical: true)
-            #if os(iOS)
-                .onScrollVisibilityChange { isVisible in
-                    withAnimation {
-                        showNavigationHeader = !isVisible
+    #if os(iOS)
+        private var iOSHeader: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                ViewThatFits(in: .horizontal) {
+                    HStack {
+                        repositoryLabel
+                        Spacer()
+                        StatusLabel(pullRequest.status)
+                    }
+                    VStack(alignment: .leading, spacing: 8) {
+                        repositoryLabel
+                        StatusLabel(pullRequest.status)
                     }
                 }
-            #endif
 
-            HStack {
-                Text("by \(pullRequest.author.displayName)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                Text(pullRequest.title)
+                    .font(.title2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                    .textSelection(.enabled)
 
-                Spacer()
-
-                TimeSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-
-            HStack {
-                HStack {
-                    Text(pullRequest.additionsFormatted)
-                        .foregroundColor(.green)
-                    Text(pullRequest.deletionsFormatted)
-                        .foregroundColor(.red)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("by \(pullRequest.author.displayName)")
+                    TimeSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
                 }
                 .font(.subheadline)
+                .foregroundStyle(.secondary)
 
-                Spacer()
+                changeStatistics
+                    .font(.subheadline)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding([.top, .leading, .trailing])
+        }
+    #else
+        private var macOSHeader: some View {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(pullRequest.repository.name)
+                        .font(.headline)
+                        .foregroundColor(.primary)
 
-                HoverableLink(destination: pullRequest.url) {
-                    Image(systemName: "arrow.up.forward.square")
+                    Text(pullRequest.numberFormatted)
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+
+                    Spacer()
+
+                    StatusLabel(pullRequest.status)
+                }
+
+                Text(pullRequest.title)
+                    .font(.title3)
+                    .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                HStack {
+                    Text("by \(pullRequest.author.displayName)")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+
+                    Spacer()
+
+                    TimeSensitiveText(getText: { pullRequest.lastUpdatedFormatted })
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+
+                HStack {
+                    changeStatistics
+                        .font(.subheadline)
+
+                    Spacer()
+
+                    HoverableLink(destination: pullRequest.url) {
+                        Image(systemName: "arrow.up.forward.square")
+                    }
                 }
             }
+            .padding([.top, .leading, .trailing])
         }
-        .padding([.top, .leading, .trailing])
+    #endif
+
+    private var changeStatistics: some View {
+        HStack {
+            Text(pullRequest.additionsFormatted)
+                .foregroundStyle(.green)
+            Text(pullRequest.deletionsFormatted)
+                .foregroundStyle(.red)
+        }
     }
+
+    #if os(iOS)
+        private var repositoryLabel: some View {
+            HStack(alignment: .firstTextBaseline) {
+                Text(pullRequest.repository.name)
+                    .foregroundStyle(.primary)
+                Text(pullRequest.numberFormatted)
+                    .foregroundStyle(.secondary)
+            }
+            .font(.headline)
+        }
+    #endif
 }
 
 #Preview {
     NavigationStack {
-        PullRequestDetailView(PullRequest.preview(id: "1", title: "long long long long long long long long long"), setRead: { _, _ in }, setUnreadOnChange: .constant(false))
+        PullRequestDetailView(PullRequest.preview(id: "1", title: "long long long long long long long long long"), onMarkUnread: {})
     }
 }

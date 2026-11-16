@@ -4,10 +4,6 @@ import SwiftUI
     import CodeScanner
 #endif
 
-private let simulatorQrCodeData = """
-{"version": 1, "token": "my-token", "gitHubEnterpriseUrl": "https://github.acme.com"}
-"""
-
 struct ImportSheetModifier: ViewModifier {
     @ObservedObject var configViewModel: ConfigViewModel
     @Binding var isPresented: Bool
@@ -16,50 +12,65 @@ struct ImportSheetModifier: ViewModifier {
     #if os(iOS)
         @State private var showImportErrorAlert: Bool = false
         @State private var importError: Error?
+        @State private var isHandlingScan = false
 
         func body(content: Content) -> some View {
             content
                 .sheet(isPresented: $isPresented, onDismiss: { showImportErrorAlert = importError != nil }) {
                     NavigationStack {
-                        VStack(alignment: .leading) {
-                            Text("Open PReek on another device and click on \"Share\" in the settings.")
-                            if let offlineImportData {
-                                Button("Import Configuration") {
-                                    do {
-                                        try configViewModel.importShareData(offlineImportData)
-                                    } catch {
-                                        importError = error
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 16) {
+                                Text("Open PReek on your other device:\n\nMac: Settings → GitHub → Show QR Code.\niPhone or iPad: Settings → Share button → Show QR Code.\n\nScan the QR code here to import your configuration.")
+                                if let offlineImportData {
+                                    Button("Import Configuration") {
+                                        do {
+                                            importError = nil
+                                            try configViewModel.importShareData(offlineImportData)
+                                        } catch {
+                                            importError = error
+                                        }
+                                        isPresented = false
                                     }
-                                    isPresented = false
+                                } else {
+                                    CodeScannerView(codeTypes: [.qr], completion: handleScan)
+                                        .frame(height: 320)
                                 }
-                            } else {
-                                CodeScannerView(
-                                    codeTypes: [.qr],
-                                    simulatedData: simulatorQrCodeData,
-                                    completion: handleScan
-                                )
                             }
+                            .padding()
                         }
-                        .padding(.horizontal)
+                        .navigationBarTitleDisplayMode(.inline)
                         .navigationTitle("Import Configuration")
                         .toolbar {
-                            Button(action: { isPresented = false }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .imageScale(.large)
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Cancel") {
+                                    isPresented = false
+                                }
                             }
                         }
+                    }
+                }
+                .onChange(of: isPresented) { _, presented in
+                    if presented {
+                        importError = nil
+                        showImportErrorAlert = false
+                        isHandlingScan = false
                     }
                 }
                 .alert(isPresented: $showImportErrorAlert) {
                     Alert(
                         title: Text(importError?.localizedDescription ?? "Unknown error"),
                         message: (importError as? LocalizedError)?.recoverySuggestion.map { value in Text(value) },
-                        dismissButton: .default(Text("OK"))
+                        dismissButton: .default(Text("OK")) {
+                            importError = nil
+                        }
                     )
                 }
         }
 
         private func handleScan(result: Result<ScanResult, ScanError>) {
+            guard isPresented, !isHandlingScan else { return }
+            isHandlingScan = true
+            importError = nil
             do {
                 switch result {
                 case let .success(result):

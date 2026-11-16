@@ -41,6 +41,14 @@ struct SettingsScreen: View {
 
     var body: some View {
         #if os(macOS)
+            macOSContent
+        #else
+            iOSContent
+        #endif
+    }
+
+    #if os(macOS)
+        private var macOSContent: some View {
             settingsNavigation
                 .frame(minWidth: 780, minHeight: 560)
                 .sheet(isPresented: $showShareSheet) {
@@ -57,20 +65,23 @@ struct SettingsScreen: View {
                     .padding(20)
                     .frame(width: 440, height: 460)
                 }
-        #else
+        }
+    #else
+        private var iOSContent: some View {
             Form {
                 ConnectionSettingsView(configViewModel: configViewModel, headerLabel: "GitHub Connection")
                 pullRequestSettings
             }
             .formStyle(.grouped)
+            .scrollDismissesKeyboard(.interactively)
             .background(.windowBackground)
             .navigationTitle("Settings")
             .toolbar {
-                Button(action: { showImportSheet = true }) {
-                    Image(systemName: "qrcode.viewfinder")
+                Button("Import Configuration", systemImage: "qrcode.viewfinder") {
+                    showImportSheet = true
                 }
-                Button(action: { showShareSheet = true }) {
-                    Image(systemName: "square.and.arrow.up")
+                Button("Share Configuration", systemImage: "square.and.arrow.up") {
+                    showShareSheet = true
                 }
             }
             .sheet(isPresented: $showShareSheet) {
@@ -79,8 +90,8 @@ struct SettingsScreen: View {
                 }
             }
             .importSheet(configViewModel: configViewModel, isPresented: $showImportSheet)
-        #endif
-    }
+        }
+    #endif
 
     #if os(macOS)
         private var settingsNavigation: some View {
@@ -206,20 +217,38 @@ struct SettingsScreen: View {
     private var pullRequestSettings: some View {
         Section("Pull Requests") {
             Stepper(value: $configViewModel.onStartFetchWeeks, in: 0 ... 100) {
-                HStack {
-                    Text("Fetch PRs from notifications of last")
-                    Spacer()
-                    Text("\(configViewModel.onStartFetchWeeks) weeks")
-                        .monospacedDigit()
-                }
+                #if os(iOS)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Fetch PRs from notifications of last")
+                        Text("\(configViewModel.onStartFetchWeeks) weeks")
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                #else
+                    HStack {
+                        Text("Fetch PRs from notifications of last")
+                        Spacer()
+                        Text("\(configViewModel.onStartFetchWeeks) weeks")
+                            .monospacedDigit()
+                    }
+                #endif
             }
             Stepper(value: $configViewModel.deleteAfterWeeks, in: 0 ... 100) {
-                HStack {
-                    Text("Remove PRs not updated since")
-                    Spacer()
-                    Text("\(configViewModel.deleteAfterWeeks) weeks")
-                        .monospacedDigit()
-                }
+                #if os(iOS)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Remove PRs not updated since")
+                        Text("\(configViewModel.deleteAfterWeeks) weeks")
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                #else
+                    HStack {
+                        Text("Remove PRs not updated since")
+                        Spacer()
+                        Text("\(configViewModel.deleteAfterWeeks) weeks")
+                            .monospacedDigit()
+                    }
+                #endif
             }
             Toggle(isOn: $configViewModel.deleteOnlyClosed) {
                 Text("Only remove closed PRs")

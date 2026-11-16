@@ -22,25 +22,43 @@ struct EventDataView: View {
                 CommentsView(comments: commentData.comments)
             }
         case let renamedTitleData as EventRenamedTitleData:
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("From:")
-                    Text("To:")
+            #if os(iOS)
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading) {
+                        Text("From:")
+                            .foregroundStyle(.secondary)
+                        Text(renamedTitleData.previousTitle)
+                    }
+                    VStack(alignment: .leading) {
+                        Text("To:")
+                            .foregroundStyle(.secondary)
+                        Text(renamedTitleData.currentTitle)
+                    }
                 }
-                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            #else
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text("From:")
+                        Text("To:")
+                    }
+                    .foregroundStyle(.secondary)
 
-                VStack(alignment: .leading) {
-                    Text(renamedTitleData.previousTitle)
-                        .lineLimit(1)
-                    Text(renamedTitleData.currentTitle)
-                        .lineLimit(1)
+                    VStack(alignment: .leading) {
+                        Text(renamedTitleData.previousTitle)
+                            .lineLimit(1)
+                        Text(renamedTitleData.currentTitle)
+                            .lineLimit(1)
+                    }
                 }
-            }
+            #endif
         case let reviewRequestedData as EventReviewRequestedData:
             if !reviewRequestedData.requestedReviewers.isEmpty {
                 HStack(alignment: .top) {
                     Text("From:")
+                    #if os(macOS)
                         .frame(width: 50, alignment: .leading)
+                    #endif
                         .foregroundStyle(.secondary)
                     if reviewRequestedData.requestedReviewers.count == 1 {
                         Text(reviewRequestedData.requestedReviewers[0])

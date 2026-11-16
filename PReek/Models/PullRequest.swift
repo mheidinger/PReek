@@ -79,7 +79,6 @@ struct PullRequest: Identifiable, Equatable {
             Date.FormatStyle()
                 .month(.abbreviated)
                 .day(.defaultDigits)
-                .hour()
         )
         return String(localized: "updated \(formattedDate) at \(formattedTime)")
     }

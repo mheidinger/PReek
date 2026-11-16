@@ -17,6 +17,21 @@ struct HelpTextField<HelpContent: View>: View {
     @State private var showPopover = false
 
     var body: some View {
+        #if os(iOS)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(label)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                field
+                    .labelsHidden()
+            }
+        #else
+            field
+        #endif
+    }
+
+    @ViewBuilder
+    private var field: some View {
         switch type {
         case .secureField:
             secureField
@@ -31,10 +46,13 @@ struct HelpTextField<HelpContent: View>: View {
         SecureField(text: $text, prompt: Text(prompt)) {
             labelContent
         }
+        #if os(iOS)
+        .accessibilityLabel(Text(label))
+        #endif
     }
 
     var revealSecureField: some View {
-        RevealSecureField(text: $text, prompt: Text(prompt)) {
+        RevealSecureField(text: $text, prompt: Text(prompt), accessibilityLabel: Text(label)) {
             labelContent
         }
     }
@@ -43,6 +61,9 @@ struct HelpTextField<HelpContent: View>: View {
         TextField(text: $text, prompt: Text(prompt)) {
             labelContent
         }
+        #if os(iOS)
+        .accessibilityLabel(Text(label))
+        #endif
     }
 
     #if os(macOS)

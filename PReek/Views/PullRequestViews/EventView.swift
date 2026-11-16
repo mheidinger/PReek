@@ -50,16 +50,47 @@ struct EventView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            if horizontalSizeClass == .compact {
-                compactEventHeader
-            } else {
-                eventHeader
-            }
+            #if os(iOS)
+                iosEventHeader
+            #else
+                if horizontalSizeClass == .compact {
+                    compactEventHeader
+                } else {
+                    eventHeader
+                }
+            #endif
             EventDataView(event.data)
+            #if os(macOS)
                 .padding(.leading, 20)
+            #endif
                 .padding(.top, 2)
         }
     }
+
+    #if os(iOS)
+        private var iosEventHeader: some View {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .top) {
+                    Text(event.user.displayName)
+                        .fontWeight(.medium)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 8)
+                    HoverableLink(destination: event.url) {
+                        Image(systemName: "arrow.up.forward.square")
+                            .frame(minWidth: 44, minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .accessibilityLabel("Open event on GitHub")
+                }
+                Text(eventDataToActionLabel(data: event.data))
+                    .font(.subheadline)
+                TimeSensitiveText(getText: { event.timeFormatted })
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+        }
+    #endif
 
     var eventHeader: some View {
         HStack {
