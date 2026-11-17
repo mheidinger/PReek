@@ -198,7 +198,7 @@
                 result += page.compactMap(\.attachment)
                 next = GitHubService.localActionNextPage(response)
                 if let next, !seen.insert(next).inserted {
-                    throw LocalActionError(message: "GitHub repeated a discussion pagination URL.")
+                    throw LocalActionError(message: String(localized: "GitHub repeated a discussion pagination URL."))
                 }
             } while next != nil
             return result
@@ -217,7 +217,7 @@
                 throw LocalActionError(message: errors.map(\.message).joined(separator: "\n"))
             }
             guard let value = envelope.data else {
-                throw LocalActionError(message: "GitHub returned no review thread data.")
+                throw LocalActionError(message: String(localized: "GitHub returned no review thread data."))
             }
             return value
         }
@@ -233,7 +233,7 @@
             while true {
                 let page = try await graph(ThreadsData.self, url: url, query: threadQuery, variables: variables)
                 guard let connection = page.repository?.pullRequest?.reviewThreads else {
-                    throw LocalActionError(message: "The pull request review threads are unavailable.")
+                    throw LocalActionError(message: String(localized: "The pull request review threads are unavailable."))
                 }
                 for thread in connection.nodes where !thread.isResolved {
                     let comments = try await replies(for: thread, url: url)
@@ -257,7 +257,7 @@
                     variables: ["id": thread.id, "cursor": cursor]
                 )
                 guard let page = response.node?.comments else {
-                    throw LocalActionError(message: "A review thread's replies are unavailable.")
+                    throw LocalActionError(message: String(localized: "A review thread's replies are unavailable."))
                 }
                 comments += page.nodes
                 pageInfo = page.pageInfo
@@ -267,7 +267,7 @@
 
         static func nextCursor(_ info: PageInfo, seen: inout Set<String>) throws -> String {
             guard let cursor = info.endCursor, !cursor.isEmpty, seen.insert(cursor).inserted else {
-                throw LocalActionError(message: "GitHub returned a missing or repeated pagination cursor.")
+                throw LocalActionError(message: String(localized: "GitHub returned a missing or repeated pagination cursor."))
             }
             return cursor
         }

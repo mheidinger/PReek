@@ -26,13 +26,13 @@
                 guard LocalWorkspaceSafety.ownedDirectory(layout.state),
                       LocalWorkspaceSafety.ownedFile(file)
                 else {
-                    throw LocalActionError(message: "The saved workspace name is unsafe.")
+                    throw LocalActionError(message: String(localized: "The saved workspace name is unsafe."))
                 }
                 let name = try String(contentsOf: file, encoding: .utf8)
                 guard name.utf8.count <= maximumNameLength,
                       LocalWorkspaceSafety.matches(name, "[a-z0-9]+(?:-[a-z0-9]+)*--pr-\(identity.number)")
                 else {
-                    throw LocalActionError(message: "The saved workspace name does not match this PR.")
+                    throw LocalActionError(message: String(localized: "The saved workspace name does not match this PR."))
                 }
                 return Layout(root: root, identity: identity, workspaceName: name)
             }
@@ -43,7 +43,7 @@
                 }
                 let layout = try saved(root: root, identity: identity)
                 guard root.path != "/", layout.workspace.path == workspace.path else {
-                    throw LocalActionError(message: "The PR identity does not match the workspace path.")
+                    throw LocalActionError(message: String(localized: "The PR identity does not match the workspace path."))
                 }
                 return layout
             }
@@ -65,10 +65,10 @@
                       LocalWorkspaceSafety.ownedDirectory(stateURL),
                       LocalWorkspaceSafety.ownedDirectory(cloneURL)
                 else {
-                    throw LocalActionError(message: "Workspace, state, and clone must be owned physical directories.")
+                    throw LocalActionError(message: String(localized: "Workspace, state, and clone must be owned physical directories."))
                 }
                 guard let pullRequestURL = URL(string: "https://" + pullRequest) else {
-                    throw LocalActionError(message: "The registered PR identity is invalid.")
+                    throw LocalActionError(message: String(localized: "The registered PR identity is invalid."))
                 }
                 let identity = try LocalWorkspaceService.identity(for: pullRequestURL)
                 let layout = try derived(workspace: workspaceURL, identity: identity)
@@ -79,7 +79,7 @@
                       clone != workspace,
                       !clone.hasPrefix(workspace + "/")
                 else {
-                    throw LocalActionError(message: "The PR identity, state, or clone does not match the workspace.")
+                    throw LocalActionError(message: String(localized: "The PR identity, state, or clone does not match the workspace."))
                 }
                 return (layout, identity)
             }
@@ -100,7 +100,7 @@
                 }
             }
             guard matches.count <= 1 else {
-                throw LocalActionError(message: "The PR branch has multiple worktree registrations. Nothing was changed.")
+                throw LocalActionError(message: String(localized: "The PR branch has multiple worktree registrations. Nothing was changed."))
             }
             return matches.first
         }
@@ -154,9 +154,9 @@
 
         static func preparedSHA(_ state: URL) throws -> String {
             let marker = state.appendingPathComponent("prepared-sha")
-            guard ownedFile(marker) else { throw LocalActionError(message: "The preparation marker is missing or unsafe.") }
+            guard ownedFile(marker) else { throw LocalActionError(message: String(localized: "The preparation marker is missing or unsafe.")) }
             let sha = try fileText(marker)
-            guard validSHA(sha) else { throw LocalActionError(message: "The preparation marker is invalid.") }
+            guard validSHA(sha) else { throw LocalActionError(message: String(localized: "The preparation marker is invalid.")) }
             return sha
         }
 
@@ -174,11 +174,11 @@
             guard ownedDirectory(clone), !isSymlink(clone.appendingPathComponent(".git")),
                   try await git(clone, ["rev-parse", "--show-toplevel"]) == clone.path
             else {
-                throw LocalActionError(message: "Choose the root of an existing local Git clone.")
+                throw LocalActionError(message: String(localized: "Choose the root of an existing local Git clone."))
             }
             let common = try await gitPath(clone, "--git-common-dir")
             guard ownedDirectory(common) else {
-                throw LocalActionError(message: "The mapped clone has unsafe Git metadata.")
+                throw LocalActionError(message: String(localized: "The mapped clone has unsafe Git metadata."))
             }
             return common
         }
@@ -193,7 +193,7 @@
                   try await git(workspace, ["rev-parse", "--show-toplevel"]) == workspace.path,
                   try await gitPath(workspace, "--git-common-dir").path == common.path
             else {
-                throw LocalActionError(message: "The saved workspace belongs to a different clone or is not a registered worktree.")
+                throw LocalActionError(message: String(localized: "The saved workspace belongs to a different clone or is not a registered worktree."))
             }
             let registration = try await gitPath(workspace, "--absolute-git-dir")
             let pointer = registration.appendingPathComponent("gitdir")
@@ -203,54 +203,70 @@
                   !requireUnlocked || !exists(registration.appendingPathComponent("locked")),
                   try fileText(pointer) == workspace.appendingPathComponent(".git").path
             else {
-                throw LocalActionError(message: "The worktree registration is foreign, locked, or unsafe.")
+                throw LocalActionError(message: String(localized: "The worktree registration is foreign, locked, or unsafe."))
             }
         }
 
-        static let operationMarkers = [
+        static let updateOperationMarkers = [
             "locked", "index.lock", "HEAD.lock", "MERGE_HEAD", "MERGE_AUTOSTASH", "AUTO_MERGE",
-            "CHERRY_PICK_HEAD", "REVERT_HEAD", "REBASE_HEAD", "sequencer", "rebase-merge", "rebase-apply",
+            "CHERRY_PICK_HEAD", "REVERT_HEAD", "sequencer", "rebase-merge", "rebase-apply",
             "BISECT_LOG", "BISECT_START", "SQUASH_MSG",
         ]
+
+        /// A completed rebase can leave REBASE_HEAD behind. Updates allow it;
+        /// removal conservatively preserves that metadata.
+        static let removalOperationMarkers = updateOperationMarkers + ["REBASE_HEAD"]
 
         static func sharedLockWarning(common: URL, branch: String) -> String? {
             ["index.lock", "HEAD.lock", "packed-refs.lock", "\(branch).lock"].contains {
                 exists(common.appendingPathComponent($0))
-            } ? "A Git operation owns shared repository metadata." : nil
+            } ? String(localized: "A Git operation owns shared repository metadata.") : nil
         }
 
         /// Synchronous so callers can retain a final check immediately before removal.
-        static func operationWarning(registration: URL, common: URL, branch: String) -> String? {
-            if operationMarkers.contains(where: { exists(registration.appendingPathComponent($0)) }) {
-                return "A Git operation is in progress or the worktree is locked."
+        static func operationWarning(
+            registration: URL, common: URL, branch: String, markers: [String]
+        ) -> String? {
+            if markers.contains(where: { exists(registration.appendingPathComponent($0)) }) {
+                return String(localized: "A Git operation is in progress or the worktree is locked.")
             }
             return sharedLockWarning(common: common, branch: branch)
         }
 
         /// Return only recoverable update hazards; ownership failures remain errors.
+        /// Ignored files never block updates; Git still refuses actual overwrite collisions.
         static func refreshWarning(_ workspace: URL, common: URL) async throws -> String? {
             let registration = try await gitPath(workspace, "--absolute-git-dir")
             let branch = try await git(workspace, ["symbolic-ref", "-q", "HEAD"])
-            if let warning = operationWarning(registration: registration, common: common, branch: branch) {
+            if let warning = operationWarning(
+                registration: registration, common: common, branch: branch, markers: updateOperationMarkers
+            ) {
                 return warning
             }
-            let staged = try await git(workspace, ["ls-files", "--stage", "-z"])
-            if staged.split(separator: "\0").contains(where: { $0.hasPrefix("160000 ") }) {
-                return "The checkout contains a submodule."
+            let index = try await git(workspace, ["ls-files", "--stage", "-v", "-z"])
+            var hiddenChanges = false
+            for entry in index.split(separator: "\0") {
+                // -v prefixes each stage entry with its status letter and a space.
+                if entry.dropFirst(2).hasPrefix("160000 ") {
+                    return String(localized: "The checkout contains a submodule.")
+                }
+                if let flag = entry.utf8.first {
+                    hiddenChanges = hiddenChanges || flag == UInt8(ascii: "S")
+                        || (UInt8(ascii: "a") ... UInt8(ascii: "z")).contains(flag)
+                }
             }
-            let flags = try await git(workspace, ["ls-files", "-v", "-z"])
-            if flags.split(separator: "\0").contains(where: {
-                guard let flag = $0.first else { return false }
-                return flag == "S" || ("a" ... "z").contains(String(flag))
-            }) {
-                return "Index flags can hide local changes."
+            if hiddenChanges {
+                return String(localized: "Index flags can hide local changes.")
             }
             let status = try await git(workspace, [
                 "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false",
                 "status", "--porcelain=v1", "--untracked-files=all",
-                "--ignored=matching", "--ignore-submodules=none",
+                "--ignored=no", "--ignore-submodules=none",
             ])
-            return status.isEmpty ? nil : "The checkout contains staged, modified, untracked, or ignored files."
+            guard !status.isEmpty else {
+                return nil
+            }
+            return String(localized: "The checkout contains staged, modified, or untracked files.")
         }
     }
 #endif

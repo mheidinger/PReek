@@ -1,6 +1,1006 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@\n\nInstall Ghostty 1.3 or newer with AppleScript enabled, and allow PReek to control Ghostty in System Settings → Privacy & Security → Automation." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@\n\nInstalliere Ghostty 1.3 oder neuer mit aktiviertem AppleScript und erlaube PReek unter Systemeinstellungen → Datenschutz & Sicherheit → Automation, Ghostty zu steuern."
+          }
+        }
+      }
+    },
+    "%@ exited with status %lld%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ wurde mit Status %lld%@ beendet"
+          }
+        }
+      }
+    },
+    "%@ must be an absolute path or begin with ~/." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ muss ein absoluter Pfad sein oder mit ~/ beginnen."
+          }
+        }
+      }
+    },
+    "A Git operation is in progress or the worktree is locked." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Git-Operation läuft oder der Worktree ist gesperrt."
+          }
+        }
+      }
+    },
+    "A Git operation owns shared repository metadata." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Git-Operation hält die gemeinsamen Repository-Metadaten gesperrt."
+          }
+        }
+      }
+    },
+    "A review thread's replies are unavailable." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Antworten eines Review-Threads sind nicht verfügbar."
+          }
+        }
+      }
+    },
+    "Address comments" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommentare bearbeiten"
+          }
+        }
+      }
+    },
+    "An existing folder occupies the PR workspace. Nothing was overwritten." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein vorhandener Ordner belegt den PR-Arbeitsbereich. Es wurde nichts überschrieben."
+          }
+        }
+      }
+    },
+    "An unmanaged folder occupies the PR workspace. Nothing was overwritten." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein nicht verwalteter Ordner belegt den PR-Arbeitsbereich. Es wurde nichts überschrieben."
+          }
+        }
+      }
+    },
+    "Choose the root of an existing local Git clone." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle das Stammverzeichnis eines vorhandenen lokalen Git-Klons."
+          }
+        }
+      }
+    },
+    "Could not construct the PR head repository URL." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die URL des PR-Head-Repositorys konnte nicht erstellt werden."
+          }
+        }
+      }
+    },
+    "Could not inspect the PR history: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Verlauf konnte nicht überprüft werden: %@"
+          }
+        }
+      }
+    },
+    "Could not inspect the checkout branch: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Checkout-Branch konnte nicht überprüft werden: %@"
+          }
+        }
+      }
+    },
+    "Could not inspect the existing checkout history: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Verlauf des vorhandenen Checkouts konnte nicht überprüft werden: %@"
+          }
+        }
+      }
+    },
+    "Could not inspect the pending PR commits: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die ausstehenden PR-Commits konnten nicht überprüft werden: %@"
+          }
+        }
+      }
+    },
+    "Could not prepare the Ghostty command." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ghostty-Befehl konnte nicht vorbereitet werden."
+          }
+        }
+      }
+    },
+    "Custom action" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eigene Aktion"
+          }
+        }
+      }
+    },
+    "Editor unavailable" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editor nicht verfügbar"
+          }
+        }
+      }
+    },
+    "Enter a prompt for this action in Settings before launching it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib vor dem Starten in den Einstellungen einen Prompt für diese Aktion ein."
+          }
+        }
+      }
+    },
+    "Enter the OMP executable path in Settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib in den Einstellungen den Pfad zur ausführbaren OMP-Datei ein."
+          }
+        }
+      }
+    },
+    "Expected an HTTPS GitHub pull request URL with an owner, repository, and PR number." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erwartet wird eine HTTPS-GitHub-Pull-Request-URL mit Besitzer, Repository und PR-Nummer."
+          }
+        }
+      }
+    },
+    "Force update is only available for PReek-managed worktrees. Your existing checkout was not changed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine erzwungene Aktualisierung ist nur für von PReek verwaltete Worktrees verfügbar. Dein vorhandener Checkout wurde nicht geändert."
+          }
+        }
+      }
+    },
+    "Git did not return the requested PR base commit %@. Nothing was updated." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Git hat den angeforderten PR-Basis-Commit %@ nicht zurückgegeben. Es wurde nichts aktualisiert."
+          }
+        }
+      }
+    },
+    "GitHub repeated a discussion pagination URL." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub hat eine Seitennavigations-URL der Diskussion wiederholt."
+          }
+        }
+      }
+    },
+    "GitHub returned a different repository or pull request. Check the repository mapping." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub hat ein anderes Repository oder einen anderen Pull Request zurückgegeben. Prüfe die Repository-Zuordnung."
+          }
+        }
+      }
+    },
+    "GitHub returned a missing or repeated pagination cursor." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub hat einen fehlenden oder wiederholten Seitennavigations-Cursor zurückgegeben."
+          }
+        }
+      }
+    },
+    "GitHub returned an invalid PR head repository." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub hat ein ungültiges PR-Head-Repository zurückgegeben."
+          }
+        }
+      }
+    },
+    "GitHub returned an unexpected API or pagination URL." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub hat eine unerwartete API- oder Seitennavigations-URL zurückgegeben."
+          }
+        }
+      }
+    },
+    "GitHub returned invalid PR commit SHAs." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub hat ungültige PR-Commit-SHAs zurückgegeben."
+          }
+        }
+      }
+    },
+    "GitHub returned no review thread data." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub hat keine Daten zu Review-Threads zurückgegeben."
+          }
+        }
+      }
+    },
+    "GitHub's API and Git remote disagree on PR #%lld after %lld attempts (API head: %@; Git head: %@). Nothing was updated." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die GitHub-API und das Git-Remote stimmen bei PR #%lld nach %lld Versuchen nicht überein (API-Head: %@; Git-Head: %@). Es wurde nichts aktualisiert."
+          }
+        }
+      }
+    },
+    "HEAD changed before its update." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HEAD hat sich vor der Aktualisierung geändert."
+          }
+        }
+      }
+    },
+    "HEAD changed while fetching." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HEAD hat sich während des Abrufs geändert."
+          }
+        }
+      }
+    },
+    "Index flags can hide local changes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Index-Flags können lokale Änderungen verbergen."
+          }
+        }
+      }
+    },
+    "No HTTPS/SSH fetch remote matches %@. Check the mapped clone; no repository was cloned." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kein HTTPS-/SSH-Fetch-Remote passt zu %@. Überprüfe den zugeordneten Klon; es wurde kein Repository geklont."
+          }
+        }
+      }
+    },
+    "Open in %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %@ öffnen"
+          }
+        }
+      }
+    },
+    "Pending preparation cannot finish safely: %@ Preserve or resolve the local data before retrying." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die ausstehende Vorbereitung kann nicht sicher abgeschlossen werden: %@ Sichere oder bereinige die lokalen Daten vor einem erneuten Versuch."
+          }
+        }
+      }
+    },
+    "Please verify you are using the latest version of the app on both devices. If the issue persists, please report the issue." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prüfe, ob du auf beiden Geräten die neueste Version der App verwendest. Wenn das Problem weiterhin besteht, melde es bitte."
+          }
+        }
+      }
+    },
+    "Review PR" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PR überprüfen"
+          }
+        }
+      }
+    },
+    "Select an installed editor in Settings → Local actions." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle unter Einstellungen → Lokale Aktionen einen installierten Editor aus."
+          }
+        }
+      }
+    },
+    "State for an existing checkout must be outside its repository and Git metadata." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Status eines vorhandenen Checkouts muss außerhalb seines Repositorys und seiner Git-Metadaten liegen."
+          }
+        }
+      }
+    },
+    "The PR branch changed before its update. Nothing was reset." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Branch hat sich vor der Aktualisierung geändert. Es wurde nichts zurückgesetzt."
+          }
+        }
+      }
+    },
+    "The PR branch changed while finishing preparation. Nothing was overwritten." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Branch hat sich beim Abschließen der Vorbereitung geändert. Es wurde nichts überschrieben."
+          }
+        }
+      }
+    },
+    "The PR branch has multiple worktree registrations. Nothing was changed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Branch hat mehrere Worktree-Registrierungen. Es wurde nichts geändert."
+          }
+        }
+      }
+    },
+    "The PR branch is already registered at %@. Nothing was overwritten." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Branch ist bereits unter %@ registriert. Es wurde nichts überschrieben."
+          }
+        }
+      }
+    },
+    "The PR branch is checked out elsewhere. Nothing was removed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Branch ist an anderer Stelle ausgecheckt. Es wurde nichts entfernt."
+          }
+        }
+      }
+    },
+    "The PR branch is checked out in another worktree. That unrelated checkout was not changed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Branch ist in einem anderen Worktree ausgecheckt. Dieser unabhängige Checkout wurde nicht geändert."
+          }
+        }
+      }
+    },
+    "The PR branch is checked out outside an owned PReek workspace. Nothing was changed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Branch ist außerhalb eines PReek-eigenen Arbeitsbereichs ausgecheckt. Es wurde nichts geändert."
+          }
+        }
+      }
+    },
+    "The PR branch moved to another checkout before removal." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Branch wurde vor dem Entfernen in einen anderen Checkout verschoben."
+          }
+        }
+      }
+    },
+    "The PR identity does not match the workspace path." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die PR-Identität passt nicht zum Arbeitsbereichspfad."
+          }
+        }
+      }
+    },
+    "The PR identity, state, or clone does not match the workspace." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die PR-Identität, der Status oder der Klon passt nicht zum Arbeitsbereich."
+          }
+        }
+      }
+    },
+    "The PR metadata or workspace root is invalid." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die PR-Metadaten oder das Stammverzeichnis des Arbeitsbereichs sind ungültig."
+          }
+        }
+      }
+    },
+    "The PR source branch changed while fetching. The checkout was not updated." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Quellbranch hat sich während des Abrufs geändert. Der Checkout wurde nicht aktualisiert."
+          }
+        }
+      }
+    },
+    "The PR workspace is detached or on another branch. Force update to replace it with the PR checkout." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Arbeitsbereich befindet sich im Detached-HEAD-Zustand oder auf einem anderen Branch. Erzwinge eine Aktualisierung, um ihn durch den PR-Checkout zu ersetzen."
+          }
+        }
+      }
+    },
+    "The PR workspace was not updated: %@ Opening the existing checkout unchanged." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der PR-Arbeitsbereich wurde nicht aktualisiert: %@ Der vorhandene Checkout wird unverändert geöffnet."
+          }
+        }
+      }
+    },
+    "The branch has diverged from the PR. Resolve its history manually; PReek will not reset or rebase your branch." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Branch ist vom PR abgewichen. Bereinige seinen Verlauf manuell; PReek wird deinen Branch weder zurücksetzen noch einen Rebase durchführen."
+          }
+        }
+      }
+    },
+    "The checkout changed during its update. The local action was not launched." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Checkout hat sich während der Aktualisierung geändert. Die lokale Aktion wurde nicht gestartet."
+          }
+        }
+      }
+    },
+    "The checkout contains a submodule." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Checkout enthält ein Submodul."
+          }
+        }
+      }
+    },
+    "The checkout contains staged, modified, or untracked files." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Checkout enthält vorgemerkte, geänderte oder nicht versionierte Dateien."
+          }
+        }
+      }
+    },
+    "The checkout or upstream branch changed. The local action was not launched." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Checkout oder der Upstream-Branch hat sich geändert. Die lokale Aktion wurde nicht gestartet."
+          }
+        }
+      }
+    },
+    "The clone's remote transport is unsupported." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Transportprotokoll des Klon-Remotes wird nicht unterstützt."
+          }
+        }
+      }
+    },
+    "The executable must be an absolute path." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die ausführbare Datei muss als absoluter Pfad angegeben werden."
+          }
+        }
+      }
+    },
+    "The existing PR workspace has no saved name. Nothing was changed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der vorhandene PR-Arbeitsbereich hat keinen gespeicherten Namen. Es wurde nichts geändert."
+          }
+        }
+      }
+    },
+    "The existing checkout state is redirected or not owned by this account." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Status des vorhandenen Checkouts wird umgeleitet oder gehört nicht diesem Benutzerkonto."
+          }
+        }
+      }
+    },
+    "The existing checkout state root is unsafe." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Stammverzeichnis für den Status des vorhandenen Checkouts ist unsicher."
+          }
+        }
+      }
+    },
+    "The existing checkout was not updated: %@ Opening it unchanged." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der vorhandene Checkout wurde nicht aktualisiert: %@ Er wird unverändert geöffnet."
+          }
+        }
+      }
+    },
+    "The login shell must be bash, zsh, sh, ksh, or fish." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Login-Shell muss bash, zsh, sh, ksh oder fish sein."
+          }
+        }
+      }
+    },
+    "The mapped clone has unsafe Git metadata." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der zugeordnete Klon hat unsichere Git-Metadaten."
+          }
+        }
+      }
+    },
+    "The mapped clone must not be inside its PR workspace." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der zugeordnete Klon darf nicht innerhalb seines PR-Arbeitsbereichs liegen."
+          }
+        }
+      }
+    },
+    "The pending preparation journal does not match this PR workspace." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Journal der ausstehenden Vorbereitung passt nicht zu diesem PR-Arbeitsbereich."
+          }
+        }
+      }
+    },
+    "The pending preparation journal is unsafe." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Journal der ausstehenden Vorbereitung ist unsicher."
+          }
+        }
+      }
+    },
+    "The pending workspace branch or base reference changed. Nothing was overwritten." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Branch oder die Basisreferenz des ausstehenden Arbeitsbereichs hat sich geändert. Es wurde nichts überschrieben."
+          }
+        }
+      }
+    },
+    "The pending workspace parent is redirected or not owned by this account." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das übergeordnete Verzeichnis des ausstehenden Arbeitsbereichs wird umgeleitet oder gehört nicht diesem Benutzerkonto."
+          }
+        }
+      }
+    },
+    "The preparation marker conflicts with the pending journal." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Vorbereitungsmarkierung steht im Konflikt mit dem ausstehenden Journal."
+          }
+        }
+      }
+    },
+    "The preparation marker is invalid." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Vorbereitungsmarkierung ist ungültig."
+          }
+        }
+      }
+    },
+    "The preparation marker is missing or unsafe." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Vorbereitungsmarkierung fehlt oder ist unsicher."
+          }
+        }
+      }
+    },
+    "The pull request review threads are unavailable." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Review-Threads des Pull Requests sind nicht verfügbar."
+          }
+        }
+      }
+    },
+    "The registered PR identity is invalid." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die registrierte PR-Identität ist ungültig."
+          }
+        }
+      }
+    },
+    "The retained PR branch could not be inspected." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der beibehaltene PR-Branch konnte nicht überprüft werden."
+          }
+        }
+      }
+    },
+    "The saved PR workspace is missing. Nothing was recreated." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gespeicherte PR-Arbeitsbereich fehlt. Es wurde nichts neu erstellt."
+          }
+        }
+      }
+    },
+    "The saved PR workspace is missing. Restore it or deliberately remove its PReek state before recreating it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gespeicherte PR-Arbeitsbereich fehlt. Stelle ihn wieder her oder entferne bewusst seinen PReek-Status, bevor du ihn neu erstellst."
+          }
+        }
+      }
+    },
+    "The saved workspace belongs to a different clone or is not a registered worktree." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gespeicherte Arbeitsbereich gehört zu einem anderen Klon oder ist kein registrierter Worktree."
+          }
+        }
+      }
+    },
+    "The saved workspace name changed during preparation. Nothing was changed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gespeicherte Arbeitsbereichsname hat sich während der Vorbereitung geändert. Es wurde nichts geändert."
+          }
+        }
+      }
+    },
+    "The saved workspace name does not match this PR." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gespeicherte Arbeitsbereichsname passt nicht zu diesem PR."
+          }
+        }
+      }
+    },
+    "The saved workspace name is unsafe." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der gespeicherte Arbeitsbereichsname ist unsicher."
+          }
+        }
+      }
+    },
+    "The workspace changed during its update. Preparation was not marked complete." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Arbeitsbereich hat sich während der Aktualisierung geändert. Die Vorbereitung wurde nicht als abgeschlossen markiert."
+          }
+        }
+      }
+    },
+    "The workspace has invalid local commit references." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Arbeitsbereich hat ungültige lokale Commit-Referenzen."
+          }
+        }
+      }
+    },
+    "The workspace operation lock is not an owned regular file: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Arbeitsbereichs-Operationssperre ist keine reguläre Datei dieses Benutzerkontos: %@"
+          }
+        }
+      }
+    },
+    "The workspace ownership or PR branch changed while fetching. Nothing was reset." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Besitzer des Arbeitsbereichs oder der PR-Branch hat sich während des Abrufs geändert. Es wurde nichts zurückgesetzt."
+          }
+        }
+      }
+    },
+    "The workspace parent is redirected by a symlink." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das übergeordnete Verzeichnis des Arbeitsbereichs wird durch einen symbolischen Link umgeleitet."
+          }
+        }
+      }
+    },
+    "The workspace registry is not an owned regular file." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Arbeitsbereichsverzeichnis ist keine reguläre Datei im Besitz des aktuellen Benutzers."
+          }
+        }
+      }
+    },
+    "The workspace root must be an absolute path." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Stammverzeichnis des Arbeitsbereichs muss ein absoluter Pfad sein."
+          }
+        }
+      }
+    },
+    "The workspace state is redirected or not owned by this account." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Arbeitsbereichsstatus wird umgeleitet oder gehört nicht diesem Benutzerkonto."
+          }
+        }
+      }
+    },
+    "The worktree has no valid committed HEAD to preserve." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Worktree hat keinen gültigen committeten HEAD, der gesichert werden kann."
+          }
+        }
+      }
+    },
+    "The worktree registration is foreign, locked, or unsafe." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Worktree-Registrierung ist fremd, gesperrt oder unsicher."
+          }
+        }
+      }
+    },
+    "This PR does not belong to the configured GitHub account's host." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser PR gehört nicht zum Host des eingerichteten GitHub-Kontos."
+          }
+        }
+      }
+    },
+    "This PR workspace is being prepared or cleaned. Try again after that finishes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser PR-Arbeitsbereich wird gerade vorbereitet oder bereinigt. Versuche es nach Abschluss erneut."
+          }
+        }
+      }
+    },
+    "Unknown" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbekannt"
+          }
+        }
+      }
+    },
+    "Unknown error" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbekannter Fehler"
+          }
+        }
+      }
+    },
+    "Workspace, state, and clone must be owned physical directories." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbeitsbereich, Status und Klon müssen eigene physische Verzeichnisse sein."
+          }
+        }
+      }
+    },
     "Automatically mark as read" : {
       "localizations" : {
         "de" : {
@@ -527,7 +1527,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gebe die URL ohne Suffix an. Beispiel: `https://github.acme.org`"
+            "value" : "Gib die URL ohne Suffix an. Beispiel: `https://github.acme.org`"
           }
         },
         "en" : {
@@ -559,7 +1559,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Der Personal Access Token (PAT) sollte vom Typ 'Classic' sein und benötigt die 'notifications' Berechtigung. Für Zugang zu privaten repositories ist zusätzlich die 'repo' Berechtigung notwendig. Benachrichtigungen werden verwendet, um die für dich relevanten Pull Requests zu identifizieren. Informationen zum Generieren eines PAT findest du in der [GitHub Dokumentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)."
+            "value" : "Der Personal Access Token (PAT) sollte vom Typ 'Classic' sein und benötigt die Berechtigung 'notifications'. Für den Zugriff auf private Repositorys ist zusätzlich die Berechtigung 'repo' erforderlich. Benachrichtigungen werden verwendet, um die für dich relevanten Pull Requests zu identifizieren. Informationen zum Erstellen eines PAT findest du in der [GitHub-Dokumentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)."
           }
         },
         "en" : {
@@ -1009,7 +2009,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importieren eine existierende Konfiguration von einem anderen Gerät auf dem PReek läuft."
+            "value" : "Importiere eine vorhandene Konfiguration von einem anderen Gerät, auf dem PReek läuft."
           }
         }
       }
@@ -1063,7 +2063,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mehr Laden"
+            "value" : "Mehr laden"
           }
         }
       }
@@ -1147,14 +2147,26 @@
         }
       }
     },
-    "Mappings are separate for each GitHub host and owner/repository. Forgetting a mapping does not delete its clone or any worktree. Clean worktrees update before opening. For local changes, choose Open Unchanged, Force Update, or Cancel. Confirming Force Update deletes all uncommitted workspace data, including ignored files and submodule data; the committed HEAD is backed up." : {
+    "Managed PR worktrees and action state are stored below this folder. Existing checkouts stay in place. An absolute path or ~/ is supported." : {
+      "comment" : "A description of the location of managed worktrees and local action state.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwaltete PR-Worktrees und Aktionsdaten werden unterhalb dieses Ordners gespeichert. Bestehende Checkouts bleiben an ihrem bisherigen Ort. Ein absoluter Pfad oder ~/ wird unterstützt."
+          }
+        }
+      }
+    },
+    "Mappings are separate for each GitHub host and owner/repository. Forgetting a mapping does not delete its clone or any worktree. Existing PR-branch checkouts update by fast-forward only and are never force-updated or automatically cleaned up. If an update is unsafe, choose Open Unchanged or Cancel. Only managed worktrees offer Force Update, which deletes all uncommitted workspace data, including ignored files and submodule data; the committed HEAD is backed up." : {
       "comment" : "A description of the local action repository settings.",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zuordnungen gelten jeweils für einen GitHub-Host und ein Besitzer/Repository-Paar. Das Entfernen einer Zuordnung löscht weder den Klon noch Worktrees. Saubere Worktrees werden vor dem Öffnen aktualisiert. Bei lokalen Änderungen kannst du unverändert öffnen, eine Aktualisierung erzwingen oder abbrechen. Wenn du die erzwungene Aktualisierung bestätigst, werden alle nicht committeten Workspace-Daten gelöscht, einschließlich ignorierter Dateien und Submoduldaten. Der committete HEAD wird gesichert."
+            "value" : "Zuordnungen gelten jeweils für einen GitHub-Host und ein Besitzer/Repository-Paar. Das Entfernen einer Zuordnung löscht weder den Klon noch Worktrees. Bestehende Checkouts auf dem PR-Branch werden nur per Fast-Forward aktualisiert, nie zwangsweise aktualisiert und nie automatisch aufgeräumt. Ist eine Aktualisierung unsicher, kannst du unverändert öffnen oder abbrechen. Nur verwaltete Worktrees bieten eine erzwungene Aktualisierung an. Dabei werden alle nicht committeten Workspace-Daten gelöscht, einschließlich ignorierter Dateien und Submoduldaten. Der committete HEAD wird gesichert."
           }
         }
       }
@@ -1236,7 +2248,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Merged"
+            "value" : "Gemergt"
           }
         }
       }
@@ -1487,18 +2499,6 @@
         }
       }
     },
-    "Persistent PR worktrees are created below this folder. An absolute path or ~/ is supported." : {
-      "comment" : "A description of the location of the folder where persistent worktrees are created.",
-      "isCommentAutoGenerated" : true,
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dauerhafte PR-Worktrees werden unterhalb dieses Ordners angelegt. Ein absoluter Pfad oder ~/ wird unterstützt."
-          }
-        }
-      }
-    },
     "PR workspace update skipped" : {
       "localizations" : {
         "de" : {
@@ -1612,7 +2612,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "App Beenden"
+            "value" : "App beenden"
           }
         }
       }
@@ -1657,14 +2657,14 @@
         }
       }
     },
-    "Removes unchanged worktrees after a PR has been closed, merged, or untracked for 24 hours. Checks after successful refreshes while PReek is running, including after enabling cleanup. Open editors and agents do not prevent cleanup; unsaved buffers are not protected." : {
+    "Removes unchanged managed worktrees after a PR has been closed, merged, or untracked for 24 hours. Existing checkouts are never automatically cleaned up. Checks after successful refreshes while PReek is running, including after enabling cleanup. Open editors and agents do not prevent cleanup; unsaved buffers are not protected." : {
       "comment" : "A description of the automatic cleanup feature.",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entfernt unveränderte Worktrees, wenn der PR seit mindestens 24 Stunden geschlossen, gemergt oder nicht mehr erfasst ist. Die Prüfung erfolgt nach erfolgreichen Aktualisierungen, solange PReek läuft, auch nach dem Aktivieren des automatischen Aufräumens. Geöffnete Editoren und Agenten verhindern das Aufräumen nicht. Nicht gespeicherte Editorinhalte sind nicht geschützt."
+            "value" : "Entfernt unveränderte verwaltete Worktrees, wenn der PR seit mindestens 24 Stunden geschlossen, gemergt oder nicht mehr erfasst ist. Bestehende Checkouts werden nie automatisch aufgeräumt. Die Prüfung erfolgt nach erfolgreichen Aktualisierungen, solange PReek läuft, auch nach dem Aktivieren des automatischen Aufräumens. Geöffnete Editoren und Agenten verhindern das Aufräumen nicht. Nicht gespeicherte Editorinhalte sind nicht geschützt."
           }
         }
       }
@@ -1739,14 +2739,14 @@
         }
       }
     },
-    "Requires Git and a configured GitHub account. Agent actions also require Ghostty 1.3 or newer and OMP. PReek prepares the shared PR worktree before opening either application." : {
+    "Requires Git and a configured GitHub account. Agent actions also require Ghostty 1.3 or newer and OMP. PReek prefers the mapped checkout when it is verified to be on the PR's head branch; otherwise it prepares a shared PR worktree." : {
       "comment" : "A description of the requirements for local editor and agent actions.",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erfordert Git und ein eingerichtetes GitHub-Konto. Agentenaktionen benötigen zusätzlich Ghostty 1.3 oder neuer und OMP. PReek bereitet den gemeinsamen PR-Worktree vor, bevor die jeweilige Anwendung geöffnet wird."
+            "value" : "Erfordert Git und ein eingerichtetes GitHub-Konto. Agentenaktionen benötigen zusätzlich Ghostty 1.3 oder neuer und OMP. PReek bevorzugt den zugeordneten Checkout, wenn verifiziert wurde, dass er auf dem Head-Branch des PRs liegt. Andernfalls wird ein gemeinsamer PR-Worktree vorbereitet."
           }
         }
       }
@@ -1756,7 +2756,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "hat reviewed"
+            "value" : "hat überprüft"
           }
         }
       }
@@ -1766,7 +2766,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "hat reviewed (verworfen)"
+            "value" : "hat überprüft (Review verworfen)"
           }
         }
       }
@@ -1824,7 +2824,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scanne diesen QR Code in the PReek App auf einem anderen Gerät, um deine Konfiguration zu importieren."
+            "value" : "Scanne diesen QR-Code in der PReek-App auf einem anderen Gerät, um deine Konfiguration zu importieren."
           }
         }
       }
@@ -1834,7 +2834,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wähle eine Pull Request aus"
+            "value" : "Wähle einen Pull Request aus"
           }
         }
       }
@@ -1886,7 +2886,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konfiguration Teilen"
+            "value" : "Konfiguration teilen"
           }
         }
       }

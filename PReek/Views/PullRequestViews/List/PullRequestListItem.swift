@@ -52,7 +52,7 @@ struct PullRequestListItem: View, Equatable {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 4)
             .accessibilityElement(children: .combine)
-            .accessibilityValue(Text(pullRequest.unread ? "Unread" : "Read"))
+            .accessibilityValue(Text(pullRequest.unread ? String(localized: "Unread") : String(localized: "Read")))
         #else
             HStack(alignment: .top, spacing: 10) {
                 VStack {

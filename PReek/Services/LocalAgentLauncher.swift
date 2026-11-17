@@ -52,13 +52,13 @@
             end tell
             """
             guard let script = NSAppleScript(source: source) else {
-                throw LocalActionError(message: "Could not prepare the Ghostty command.")
+                throw LocalActionError(message: String(localized: "Could not prepare the Ghostty command."))
             }
             var details: NSDictionary?
             script.executeAndReturnError(&details)
             if let details {
                 let message = details[NSAppleScript.errorMessage] as? String ?? details.description
-                throw LocalActionError(message: "\(message)\n\nInstall Ghostty 1.3 or newer with AppleScript enabled, and allow PReek to control Ghostty in System Settings → Privacy & Security → Automation.")
+                throw LocalActionError(message: String(localized: "\(message)\n\nInstall Ghostty 1.3 or newer with AppleScript enabled, and allow PReek to control Ghostty in System Settings → Privacy & Security → Automation."))
             }
         }
 

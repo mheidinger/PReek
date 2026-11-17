@@ -24,13 +24,13 @@
                   published.st_dev == information.st_dev, published.st_ino == information.st_ino
             else {
                 close(descriptor)
-                throw LocalActionError(message: "The workspace operation lock is not an owned regular file: \(path)")
+                throw LocalActionError(message: String(localized: "The workspace operation lock is not an owned regular file: \(path)"))
             }
             guard flock(descriptor, LOCK_EX | LOCK_NB) == 0 else {
                 let code = errno
                 close(descriptor)
                 if code == EWOULDBLOCK || code == EAGAIN {
-                    throw LocalActionError(message: "This PR workspace is being prepared or cleaned. Try again after that finishes.")
+                    throw LocalActionError(message: String(localized: "This PR workspace is being prepared or cleaned. Try again after that finishes."))
                 }
                 throw POSIXError(POSIXErrorCode(rawValue: code) ?? .EIO)
             }

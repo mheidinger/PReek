@@ -35,7 +35,7 @@ struct StatusIcon: View {
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(width: size, height: size)
-            .accessibilityLabel(Text(statusToText[status] ?? "Unknown"))
+            .accessibilityLabel(Text(statusToText[status] ?? String(localized: "Unknown")))
     }
 }
 
@@ -51,7 +51,7 @@ struct StatusLabel: View {
     }
 
     var body: some View {
-        Label(statusToText[status] ?? "Unknown", image: statusToImageResource[status] ?? .prOpen)
+        Label(statusToText[status] ?? String(localized: "Unknown"), image: statusToImageResource[status] ?? .prOpen)
             .font(.caption)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)

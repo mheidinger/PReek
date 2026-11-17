@@ -58,7 +58,7 @@ struct ImportSheetModifier: ViewModifier {
                 }
                 .alert(isPresented: $showImportErrorAlert) {
                     Alert(
-                        title: Text(importError?.localizedDescription ?? "Unknown error"),
+                        title: Text(importError?.localizedDescription ?? String(localized: "Unknown error")),
                         message: (importError as? LocalizedError)?.recoverySuggestion.map { value in Text(value) },
                         dismissButton: .default(Text("OK")) {
                             importError = nil

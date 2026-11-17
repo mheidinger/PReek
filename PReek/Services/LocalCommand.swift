@@ -46,7 +46,7 @@
         ) async throws -> Result {
             try Task.checkCancellation()
             guard executable.hasPrefix("/"), !executable.contains("\0") else {
-                throw LocalActionError(message: "The executable must be an absolute path.")
+                throw LocalActionError(message: String(localized: "The executable must be an absolute path."))
             }
             var values = ProcessInfo.processInfo.environment
             if let environment {
@@ -136,7 +136,7 @@
                 let details = (result.error.isEmpty ? result.output : result.error).trimmingCharacters(in: .whitespacesAndNewlines)
                 let name = URL(fileURLWithPath: executable).lastPathComponent
                 let suffix = details.isEmpty ? "." : ": \(details)"
-                throw LocalActionError(message: "\(name) exited with status \(result.status)\(suffix)")
+                throw LocalActionError(message: String(localized: "\(name) exited with status \(Int(result.status))\(suffix)"))
             }
             return result.output
         }

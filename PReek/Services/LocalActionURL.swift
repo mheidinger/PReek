@@ -10,7 +10,7 @@
             guard url.scheme == base.scheme, url.host == base.host, url.port == base.port,
                   url.path.hasPrefix(base.path.isEmpty ? "/" : base.path + "/") || url == base
             else {
-                throw LocalActionError(message: "GitHub returned an unexpected API or pagination URL.")
+                throw LocalActionError(message: String(localized: "GitHub returned an unexpected API or pagination URL."))
             }
             return url
         }

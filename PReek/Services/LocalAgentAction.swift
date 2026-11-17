@@ -19,14 +19,14 @@
         }
 
         var displayName: String {
-            name.isEmpty ? "Untitled action" : name
+            name.isEmpty ? String(localized: "Untitled action") : name
         }
 
         static let defaults: [LocalAgentAction] = [
-            LocalAgentAction(name: "Review PR", prompt: """
+            LocalAgentAction(name: String(localized: "Review PR"), prompt: """
             Review the PR diff and relevant surrounding code for defects, maintainability, and unnecessary complexity. Prefer simple, robust solutions. Report actionable findings by severity with file/line references and impact; say if none. Do not modify files.
             """, kind: .review),
-            LocalAgentAction(name: "Address comments", prompt: """
+            LocalAgentAction(name: String(localized: "Address comments"), prompt: """
             Address actionable unresolved feedback in the local worktree. Read unresolved threads with their replies; consult review/discussion files listed in the PR context as needed. Check whether outdated feedback still applies. Run relevant checks; summarize changes, verification, and anything needing a human decision.
             """, kind: .address),
         ]

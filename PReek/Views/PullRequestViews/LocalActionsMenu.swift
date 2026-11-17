@@ -110,8 +110,8 @@
             }
             .buttonStyle(.plain)
             .disabled(defaultAgentAction?.hasPrompt != true)
-            .help(defaultAgentAction?.displayName ?? "Local agent")
-            .accessibilityLabel(defaultAgentAction?.displayName ?? "Local agent")
+            .help(defaultAgentAction?.displayName ?? String(localized: "Local agent"))
+            .accessibilityLabel(defaultAgentAction?.displayName ?? String(localized: "Local agent"))
         }
 
         private var agentActionsMenu: some View {

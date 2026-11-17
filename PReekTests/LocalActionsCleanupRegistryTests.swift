@@ -62,5 +62,34 @@
             #expect(Set(entries.map(\.workspace)) == Set([old, new].map { $0.resolvingSymlinksInPath().appendingPathComponent("github.com/owner/repo/untitled--pr-7").path }))
             #expect(entries.allSatisfy { $0.eligibleSince == now.timeIntervalSince1970 })
         }
+
+        @Test func existingCheckoutsAreNeverRegisteredOrAllowedToReplaceManagedEntries() throws {
+            let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+            let suite = "LocalActionsCleanupRegistryTests.\(UUID().uuidString)"
+            let defaults = try #require(UserDefaults(suiteName: suite))
+            defer { defaults.removePersistentDomain(forName: suite) }
+            defer { try? FileManager.default.removeItem(at: directory) }
+            let cleanup = LocalActionsCleanup(registry: LocalWorkspaceRegistry(directory: directory), defaults: defaults)
+            let managed = try workspace(
+                root: directory.appendingPathComponent("worktrees"),
+                clone: directory.appendingPathComponent("clone")
+            )
+            let existing = LocalWorkspaceService.PreparedWorkspace(
+                checkout: managed.url, state: directory.appendingPathComponent(".preek-existing/pr"),
+                headSHA: String(repeating: "c", count: 40), baseSHA: String(repeating: "d", count: 40)
+            )
+
+            try cleanup.register(pullRequest: request(.closed), workspace: existing)
+            #expect(cleanup.registry.workspaces.isEmpty)
+            #expect(!FileManager.default.fileExists(atPath: cleanup.registry.url.path))
+
+            try cleanup.register(pullRequest: request(), workspace: managed)
+            let entries = try read(cleanup).workspaces
+            try cleanup.register(pullRequest: request(.closed), workspace: existing)
+            #expect(cleanup.registry.workspaces == entries)
+            #expect(try read(cleanup).workspaces == entries)
+            #expect(entries.count == 1)
+            #expect(entries.first?.eligibleSince == nil)
+        }
     }
 #endif

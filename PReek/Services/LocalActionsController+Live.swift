@@ -1,9 +1,12 @@
 #if os(macOS)
     import AppKit
     import Foundation
+    import OSLog
 
     @MainActor
     extension LocalActionsController {
+        private static let localActionLogger = Logger(subsystem: "de.max-heidinger.PReek", category: "LocalActions")
+
         static let shared = LocalActionsController(
             defaults: .standard,
             dependencies: Dependencies(
@@ -41,6 +44,8 @@
                     try await LocalAgentLauncher.launch(action, pullRequestURL: pullRequestURL, workspace: workspace, executable: executable)
                 },
                 showError: { error in
+                    let details = error as NSError
+                    localActionLogger.error("Local action failed: \(details.domain, privacy: .public) \(details.code); \(error.localizedDescription, privacy: .private)")
                     let alert = NSAlert()
                     alert.alertStyle = .warning
                     alert.messageText = String(localized: "Could not complete local action")
@@ -49,18 +54,21 @@
                     NSApp.activate(ignoringOtherApps: true)
                     alert.runModal()
                 },
-                chooseWorkspaceUpdate: { warning in
+                chooseWorkspaceUpdate: { warning, canForceUpdate in
+                    localActionLogger.notice("Checkout update skipped: \(warning, privacy: .public)")
                     let alert = NSAlert()
                     alert.alertStyle = .warning
                     alert.messageText = String(localized: "PR workspace update skipped")
                     alert.informativeText = warning
                     alert.addButton(withTitle: String(localized: "Open Unchanged"))
-                    alert.addButton(withTitle: String(localized: "Force Update…"))
+                    if canForceUpdate {
+                        alert.addButton(withTitle: String(localized: "Force Update…"))
+                    }
                     alert.addButton(withTitle: String(localized: "Cancel")).keyEquivalent = "\u{1b}"
                     NSApp.activate(ignoringOtherApps: true)
                     switch alert.runModal() {
                     case .alertFirstButtonReturn: return .openUnchanged
-                    case .alertSecondButtonReturn: return .forceUpdate
+                    case .alertSecondButtonReturn where canForceUpdate: return .forceUpdate
                     default: return .cancel
                     }
                 },

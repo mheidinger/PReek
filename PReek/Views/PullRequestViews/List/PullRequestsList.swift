@@ -168,7 +168,7 @@ struct PullRequestsList<Footer: View>: View {
     }
 
     private func readButton(for pullRequest: PullRequest) -> some View {
-        Button(pullRequest.unread ? "Mark read" : "Mark unread", systemImage: pullRequest.unread ? "envelope.open" : "envelope.badge") {
+        Button(pullRequest.unread ? String(localized: "Mark read") : String(localized: "Mark unread"), systemImage: pullRequest.unread ? "envelope.open" : "envelope.badge") {
             if selectedPullRequest?.id == pullRequest.id, !pullRequest.unread {
                 markUnread(pullRequest.id)
             } else {

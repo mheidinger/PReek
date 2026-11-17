@@ -60,7 +60,7 @@
                   normalizedPath(details.url) == normalizedPath(url),
                   details.base.repository?.fullName.lowercased() == repository
             else {
-                throw LocalActionError(message: "GitHub returned a different repository or pull request. Check the repository mapping.")
+                throw LocalActionError(message: String(localized: "GitHub returned a different repository or pull request. Check the repository mapping."))
             }
             return details
         }

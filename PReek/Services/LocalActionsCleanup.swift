@@ -31,8 +31,8 @@
         }
 
         func register(pullRequest: PullRequest, workspace: LocalWorkspaceService.PreparedWorkspace) throws {
+            guard let layout = workspace.layout else { return }
             let identity = try LocalWorkspaceService.identity(for: pullRequest.url)
-            let layout = workspace.layout
             let path = layout.workspace.path
             var next = registry.workspaces
             let index = next.firstIndex(where: { $0.workspace == path })
@@ -175,8 +175,17 @@
             common: URL,
             branch: String
         ) async throws {
+            // Updates allow ignored files; automatic removal must preserve that local data.
+            let ignored = try await LocalWorkspaceSafety.git(layout.workspace, [
+                "ls-files", "--others", "--ignored", "--exclude-standard", "--directory", "-z",
+            ])
+            guard ignored.isEmpty else {
+                throw LocalActionError(message: "The workspace contains ignored files.")
+            }
             // No additional await between the final metadata check and non-forced removal.
-            if let reason = LocalWorkspaceSafety.operationWarning(registration: registration, common: common, branch: branch) {
+            if let reason = LocalWorkspaceSafety.operationWarning(
+                registration: registration, common: common, branch: branch, markers: LocalWorkspaceSafety.removalOperationMarkers
+            ) {
                 throw LocalActionError(message: reason)
             }
             // Git independently refuses dirty/locked worktrees. Never force; keep the branch.

@@ -1,4 +1,5 @@
 #if os(macOS)
+    import AppKit
     import Foundation
     import Testing
 
@@ -43,18 +44,30 @@
             var confirmations = 0
             var destructiveCalls = 0
 
-            init() throws {
+            init(
+                existingCheckout: Bool = false,
+                updateWarning: String? = "Local changes prevented updating the PR worktree."
+            ) throws {
                 defaults = try #require(UserDefaults(suiteName: suite))
                 let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
                 let root = directory.appendingPathComponent("worktrees")
                 let clone = directory.appendingPathComponent("clone")
                 let identity = try LocalWorkspaceService.identity(for: request.url)
                 let layout = LocalWorkspaceSafety.Layout(root: root, identity: identity)
-                workspace = LocalWorkspaceService.PreparedWorkspace(
-                    layout: layout, clone: clone,
-                    headSHA: String(repeating: "a", count: 40), baseSHA: String(repeating: "b", count: 40),
-                    updateWarning: "Local changes prevented updating the PR worktree."
-                )
+                if existingCheckout {
+                    workspace = LocalWorkspaceService.PreparedWorkspace(
+                        checkout: clone,
+                        state: root.appendingPathComponent(".preek-existing/\(identity.suffix)"),
+                        headSHA: String(repeating: "a", count: 40), baseSHA: String(repeating: "b", count: 40),
+                        updateWarning: updateWarning
+                    )
+                } else {
+                    workspace = LocalWorkspaceService.PreparedWorkspace(
+                        layout: layout, clone: clone,
+                        headSHA: String(repeating: "a", count: 40), baseSHA: String(repeating: "b", count: 40),
+                        updateWarning: updateWarning
+                    )
+                }
                 forcedWorkspace = LocalWorkspaceService.PreparedWorkspace(
                     layout: layout, clone: clone,
                     headSHA: String(repeating: "c", count: 40), baseSHA: String(repeating: "d", count: 40)
@@ -82,8 +95,9 @@
                         self.handoffs.append(workspace)
                     },
                     showError: { self.errors.append($0) },
-                    chooseWorkspaceUpdate: { warning in
+                    chooseWorkspaceUpdate: { warning, canForceUpdate in
                         #expect(warning == self.workspace.updateWarning)
+                        #expect(canForceUpdate == self.workspace.isManaged)
                         self.warnings += 1
                         return .openUnchanged
                     },
@@ -164,7 +178,7 @@
         func cancelUpdateChoiceDoesNotConfirmDestroyOrHandOff() async throws {
             let fixture = try Fixture()
             defer { fixture.removePreferences() }
-            let controller = fixture.controller { $0.chooseWorkspaceUpdate = { _ in .cancel } }
+            let controller = fixture.controller { $0.chooseWorkspaceUpdate = { _, _ in .cancel } }
 
             #expect(await controller.launch(.agent(fixture.action), for: fixture.request) == false)
             #expect(fixture.registrations.count == 1)
@@ -179,7 +193,7 @@
         func confirmedForceUpdateHandsOffItsNewSnapshotWithoutRegisteringAgain() async throws {
             let fixture = try Fixture()
             defer { fixture.removePreferences() }
-            let controller = fixture.controller { $0.chooseWorkspaceUpdate = { _ in .forceUpdate } }
+            let controller = fixture.controller { $0.chooseWorkspaceUpdate = { _, _ in .forceUpdate } }
 
             #expect(await controller.launch(.agent(fixture.action), for: fixture.request))
             let actual = try #require(fixture.handoffs.first)
@@ -202,7 +216,7 @@
             let fixture = try Fixture()
             defer { fixture.removePreferences() }
             let controller = fixture.controller {
-                $0.chooseWorkspaceUpdate = { _ in .forceUpdate }
+                $0.chooseWorkspaceUpdate = { _, _ in .forceUpdate }
                 $0.confirmForceUpdate = { _ in fixture.confirmations += 1; return false }
             }
 
@@ -220,7 +234,7 @@
             let fixture = try Fixture()
             defer { fixture.removePreferences() }
             let controller = fixture.controller {
-                $0.chooseWorkspaceUpdate = { _ in .forceUpdate }
+                $0.chooseWorkspaceUpdate = { _, _ in .forceUpdate }
                 $0.forceUpdateWorkspace = { _, _ in
                     #expect(fixture.confirmations == 1)
                     fixture.destructiveCalls += 1
@@ -242,7 +256,7 @@
             let fixture = try Fixture()
             defer { fixture.removePreferences() }
             let controller = fixture.controller {
-                $0.chooseWorkspaceUpdate = { _ in
+                $0.chooseWorkspaceUpdate = { _, _ in
                     withUnsafeCurrentTask { $0?.cancel() }
                     return .forceUpdate
                 }
@@ -263,7 +277,7 @@
             let fixture = try Fixture()
             defer { fixture.removePreferences() }
             let controller = fixture.controller {
-                $0.chooseWorkspaceUpdate = { _ in .forceUpdate }
+                $0.chooseWorkspaceUpdate = { _, _ in .forceUpdate }
                 $0.confirmForceUpdate = { _ in
                     fixture.confirmations += 1
                     withUnsafeCurrentTask { $0?.cancel() }
@@ -388,6 +402,73 @@
             #expect(fixture.confirmations == 0)
             #expect(fixture.destructiveCalls == 0)
             #expect(fixture.handoffs.isEmpty)
+            #expect(fixture.errors.isEmpty)
+            #expect(!controller.isPreparing(fixture.request))
+        }
+
+        @Test(arguments: [false, true], [false, true])
+        func existingCheckoutReachesRequestedApplicationWithoutRegistration(openEditor: Bool, hasWarning: Bool) async throws {
+            let fixture = try Fixture(
+                existingCheckout: true,
+                updateWarning: hasWarning ? "Local changes prevented updating the PR worktree." : nil
+            )
+            defer { fixture.removePreferences() }
+            let editor = LocalEditor(
+                id: "test.editor", name: "Test Editor",
+                applicationURL: URL(fileURLWithPath: "/Applications/Test Editor.app"), icon: NSImage()
+            )
+            var editorURLs: [URL] = []
+            let controller = fixture.controller {
+                $0.discoverEditors = { [editor] }
+                $0.openEditor = { actualEditor, url in
+                    #expect(actualEditor.id == editor.id)
+                    editorURLs.append(url)
+                }
+            }
+            let destination: LocalActionsController.Destination = openEditor ? .editor : .agent(fixture.action)
+
+            #expect(await controller.launch(destination, for: fixture.request))
+            #expect(fixture.workspace.url == fixture.workspace.clone)
+            #expect(fixture.registrations.isEmpty)
+            if openEditor {
+                #expect(editorURLs == [fixture.workspace.clone])
+                #expect(fixture.handoffs.isEmpty)
+            } else {
+                #expect(editorURLs.isEmpty)
+                #expect(fixture.handoffs.count == 1)
+                let actual = try #require(fixture.handoffs.first)
+                #expect(actual.url == fixture.workspace.clone)
+                #expect(actual.state == fixture.workspace.state)
+                #expect(actual.headSHA == fixture.workspace.headSHA)
+                #expect(actual.baseSHA == fixture.workspace.baseSHA)
+                #expect(!actual.isManaged)
+            }
+            #expect(fixture.warnings == (hasWarning ? 1 : 0))
+            #expect(fixture.confirmations == 0)
+            #expect(fixture.destructiveCalls == 0)
+            #expect(fixture.errors.isEmpty)
+            #expect(!controller.isPreparing(fixture.request))
+        }
+
+        @Test(arguments: [false, true])
+        func existingCheckoutCancelAndFaultyForceChoiceNeverConfirmDestroyOrHandOff(forceChoice: Bool) async throws {
+            let fixture = try Fixture(existingCheckout: true)
+            defer { fixture.removePreferences() }
+            let controller = fixture.controller {
+                $0.chooseWorkspaceUpdate = { warning, canForceUpdate in
+                    #expect(warning == fixture.workspace.updateWarning)
+                    #expect(!canForceUpdate)
+                    fixture.warnings += 1
+                    return forceChoice ? .forceUpdate : .cancel
+                }
+            }
+
+            #expect(await controller.launch(.agent(fixture.action), for: fixture.request) == false)
+            #expect(fixture.registrations.isEmpty)
+            #expect(fixture.handoffs.isEmpty)
+            #expect(fixture.warnings == 1)
+            #expect(fixture.confirmations == 0)
+            #expect(fixture.destructiveCalls == 0)
             #expect(fixture.errors.isEmpty)
             #expect(!controller.isPreparing(fixture.request))
         }
