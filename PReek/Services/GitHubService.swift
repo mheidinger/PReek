@@ -296,7 +296,7 @@ class GitHubService {
                   pullRequestURL.host?.lowercased() == configuredHost.host?.lowercased(),
                   pullRequestURL.port == configuredHost.port
             else {
-                throw LocalActionError(message: "This PR does not belong to the configured GitHub account's host.")
+                throw LocalActionError(message: String(localized: "This PR does not belong to the configured GitHub account's host."))
             }
             let url = try LocalActionURL.resolve(base: base, path: path, pageURL: pageURL)
             var request = URLRequest(url: url)

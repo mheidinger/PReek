@@ -31,7 +31,7 @@
         /// Always reads disk so cleanup can reject externally changed or unsafe records.
         func read() throws -> Snapshot {
             guard LocalWorkspaceSafety.ownedFile(url) else {
-                throw LocalActionError(message: "The workspace registry is not an owned regular file.")
+                throw LocalActionError(message: String(localized: "The workspace registry is not an owned regular file."))
             }
             return try JSONDecoder().decode(Snapshot.self, from: Data(contentsOf: url))
         }

@@ -35,7 +35,7 @@
             var openEditor: (_ editor: LocalEditor, _ workspace: URL) async throws -> Void
             var launchAgent: (_ action: LocalAgentAction, _ pullRequestURL: URL, _ workspace: LocalWorkspaceService.PreparedWorkspace, _ executable: String) async throws -> Void
             var showError: (Error) -> Void
-            var chooseWorkspaceUpdate: (String) -> WorkspaceUpdateChoice
+            var chooseWorkspaceUpdate: (_ warning: String, _ canForceUpdate: Bool) -> WorkspaceUpdateChoice
             var confirmForceUpdate: (URL) -> Bool
             var forceUpdateWorkspace: (URL, LocalWorkspaceService.PreparedWorkspace) async throws -> LocalWorkspaceService.PreparedWorkspace
         }
@@ -88,7 +88,7 @@
         }
 
         var editorActionTitle: String {
-            selectedEditor.map { "Open in \($0.name)" } ?? "Editor unavailable"
+            selectedEditor.map { String(localized: "Open in \($0.name)") } ?? String(localized: "Editor unavailable")
         }
 
         func refreshEditors() {
@@ -97,7 +97,7 @@
         }
 
         func addAgentAction() {
-            agentActions.append(LocalAgentAction(name: "Custom action", prompt: "", kind: .custom))
+            agentActions.append(LocalAgentAction(name: String(localized: "Custom action"), prompt: "", kind: .custom))
         }
 
         func removeAgentAction(id: UUID) {
@@ -129,7 +129,7 @@
                 guard var workspace = try await prepareWorkspace(for: pullRequest) else { return false }
                 try Task.checkCancellation()
                 if let warning = workspace.updateWarning {
-                    let choice = dependencies.chooseWorkspaceUpdate(warning)
+                    let choice = dependencies.chooseWorkspaceUpdate(warning, workspace.isManaged)
                     try Task.checkCancellation()
                     switch choice {
                     case .cancel:
@@ -137,7 +137,7 @@
                     case .openUnchanged:
                         break
                     case .forceUpdate:
-                        guard dependencies.confirmForceUpdate(workspace.url) else { return false }
+                        guard workspace.isManaged, dependencies.confirmForceUpdate(workspace.url) else { return false }
                         try Task.checkCancellation()
                         workspace = try await dependencies.forceUpdateWorkspace(pullRequest.url, workspace)
                         try Task.checkCancellation()
@@ -162,25 +162,25 @@
             switch destination {
             case .editor:
                 guard let editor = selectedEditor else {
-                    throw LocalActionError(message: "Select an installed editor in Settings → Local actions.")
+                    throw LocalActionError(message: String(localized: "Select an installed editor in Settings → Local actions."))
                 }
                 return .editor(editor)
             case let .agent(action):
                 guard action.hasPrompt else {
-                    throw LocalActionError(message: "Enter a prompt for this action in Settings before launching it.")
+                    throw LocalActionError(message: String(localized: "Enter a prompt for this action in Settings before launching it."))
                 }
                 let program = ompPath.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !program.isEmpty else {
-                    throw LocalActionError(message: "Enter the OMP executable path in Settings.")
+                    throw LocalActionError(message: String(localized: "Enter the OMP executable path in Settings."))
                 }
-                let executable = program.hasPrefix("~") ? try expandedAbsolutePath(program, label: "OMP executable") : program
+                let executable = program.hasPrefix("~") ? try expandedAbsolutePath(program, label: String(localized: "OMP executable")) : program
                 return .agent(action, executable: executable)
             }
         }
 
         private func prepareWorkspace(for pullRequest: PullRequest) async throws -> LocalWorkspaceService.PreparedWorkspace? {
             let identity = try LocalWorkspaceService.identity(for: pullRequest.url)
-            let root = try URL(fileURLWithPath: expandedAbsolutePath(workspacePath, label: "Workspace root"), isDirectory: true)
+            let root = try URL(fileURLWithPath: expandedAbsolutePath(workspacePath, label: String(localized: "Workspace root")), isDirectory: true)
             var candidate = repositoryMappings.first(where: { $0.id == identity.repositoryKey })
                 .map { URL(fileURLWithPath: $0.path, isDirectory: true) }
                 ?? chooseRepository(for: identity.repositoryKey)
@@ -197,7 +197,9 @@
                     continue
                 }
                 try Task.checkCancellation()
-                try await dependencies.registerWorkspace(pullRequest, workspace)
+                if workspace.isManaged {
+                    try await dependencies.registerWorkspace(pullRequest, workspace)
+                }
                 try Task.checkCancellation()
                 return workspace
             }
@@ -224,7 +226,7 @@
             let value = path.trimmingCharacters(in: .whitespacesAndNewlines)
             let expanded = (value as NSString).expandingTildeInPath
             guard expanded.hasPrefix("/"), !expanded.contains("\0") else {
-                throw LocalActionError(message: "\(label) must be an absolute path or begin with ~/.")
+                throw LocalActionError(message: String(localized: "\(label) must be an absolute path or begin with ~/."))
             }
             return expanded
         }

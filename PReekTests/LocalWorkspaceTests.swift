@@ -19,6 +19,340 @@
             }
         }
 
+        @Test func managedUpdatesIgnoreInstalledDependencies() async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let workspace = try await fixture.prepare()
+            try Data("node_modules/\n".utf8).write(to: fixture.clone.appendingPathComponent(".git/info/exclude"))
+            let dependency = workspace.url.appendingPathComponent("node_modules/keep")
+            try FileManager.default.createDirectory(at: dependency.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try Data("installed\n".utf8).write(to: dependency)
+            try await fixture.advanceRemote()
+            let updated = try await fixture.prepare()
+            #expect(updated.updateWarning == nil)
+            #expect(try await Fixture.git(updated.url, ["rev-parse", "HEAD"]) == fixture.head)
+            #expect(try String(contentsOf: dependency, encoding: .utf8) == "installed\n")
+        }
+
+        @Test(arguments: ["completed", "rebase-merge", "rebase-apply"])
+        func updatesAfterCompletedRebaseButPreservesActiveRebases(_ state: String) async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let original = try await fixture.prepare()
+            try await fixture.advanceRemote()
+            let registration = try await LocalWorkspaceSafety.gitPath(original.url, "--absolute-git-dir")
+            let rebaseHead = registration.appendingPathComponent("REBASE_HEAD")
+            let saved = Data((original.headSHA + "\n").utf8)
+            try saved.write(to: rebaseHead)
+            if state != "completed" {
+                try FileManager.default.createDirectory(at: registration.appendingPathComponent(state), withIntermediateDirectories: false)
+            }
+            let reopened = try await fixture.prepare()
+            #expect(reopened.url == original.url)
+            #expect(try Data(contentsOf: rebaseHead) == saved)
+            if state == "completed" {
+                #expect(reopened.updateWarning == nil)
+                #expect(reopened.headSHA == fixture.head)
+                #expect(try await Fixture.git(reopened.url, ["rev-parse", "HEAD"]) == fixture.head)
+            } else {
+                #expect(reopened.updateWarning != nil)
+                #expect(reopened.headSHA == original.headSHA)
+                #expect(try await Fixture.git(reopened.url, ["rev-parse", "HEAD"]) == original.headSHA)
+                #expect(LocalWorkspaceSafety.exists(registration.appendingPathComponent(state)))
+            }
+        }
+
+        @Test(arguments: ["same-repository", "fork", "renamed", "no-upstream", "no-upstream-first-use", "linked-worktree"])
+        func prefersExistingPRBranchWithoutReconfiguringIt(_ scenario: String) async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let branch = "feature/review-fixes"
+            let headRepository = scenario == "fork" ? "contributor/fork" : "owner/repo"
+            let details = LocalWorkspaceService.Metadata(
+                headSHA: fixture.head, baseSHA: fixture.base, title: "Review",
+                pushDestination: .init(repository: headRepository, branch: branch)
+            )
+            // Also prove preference over an already-created managed worktree.
+            let managed: LocalWorkspaceService.PreparedWorkspace?
+            if scenario == "no-upstream-first-use" {
+                managed = nil
+            } else {
+                managed = try await LocalWorkspaceService.shared.prepare(
+                    pullRequestURL: fixture.request, clone: fixture.clone, root: fixture.root
+                ) { details }
+            }
+            try await fixture.advanceRemote()
+            let localBranch = scenario == "renamed" ? "my-local-review" : branch
+            let checkout: URL
+            if scenario == "linked-worktree" {
+                checkout = fixture.directory.appendingPathComponent("user checkout")
+                _ = try await Fixture.git(fixture.clone, ["worktree", "add", "-b", localBranch, checkout.path, fixture.base])
+            } else {
+                checkout = fixture.clone
+                _ = try await Fixture.git(checkout, ["switch", "-c", localBranch, fixture.base])
+            }
+            let remote = scenario == "fork" ? "contributor" : "origin"
+            if scenario == "fork" {
+                _ = try await Fixture.git(checkout, ["remote", "add", remote, "git@fixture.invalid:contributor/fork.git"])
+            }
+            if !scenario.hasPrefix("no-upstream") {
+                _ = try await Fixture.git(checkout, ["config", "branch.\(localBranch).remote", remote])
+                _ = try await Fixture.git(checkout, ["config", "branch.\(localBranch).merge", "refs/heads/\(branch)"])
+            }
+            let configuration = try Data(contentsOf: fixture.clone.appendingPathComponent(".git/config"))
+            let worktrees = try await Fixture.git(checkout, ["worktree", "list", "--porcelain"])
+                .components(separatedBy: "\n").filter { $0.hasPrefix("worktree ") }
+            let updated = LocalWorkspaceService.Metadata(
+                headSHA: fixture.head, baseSHA: fixture.base, title: "Review",
+                pushDestination: details.pushDestination
+            )
+            let workspace = try await LocalWorkspaceService.shared.prepare(
+                pullRequestURL: fixture.request, clone: checkout, root: fixture.root
+            ) { updated }
+            #expect(workspace.url.path == checkout.path)
+            #expect(!workspace.isManaged)
+            #expect(workspace.headSHA == fixture.head && workspace.updateWarning == nil)
+            #expect(!workspace.state.path.hasPrefix(checkout.path + "/"))
+            #expect(try await Fixture.git(checkout, ["symbolic-ref", "--short", "HEAD"]) == localBranch)
+            #expect(try await Fixture.git(checkout, ["rev-parse", "HEAD"]) == fixture.head)
+            #expect(try Data(contentsOf: fixture.clone.appendingPathComponent(".git/config")) == configuration)
+            if let managed {
+                #expect(try await Fixture.git(managed.url, ["rev-parse", "HEAD"]) == details.headSHA)
+            }
+            let remainingWorktrees = try await Fixture.git(checkout, ["worktree", "list", "--porcelain"])
+                .components(separatedBy: "\n").filter { $0.hasPrefix("worktree ") }
+            #expect(remainingWorktrees == worktrees)
+        }
+
+        @Test(arguments: [false, true])
+        func repeatedExistingCheckoutActionsReuseStateWithoutLosingData(differentPullRequest: Bool) async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let metadata = try await fixture.checkOutPR()
+            let first = try await LocalWorkspaceService.shared.prepare(
+                pullRequestURL: fixture.request, clone: fixture.clone, root: fixture.root
+            ) { metadata }
+            let sentinel = first.state.appendingPathComponent("keep")
+            try Data("existing action state\n".utf8).write(to: sentinel)
+            let request = differentPullRequest ? URL(string: "https://fixture.invalid/owner/repo/pull/2")! : fixture.request
+            if differentPullRequest {
+                _ = try await Fixture.git(fixture.clone, ["push", fixture.remote.path, "HEAD:refs/pull/2/head"])
+            }
+            let reopened = try await LocalWorkspaceService.shared.prepare(
+                pullRequestURL: request, clone: fixture.clone, root: fixture.root
+            ) { metadata }
+            #expect(reopened.url.path == fixture.clone.path)
+            #expect(!reopened.isManaged)
+            #expect(reopened.updateWarning == nil)
+            #expect(reopened.headSHA == fixture.head)
+            #expect(try String(contentsOf: sentinel, encoding: .utf8) == "existing action state\n")
+            if differentPullRequest {
+                #expect(reopened.state != first.state)
+            } else {
+                #expect(reopened.state == first.state)
+            }
+        }
+
+        @Test(arguments: [false, true])
+        func existingCheckoutUpdatesWithIgnoredFilesButNeverOverwritesThem(collision: Bool) async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let original = try await fixture.checkOutPR()
+            let incomingPath = collision ? "ignored.txt" : "tracked.txt"
+            try Data("remote change\n".utf8).write(to: fixture.clone.appendingPathComponent(incomingPath))
+            _ = try await Fixture.git(fixture.clone, ["add", incomingPath])
+            _ = try await Fixture.git(fixture.clone, ["commit", "-m", "remote update"])
+            let updated = try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"])
+            _ = try await Fixture.git(fixture.clone, ["push", fixture.remote.path, "HEAD:refs/pull/1/head"])
+            _ = try await Fixture.git(fixture.clone, ["reset", "--hard", original.headSHA])
+            try Data("ignored.txt\n".utf8).write(to: fixture.clone.appendingPathComponent(".git/info/exclude"))
+            let ignored = fixture.clone.appendingPathComponent("ignored.txt")
+            try Data("precious ignored data\n".utf8).write(to: ignored)
+            let metadata = LocalWorkspaceService.Metadata(
+                headSHA: updated, baseSHA: original.baseSHA, title: "Review", pushDestination: original.pushDestination
+            )
+            if collision {
+                await #expect(throws: LocalActionError.self) {
+                    _ = try await LocalWorkspaceService.shared.prepare(
+                        pullRequestURL: fixture.request, clone: fixture.clone, root: fixture.root
+                    ) { metadata }
+                }
+                #expect(try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"]) == original.headSHA)
+            } else {
+                let workspace = try await LocalWorkspaceService.shared.prepare(
+                    pullRequestURL: fixture.request, clone: fixture.clone, root: fixture.root
+                ) { metadata }
+                #expect(workspace.updateWarning == nil)
+                #expect(workspace.url.path == fixture.clone.path)
+                #expect(workspace.headSHA == updated)
+                #expect(try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"]) == updated)
+                #expect(try String(contentsOf: fixture.clone.appendingPathComponent("tracked.txt"), encoding: .utf8) == "remote change\n")
+            }
+            #expect(try String(contentsOf: ignored, encoding: .utf8) == "precious ignored data\n")
+        }
+
+        @Test(arguments: ["wrong-fork", "wrong-branch", "detached"])
+        func unrelatedCheckoutStillUsesManagedWorktree(_ scenario: String) async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let branch = "feature/review-fixes"
+            if scenario == "detached" {
+                _ = try await Fixture.git(fixture.clone, ["switch", "--detach", fixture.head])
+            } else {
+                _ = try await Fixture.git(fixture.clone, ["switch", "-c", branch, fixture.head])
+                _ = try await Fixture.git(fixture.clone, ["config", "branch.\(branch).remote", "origin"])
+                _ = try await Fixture.git(fixture.clone, [
+                    "config", "branch.\(branch).merge", "refs/heads/\(scenario == "wrong-branch" ? "another" : branch)",
+                ])
+            }
+            let details = LocalWorkspaceService.Metadata(
+                headSHA: fixture.head, baseSHA: fixture.base, title: "Review",
+                pushDestination: .init(repository: scenario == "wrong-fork" ? "contributor/fork" : "owner/repo", branch: branch)
+            )
+            let workspace = try await LocalWorkspaceService.shared.prepare(
+                pullRequestURL: fixture.request, clone: fixture.clone, root: fixture.root
+            ) { details }
+            #expect(workspace.isManaged && workspace.url != fixture.clone)
+            #expect(try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"]) == fixture.head)
+        }
+
+        @Test(arguments: ["modified", "ignored", "index-lock", "merge", "local-ahead", "diverged"])
+        func existingCheckoutPreservesLocalDataAndHistory(_ scenario: String) async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let details = try await fixture.checkOutPR()
+            let original = fixture.head
+            let registration = try await LocalWorkspaceSafety.gitPath(fixture.clone, "--absolute-git-dir")
+            switch scenario {
+            case "modified":
+                try Data("unfinished\n".utf8).write(to: fixture.clone.appendingPathComponent("tracked.txt"))
+            case "ignored":
+                try Data("ignored.txt\n".utf8).write(to: registration.appendingPathComponent("info/exclude"))
+                try Data("precious\n".utf8).write(to: fixture.clone.appendingPathComponent("ignored.txt"))
+            case "index-lock":
+                try Data("held\n".utf8).write(to: registration.appendingPathComponent("index.lock"))
+            case "merge":
+                try Data((fixture.base + "\n").utf8).write(to: registration.appendingPathComponent("MERGE_HEAD"))
+            default:
+                _ = try await Fixture.git(fixture.clone, ["commit", "--allow-empty", "-m", "local work"])
+            }
+            let expected = try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"])
+            let remoteHead: String
+            if scenario == "diverged" {
+                let tree = try await Fixture.git(fixture.clone, ["rev-parse", "\(original)^{tree}"])
+                remoteHead = try await Fixture.git(fixture.clone, ["commit-tree", tree, "-p", original, "-m", "remote work"])
+                _ = try await Fixture.git(fixture.clone, ["push", fixture.remote.path, "\(remoteHead):refs/pull/1/head"])
+            } else {
+                remoteHead = original
+            }
+            let metadata = LocalWorkspaceService.Metadata(
+                headSHA: remoteHead, baseSHA: fixture.base, title: "Review", pushDestination: details.pushDestination
+            )
+            let workspace = try await LocalWorkspaceService.shared.prepare(
+                pullRequestURL: fixture.request, clone: fixture.clone, root: fixture.root
+            ) { metadata }
+            #expect(workspace.url.path == fixture.clone.path)
+            #expect(!workspace.isManaged)
+            #expect(workspace.headSHA == expected)
+            #expect(try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"]) == expected)
+            #expect((workspace.updateWarning == nil) == (scenario == "local-ahead" || scenario == "ignored"))
+            if scenario == "modified" {
+                #expect(try String(contentsOf: fixture.clone.appendingPathComponent("tracked.txt"), encoding: .utf8) == "unfinished\n")
+            } else if scenario == "ignored" {
+                #expect(try String(contentsOf: fixture.clone.appendingPathComponent("ignored.txt"), encoding: .utf8) == "precious\n")
+            } else if scenario == "index-lock" {
+                #expect(try String(contentsOf: registration.appendingPathComponent("index.lock"), encoding: .utf8) == "held\n")
+            }
+            await #expect(throws: LocalActionError.self) {
+                _ = try await LocalWorkspaceService.shared.forceUpdate(pullRequestURL: fixture.request, workspace: workspace) {
+                    Issue.record("User-owned checkout force update must fail before fetching")
+                    return metadata
+                }
+            }
+            #expect(try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"]) == expected)
+        }
+
+        @Test(arguments: ["branch", "upstream", "head", "edit"])
+        func existingCheckoutRevalidatesAfterFetching(_ change: String) async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let oldDetails = try await fixture.checkOutPR()
+            let original = fixture.head
+            _ = try await Fixture.git(fixture.clone, ["commit", "--allow-empty", "-m", "remote advance"])
+            fixture.head = try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"])
+            _ = try await Fixture.git(fixture.clone, ["push", fixture.remote.path, "HEAD:refs/pull/1/head"])
+            _ = try await Fixture.git(fixture.clone, ["reset", "--hard", original])
+            let snapshots = MetadataSnapshots(
+                initial: oldDetails,
+                refreshed: .init(headSHA: fixture.head, baseSHA: fixture.base, title: "Review", pushDestination: oldDetails.pushDestination)
+            )
+            let prepare: @Sendable () async throws -> LocalWorkspaceService.PreparedWorkspace = {
+                try await LocalWorkspaceService.shared.prepare(
+                    pullRequestURL: fixture.request, clone: fixture.clone, root: fixture.root
+                ) {
+                    let details = await snapshots.next()
+                    if await snapshots.requests == 2 {
+                        switch change {
+                        case "branch":
+                            _ = try await Fixture.git(fixture.clone, ["switch", "-c", "unrelated"])
+                        case "upstream":
+                            _ = try await Fixture.git(fixture.clone, ["config", "branch.feature/review-fixes.merge", "refs/heads/other"])
+                        case "head":
+                            _ = try await Fixture.git(fixture.clone, ["commit", "--allow-empty", "-m", "concurrent local work"])
+                        default:
+                            try Data("concurrent edit\n".utf8).write(to: fixture.clone.appendingPathComponent("tracked.txt"))
+                        }
+                    }
+                    return details
+                }
+            }
+            if change == "branch" || change == "upstream" {
+                await #expect(throws: LocalActionError.self) { _ = try await prepare() }
+                #expect(try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"]) == original)
+            } else {
+                let workspace = try await prepare()
+                #expect(workspace.updateWarning != nil)
+                #expect(try await workspace.headSHA == Fixture.git(fixture.clone, ["rev-parse", "HEAD"]))
+                if change == "head" {
+                    #expect(try await Fixture.git(fixture.clone, ["log", "-1", "--format=%s"]) == "concurrent local work")
+                } else {
+                    #expect(try String(contentsOf: fixture.clone.appendingPathComponent("tracked.txt"), encoding: .utf8) == "concurrent edit\n")
+                }
+            }
+        }
+
+        @Test(arguments: ["metadata", "fetch", "state-inside-checkout", "state-symlink", "state-file"])
+        func existingCheckoutFailuresNeverFallBackToResettingIt(_ failure: String) async throws {
+            let fixture = try await Fixture()
+            defer { fixture.remove() }
+            let details = try await fixture.checkOutPR()
+            if failure == "fetch" {
+                try FileManager.default.removeItem(at: fixture.remote)
+            }
+            if failure == "state-symlink" {
+                try FileManager.default.createDirectory(at: fixture.root, withIntermediateDirectories: true)
+                try FileManager.default.createSymbolicLink(at: fixture.root.appendingPathComponent(".preek-existing"), withDestinationURL: fixture.clone)
+            } else if failure == "state-file" {
+                try FileManager.default.createDirectory(at: fixture.root, withIntermediateDirectories: true)
+                try Data("keep file\n".utf8).write(to: fixture.root.appendingPathComponent(".preek-existing"))
+            }
+            let root = failure == "state-inside-checkout" ? fixture.clone.appendingPathComponent("must-not-create") : fixture.root
+            await #expect(throws: (any Error).self) {
+                _ = try await LocalWorkspaceService.shared.prepare(pullRequestURL: fixture.request, clone: fixture.clone, root: root) {
+                    if failure == "metadata" {
+                        throw LocalActionError(message: "offline")
+                    }
+                    return details
+                }
+            }
+            #expect(try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"]) == fixture.head)
+            #expect(!LocalWorkspaceSafety.exists(fixture.clone.appendingPathComponent("must-not-create")))
+            #expect(!LocalWorkspaceSafety.exists(fixture.clone.appendingPathComponent("fixture.invalid")))
+            if failure == "state-file" {
+                #expect(try String(contentsOf: fixture.root.appendingPathComponent(".preek-existing"), encoding: .utf8) == "keep file\n")
+            }
+        }
+
         @Test(arguments: [
             ("  Fix: Café / Refunds! 🚀  ", "fix-cafe-refunds--pr-2147483647"),
             ("ＦＩＸ refund", "fix-refund--pr-2147483647"),
@@ -93,7 +427,7 @@
                 try Data("/unrelated/.git\n".utf8).write(to: registration.appendingPathComponent("gitdir"))
             }
             let forged = try LocalWorkspaceService.PreparedWorkspace(
-                layout: scenario == "foreign-registration" ? workspace.layout
+                layout: scenario == "foreign-registration" ? #require(workspace.layout)
                     : LocalWorkspaceSafety.Layout(root: selected, identity: LocalWorkspaceService.identity(for: fixture.request)),
                 clone: workspace.clone,
                 headSHA: workspace.headSHA, baseSHA: workspace.baseSHA
@@ -151,10 +485,8 @@
             }
             try await fixture.advanceRemote(replacingHead: true, advanceBase: true)
             let main = try await Fixture.git(fixture.clone, ["rev-parse", "HEAD"])
-            let skipped = try await fixture.reuseOffline()
-            #expect(skipped.updateWarning != nil)
             let metadata = LocalWorkspaceService.Metadata(headSHA: fixture.head, baseSHA: fixture.base, title: "Untitled")
-            let updated = try await LocalWorkspaceService.shared.forceUpdate(pullRequestURL: fixture.request, workspace: skipped) { metadata }
+            let updated = try await LocalWorkspaceService.shared.forceUpdate(pullRequestURL: fixture.request, workspace: workspace) { metadata }
             let identity = try LocalWorkspaceService.identity(for: fixture.request)
             #expect(updated.updateWarning == nil)
             #expect(try await Fixture.git(updated.url, ["rev-parse", "HEAD"]) == fixture.head)
@@ -235,7 +567,7 @@
         }
 
         @Test(arguments: [
-            "modified", "staged", "untracked", "ignored", "assume-unchanged", "skip-worktree",
+            "modified", "staged", "untracked", "assume-unchanged", "skip-worktree",
             "submodule", "locked", "index-lock", "merge", "rebase",
         ])
         func unsafeCheckoutsSkipRefreshOfflineAndPreserveData(_ scenario: String) async throws {
@@ -257,9 +589,6 @@
                 }
             case "untracked":
                 try Data("precious local data\n".utf8).write(to: workspace.url.appendingPathComponent("untracked.txt"))
-            case "ignored":
-                try Data("ignored.txt\n".utf8).write(to: fixture.clone.appendingPathComponent(".git/info/exclude"))
-                try Data("precious local data\n".utf8).write(to: workspace.url.appendingPathComponent("ignored.txt"))
             case "submodule":
                 _ = try await Fixture.git(workspace.url, ["update-index", "--add", "--cacheinfo", "160000", originalHead, "submodule"])
             case "locked", "index-lock", "merge":
@@ -282,8 +611,8 @@
             if scenario == "staged" {
                 #expect(try await Fixture.git(workspace.url, ["show", ":tracked.txt"]) == "precious local data")
             }
-            if scenario == "untracked" || scenario == "ignored" {
-                #expect(try String(contentsOf: workspace.url.appendingPathComponent("\(scenario).txt"), encoding: .utf8) == "precious local data\n")
+            if scenario == "untracked" {
+                #expect(try String(contentsOf: workspace.url.appendingPathComponent("untracked.txt"), encoding: .utf8) == "precious local data\n")
             }
         }
 
@@ -465,6 +794,17 @@
             func prepare(root: URL? = nil, title: String = "Untitled") async throws -> LocalWorkspaceService.PreparedWorkspace {
                 let metadata = LocalWorkspaceService.Metadata(headSHA: head, baseSHA: base, title: title)
                 return try await LocalWorkspaceService.shared.prepare(pullRequestURL: request, clone: clone, root: root ?? self.root) { metadata }
+            }
+
+            func checkOutPR() async throws -> LocalWorkspaceService.Metadata {
+                let branch = "feature/review-fixes"
+                _ = try await Self.git(clone, ["switch", "-c", branch, head])
+                _ = try await Self.git(clone, ["config", "branch.\(branch).remote", "origin"])
+                _ = try await Self.git(clone, ["config", "branch.\(branch).merge", "refs/heads/\(branch)"])
+                return LocalWorkspaceService.Metadata(
+                    headSHA: head, baseSHA: base, title: "Review",
+                    pushDestination: .init(repository: "owner/repo", branch: branch)
+                )
             }
 
             func installCheckoutHook(_ body: String) throws {

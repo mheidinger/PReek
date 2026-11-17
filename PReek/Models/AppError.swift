@@ -52,7 +52,7 @@ enum AppError: LocalizedError {
         case .rateLimited:
             return String(localized: "GitHub limits API usage per hour. Wait a while before refreshing again.")
         case .failedToImportShareData:
-            return "Please verify you are using the latest version of the app on both devices. If the issue persists, please report the issue."
+            return String(localized: "Please verify you are using the latest version of the app on both devices. If the issue persists, please report the issue.")
         default:
             return nil
         }

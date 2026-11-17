@@ -75,7 +75,7 @@
                     showError: { error in
                         preconditionFailure("Alerts are forbidden during local actions rendering: \(error)")
                     },
-                    chooseWorkspaceUpdate: { _ in
+                    chooseWorkspaceUpdate: { _, _ in
                         preconditionFailure("Workspace update choices are forbidden during local actions rendering.")
                     },
                     confirmForceUpdate: { _ in

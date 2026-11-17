@@ -21,19 +21,19 @@
         private var workspaceSettings: some View {
             Section("Local actions") {
                 TextField("Workspace root", text: $localActions.workspacePath)
-                    .help("Persistent PR worktrees are created below this folder. An absolute path or ~/ is supported.")
+                    .help("Managed PR worktrees and action state are stored below this folder. Existing checkouts stay in place. An absolute path or ~/ is supported.")
                 editorPicker
                 Text("Installed supported editors are detected automatically and opened directly; no editor CLI installation is needed.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text("Requires Git and a configured GitHub account. Agent actions also require Ghostty 1.3 or newer and OMP. PReek prepares the shared PR worktree before opening either application.")
+                Text("Requires Git and a configured GitHub account. Agent actions also require Ghostty 1.3 or newer and OMP. PReek prefers the mapped checkout when it is verified to be on the PR's head branch; otherwise it prepares a shared PR worktree.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Toggle("Automatically clean up worktrees", isOn: Binding(
                     get: { cleanup.enabled },
                     set: { cleanup.setEnabled($0) }
                 ))
-                Text("Removes unchanged worktrees after a PR has been closed, merged, or untracked for 24 hours. Checks after successful refreshes while PReek is running, including after enabling cleanup. Open editors and agents do not prevent cleanup; unsaved buffers are not protected.")
+                Text("Removes unchanged managed worktrees after a PR has been closed, merged, or untracked for 24 hours. Existing checkouts are never automatically cleaned up. Checks after successful refreshes while PReek is running, including after enabling cleanup. Open editors and agents do not prevent cleanup; unsaved buffers are not protected.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -43,7 +43,7 @@
         private var editorPicker: some View {
             Picker("Editor", selection: $localActions.selectedEditorID) {
                 if localActions.selectedEditor == nil {
-                    Text(localActions.selectedEditorID == nil ? "No installed editors found" : "Selected editor not installed")
+                    Text(localActions.selectedEditorID == nil ? String(localized: "No installed editors found") : String(localized: "Selected editor not installed"))
                         .tag(localActions.selectedEditorID)
                 }
                 ForEach(localActions.installedEditors) { editor in
@@ -88,7 +88,7 @@
                 ForEach(localActions.repositoryMappings.sorted(by: { $0.id < $1.id })) { mapping in
                     repositoryRow(mapping)
                 }
-                Text("Mappings are separate for each GitHub host and owner/repository. Forgetting a mapping does not delete its clone or any worktree. Clean worktrees update before opening. For local changes, choose Open Unchanged, Force Update, or Cancel. Confirming Force Update deletes all uncommitted workspace data, including ignored files and submodule data; the committed HEAD is backed up.")
+                Text("Mappings are separate for each GitHub host and owner/repository. Forgetting a mapping does not delete its clone or any worktree. Existing PR-branch checkouts update by fast-forward only and are never force-updated or automatically cleaned up. If an update is unsafe, choose Open Unchanged or Cancel. Only managed worktrees offer Force Update, which deletes all uncommitted workspace data, including ignored files and submodule data; the committed HEAD is backed up.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

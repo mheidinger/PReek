@@ -12,7 +12,7 @@
         ) throws -> String {
             let shellName = URL(fileURLWithPath: shell).lastPathComponent
             guard ["zsh", "bash", "sh", "ksh", "fish"].contains(shellName) else {
-                throw LocalActionError(message: "The login shell must be bash, zsh, sh, ksh, or fish.")
+                throw LocalActionError(message: String(localized: "The login shell must be bash, zsh, sh, ksh, or fish."))
             }
             let arguments = [executable, "--cwd", workspace.path, "--append-system-prompt", instructions.path]
                 + attachments.map { "@" + $0.path }
